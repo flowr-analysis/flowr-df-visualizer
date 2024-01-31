@@ -3,9 +3,27 @@ import '../css/main.css';
 import React from 'react';
 import { MainContainerComponent } from './components/mainContainerComponent';
 import { GraphViewComponent } from './components/graphComponent';
+import { FileAnalysisRequestMessage } from '@eagleoutice/flowr/cli/repl/server/messages/analysis';
 
 function initialize() {
    console.log('initialize');
+}
+
+try {
+  let socket = new WebSocket("ws://flowr.informatik.uni-ulm.de:1042");
+  socket.onmessage = function(event) {
+    console.log(event.data);
+  }
+  const msg: FileAnalysisRequestMessage = {
+    id:       '1',
+    type:     'request-file-analysis',
+    content:  'x <- 2 * 3; x',
+    filename: 'test.R',
+    format:   'json'
+  }
+  socket.send(JSON.stringify(msg));
+} catch (e) {
+  console.error(e);
 }
 
 // borderline graph :D
