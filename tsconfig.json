@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"target": "ESNext",
+		"strict": true,
+		"sourceMap": true,
+		"jsx": "react-jsx",
+		"jsxImportSource": "react",
+		"allowJs": true,
+		"downlevelIteration": true,
+		"esModuleInterop": true,
+		"moduleResolution": "Node"
+	},
+	"exclude": ["test"]
+}
