@@ -4,24 +4,27 @@ import React from 'react';
 import { MainContainerComponent } from './components/mainContainerComponent';
 import { GraphViewComponent } from './components/graphComponent';
 import { FileAnalysisRequestMessage } from '@eagleoutice/flowr/cli/repl/server/messages/analysis';
+import { DataflowGraph } from '@eagleoutice/flowr';
 
 function initialize() {
    console.log('initialize');
 }
 
 try {
-  let socket = new WebSocket("ws://flowr.informatik.uni-ulm.de:1042");
+  // flowr.informatik.uni-ulm.de
+  let socket = new WebSocket("ws://127.0.0.1:1042");
   socket.onmessage = function(event) {
     console.log(event.data);
+    const msg: FileAnalysisRequestMessage = {
+      id:       '1',
+      type:     'request-file-analysis',
+      content:  'x <- 2 * 3; x',
+      filename: 'test.R',
+      format:   'json'
+    }
+    // socket.send(JSON.stringify(msg) + "\n");
+    console.log('SEND YEAH');
   }
-  const msg: FileAnalysisRequestMessage = {
-    id:       '1',
-    type:     'request-file-analysis',
-    content:  'x <- 2 * 3; x',
-    filename: 'test.R',
-    format:   'json'
-  }
-  socket.send(JSON.stringify(msg));
 } catch (e) {
   console.error(e);
 }
