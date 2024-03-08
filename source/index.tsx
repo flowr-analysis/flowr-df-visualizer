@@ -6,6 +6,7 @@ import { GraphViewComponent } from './components/graphComponent';
 import { FileAnalysisRequestMessage, FileAnalysisResponseMessageJson } from '@eagleoutice/flowr/cli/repl/server/messages/analysis';
 import { FlowrHelloResponseMessage } from '@eagleoutice/flowr/cli/repl/server/messages/hello';
 import { DataflowGraph } from '@eagleoutice/flowr';
+import { transformToVisualizazionGraph } from './components/model/graphTransformer';
 
 function initialize() {
    console.log('initialize');
@@ -30,6 +31,9 @@ try {
     if(parsedJson.type === 'response-file-analysis'){
       const requestResponse: FileAnalysisResponseMessageJson = parsedJson
       console.log(JSON.stringify(requestResponse.results.dataflow.graph))
+      //const dataflowGraph: DataflowGraph = new DataflowGraph(requestResponse.results.dataflow.graph)
+      const visualizationGraph = transformToVisualizazionGraph(requestResponse.results.dataflow.graph)
+      console.log(JSON.stringify(visualizationGraph))
     }
 
     console.log(event.data);
@@ -141,6 +145,17 @@ const graphSeries = {
    ]
  }
 
+
+ const graphSeriesExample = {
+  tooltip: {},
+  series: {
+    name: 'randomCheck', 
+    type: 'graph',
+    layout: 'none',
+    data: {},
+    links: {}
+  }
+}
 const graphRef: React.RefObject<GraphViewComponent> = React.createRef();
 
 const main = document.createElement('div');
