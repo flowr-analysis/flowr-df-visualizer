@@ -3,27 +3,41 @@ import '../css/main.css';
 import React from 'react';
 import { MainContainerComponent } from './components/mainContainerComponent';
 import { GraphViewComponent } from './components/graphComponent';
-import { FileAnalysisRequestMessage } from '@eagleoutice/flowr/cli/repl/server/messages/analysis';
+import { FileAnalysisRequestMessage, FileAnalysisResponseMessageJson } from '@eagleoutice/flowr/cli/repl/server/messages/analysis';
+import { FlowrHelloResponseMessage } from '@eagleoutice/flowr/cli/repl/server/messages/hello';
 import { DataflowGraph } from '@eagleoutice/flowr';
 
 function initialize() {
    console.log('initialize');
 }
 
+const msg: FileAnalysisRequestMessage = {
+  id:       '1',
+  type:     'request-file-analysis',
+  content:  'x <- 2 * 3; x',
+  filename: 'test.R',
+  format:   'json'
+}
+let socket: WebSocket
+
 try {
   // flowr.informatik.uni-ulm.de
-  let socket = new WebSocket("ws://127.0.0.1:1042");
+  socket = new WebSocket("ws://127.0.0.1:1042");
   socket.onmessage = function(event) {
-    console.log(event.data);
-    const msg: FileAnalysisRequestMessage = {
-      id:       '1',
-      type:     'request-file-analysis',
-      content:  'x <- 2 * 3; x',
-      filename: 'test.R',
-      format:   'json'
+    try{
+
+    const parsedJson = JSON.parse(event.data)
+    if(parsedJson.type === 'response-file-analysis'){
+      const requestResponse: FileAnalysisResponseMessageJson = parsedJson
+      console.log(JSON.stringify(requestResponse.results.dataflow.graph))
     }
+
+    console.log(event.data);
+    } catch (e){
+      console.error(e)
+    }
+    
     // socket.send(JSON.stringify(msg) + "\n");
-    console.log('SEND YEAH');
   }
 } catch (e) {
   console.error(e);
@@ -136,7 +150,10 @@ const root = createRoot(main);
 
 root.render(
    <MainContainerComponent initialize={initialize}>
-      <button onClick={() => graphRef.current?.updateTreeSeries(graphSeries)}>All</button>
+      <button onClick={() => {
+          graphRef.current?.updateTreeSeries(graphSeries)
+          socket.send(JSON.stringify(msg) + "\n")
+        }}>All</button>
       <GraphViewComponent ref={graphRef} key="pattern" />
    </MainContainerComponent>
 );
