@@ -29,7 +29,7 @@ try {
     const parsedJson = JSON.parse(event.data)
     if(parsedJson.type === 'response-file-analysis'){
       const requestResponse: FileAnalysisResponseMessageJson = parsedJson
-      console.log(requestResponse.results)
+      console.log(JSON.stringify(requestResponse.results.dataflow.graph))
     }
 
     console.log(event.data);
