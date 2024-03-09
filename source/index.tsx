@@ -13,11 +13,16 @@ const flowrGraph: Graph = {
   rootVertices: new Set(['1', '2']),
   vertexInformation: new Map([
     ['1', {name: 'foo', tag: 'use'}],
-    ['2', {name: 'bar', tag: 'use'}]
+    ['2', {name: 'bar', tag: 'use'}],
+    ['4', {name: 'bar', tag: 'use'}],
+    ['5', {name: 'bar', tag: 'use'}],
+    ['3', {name: 'bar', tag: 'use'}],
+    ['9', {name: 'bar', tag: 'use'}],
   ]),
   edgeInformation: new Map([
     ['1', new Map([
-      ['2', {types: {foo: 'foo'}}]
+      ['2', {types: {foo: 'foo'}}],
+      ['9', {types: {foo: 'foo'}}]
     ])]
   ])
 }

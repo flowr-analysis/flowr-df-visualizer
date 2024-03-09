@@ -7,13 +7,14 @@ export interface Graph {
     edgeInformation: Map<string, Map<string, {types: {[key: string]: string}}>>
 }
 
+
 export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
 
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
         /* position will be set by the layout later */
-        const newNode: Node = {id: nodeId, data: { label: nodeInfo.name }, position: { x: 0, y: 0 } }
+        const newNode: Node = {id: nodeId, data: { label: nodeInfo.name }, position: { x: 0, y: 0 }, connectable: false, dragging: true, selectable: true, type: 'exampleNode' }
         visualizationGraph.nodes.push(newNode)
     }
 

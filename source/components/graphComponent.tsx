@@ -1,5 +1,5 @@
 import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
-import { useCallback, useLayoutEffect } from 'react';
+import { ChangeEventHandler, useCallback, useLayoutEffect, useMemo } from 'react';
 import ReactFlow, {
   addEdge,
   Panel,
@@ -9,12 +9,30 @@ import ReactFlow, {
   Edge,
   Node,
   Connection,
+  MiniMap,
+  NodeToolbar,
+  Controls,
+  Background,
+  Position,
+  Handle,
+  NodeProps,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 
 
+function ExampleNode({ data } : { readonly data: NodeProps['data'] }) {
+  return (
+    <>
+      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
+      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px' }}>
+        <label htmlFor="text">{data.label}</label>
+      </div>
+      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
+    </>
+  );
+}
 
 const elk = new ELK();
 
@@ -41,7 +59,7 @@ const elkOptions: LayoutOptions = {
        // direction.
        targetPosition: isHorizontal ? 'left' : 'top',
        sourcePosition: isHorizontal ? 'right' : 'bottom',
-
+       labels: [{ text: node.data.label }],
        // Hardcode a width and height for elk to use when layouting.
        width: 150,
        height: 50,
@@ -53,7 +71,7 @@ const elkOptions: LayoutOptions = {
    return {
        nodes: layoutedGraph.children?.map(node => ({
          ...node,
-         data: { label: node.id },
+         data: { label: node.labels?.[0]?.text },
          // React Flow expects a position property on the node instead of `x`
          // and `y` fields.
          position: { x: node.x ?? 0, y: node.y ?? 0 },
@@ -110,15 +128,22 @@ const elkOptions: LayoutOptions = {
    useLayoutEffect(() => {
      onLayout({ direction: 'DOWN', useInitialNodes: true });
    }, []);
+   /* allows to map custom types */
+   const nodeTypes = useMemo(() => ({ exampleNode: ExampleNode }), []);
 
    return (
      <ReactFlow
        nodes={nodes}
        edges={edges}
+       nodeTypes={nodeTypes}
        onNodesChange={onNodesChange}
        onEdgesChange={onEdgesChange}
+       proOptions={{hideAttribution: true}}
        fitView
      >
+      <Background />
+      <MiniMap />
+      <Controls />
      </ReactFlow>
    );
  }
