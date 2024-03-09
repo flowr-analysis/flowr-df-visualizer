@@ -1,23 +1,27 @@
+import { Edge, Node } from "reactflow";
+import { VisualizationGraph } from "./graph";
+
 export interface Graph {
     rootVertices: Set<string>,
     vertexInformation: Map<string, {name: string, tag: string}>,
     edgeInformation: Map<string, Map<string, {types: {[key: string]: string}}>>
 }
 
-export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph{
+export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
 
-    const visualizationGraph: VisualizationGraph = {nodes:[], links: []}
+    const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
-        const newNode: VisualizationNode = {id: nodeId, name: nodeInfo.name, nodeType: nodeInfo.tag, x: 10, y: 10}
+        /* position will be set by the layout later */
+        const newNode: Node = {id: nodeId, data: { label: nodeInfo.name }, position: { x: 0, y: 0 } }
         visualizationGraph.nodes.push(newNode)
     }
 
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes){
             for( let linkEdgeType in targetNodeInfo.types){
-                const newEdge: VisualizationEdge = {source: sourceNodeId, target: targetNodeId, edgeType: linkEdgeType}
-                visualizationGraph.links.push(newEdge)
+                const newEdge: Edge = {source: sourceNodeId, target: targetNodeId, id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`, label: linkEdgeType, animated: true, style: { stroke: '#000' }, type: 'smoothstep', data: { label: linkEdgeType } }
+                visualizationGraph.edges.push(newEdge)
             }
         }
     }

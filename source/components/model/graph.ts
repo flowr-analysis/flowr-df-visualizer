@@ -1,18 +1,6 @@
-interface VisualizationGraph {
-    nodes: VisualizationNode[]
-    links: VisualizationEdge[]
-}
+import { Edge, Node } from "reactflow";
 
-interface VisualizationNode {
-    id: string
-    name: string
-    nodeType: string
-    x: number,
-    y: number
-}
-
-interface VisualizationEdge {
-    source: string
-    target: string
-    edgeType: string
+export interface VisualizationGraph {
+    nodes: Node[]
+    edges: Edge[]
 }
