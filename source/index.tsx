@@ -1,12 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import '../css/main.css';
-import React from 'react';
 import { MainContainerComponent } from './components/mainContainerComponent';
 import { Graph, transformToVisualizationGraph } from './components/model/graphTransformer';
 import { ReactFlowProvider } from 'reactflow';
 import { LayoutFlow } from './components/graphComponent';
-
-
 
 
 const flowrGraph: Graph = {
@@ -23,6 +20,19 @@ const flowrGraph: Graph = {
     ['1', new Map([
       ['2', {types: {foo: 'foo'}}],
       ['9', {types: {foo: 'foo'}}]
+    ])],
+    ['2', new Map([
+      ['3', {types: {foo: 'foo'}}],
+      ['4', {types: {foo: 'foo'}}]
+    ])],
+    ['4', new Map([
+      ['5', {types: {foo: 'foo'}}]
+    ])],
+    ['5', new Map([
+      ['3', {types: {foo: 'foo'}}]
+    ])],
+    ['9', new Map([
+      ['2', {types: {foo: 'foo'}}]
     ])]
   ])
 }

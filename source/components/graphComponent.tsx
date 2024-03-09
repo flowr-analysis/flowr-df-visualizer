@@ -42,8 +42,8 @@ const elk = new ELK();
 // - https://www.eclipse.org/elk/reference/algorithms.html
 // - https://www.eclipse.org/elk/reference/options.html
 const elkOptions: LayoutOptions = {
-   'elk.algorithm': 'layered',
-   'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+   'elk.algorithm': 'layered', // 'stress',
+   'elk.layered.spacing.nodeNodeBetweenLayers': '50',
    'elk.spacing.nodeNode': '80'
  };
 
@@ -107,7 +107,6 @@ const elkOptions: LayoutOptions = {
    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
    const { fitView } = useReactFlow();
 
-   const onConnect = useCallback((params: Connection) => setEdges(eds => addEdge(params, eds)), []);
    const onLayout = useCallback(
      ({ direction , useInitialNodes = false } : { direction: string, useInitialNodes?: boolean }) => {
        const opts = { 'elk.direction': direction, ...elkOptions };
