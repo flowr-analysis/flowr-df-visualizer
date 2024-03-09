@@ -1,12 +1,14 @@
 interface VisualizationGraph {
     nodes: VisualizationNode[]
-    links: VisualizationEdge[] 
+    links: VisualizationEdge[]
 }
 
 interface VisualizationNode {
     id: string
     name: string
     nodeType: string
+    x: number,
+    y: number
 }
 
 interface VisualizationEdge {
