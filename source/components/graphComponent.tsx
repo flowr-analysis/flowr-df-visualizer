@@ -115,16 +115,10 @@ const elkOptions: LayoutOptions = {
      <ReactFlow
        nodes={nodes}
        edges={edges}
-       onConnect={onConnect}
        onNodesChange={onNodesChange}
        onEdgesChange={onEdgesChange}
        fitView
      >
-       <Panel position="top-right">
-         <button onClick={() => onLayout({ direction: 'DOWN' })}>vertical layout</button>
-
-         <button onClick={() => onLayout({ direction: 'RIGHT' })}>horizontal layout</button>
-       </Panel>
      </ReactFlow>
    );
  }
