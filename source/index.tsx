@@ -9,7 +9,7 @@ import { LayoutFlow } from './components/graphComponent';
 const flowrGraph: Graph = {
   rootVertices: new Set(['1', '2']),
   vertexInformation: new Map([
-    ['1', {name: 'foo', tag: 'use'}],
+    ['1', {name: 'foooooooooooooooooooooooooo', tag: 'use'}],
     ['2', {name: 'bar', tag: 'use'}],
     ['4', {name: 'bar', tag: 'use'}],
     ['5', {name: 'bar', tag: 'use'}],

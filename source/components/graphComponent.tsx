@@ -22,7 +22,7 @@ import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 
 
-function ExampleNode({ data } : { readonly data: NodeProps['data'] }) {
+function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] }) {
   return (
     <>
       <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
@@ -33,6 +33,20 @@ function ExampleNode({ data } : { readonly data: NodeProps['data'] }) {
     </>
   );
 }
+
+function UseNode({ data } : { readonly data: NodeProps['data'] }){
+  return(
+    <>
+      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
+      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px', borderRadius: '20px'}}>
+        <label htmlFor="text">{data.label}</label>
+      </div>
+      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
+    </>
+  )
+}
+
+
 
 const elk = new ELK();
 
@@ -128,7 +142,7 @@ const elkOptions: LayoutOptions = {
      onLayout({ direction: 'DOWN', useInitialNodes: true });
    }, []);
    /* allows to map custom types */
-   const nodeTypes = useMemo(() => ({ exampleNode: ExampleNode }), []);
+   const nodeTypes = useMemo(() => ({ variableDefinitionNode: VariableDefinitionNode, useNode:UseNode }), []);
 
    return (
      <ReactFlow
