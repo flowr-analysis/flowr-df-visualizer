@@ -13,7 +13,7 @@ const flowrGraph: Graph = {
     ['2', {name: 'bar', tag: 'use'}],
     ['4', {name: 'bar', tag: 'use'}],
     ['5', {name: 'bar', tag: 'use'}],
-    ['3', {name: 'bar', tag: 'use'}],
+    ['3', {name: 'bar', tag: 'variable-definition'}],
     ['9', {name: 'bar', tag: 'use'}],
   ]),
   edgeInformation: new Map([
