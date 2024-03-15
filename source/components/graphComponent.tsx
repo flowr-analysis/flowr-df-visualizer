@@ -46,7 +46,31 @@ function UseNode({ data } : { readonly data: NodeProps['data'] }){
   )
 }
 
+function FunctionCallNode({ data } : { readonly data: NodeProps['data'] }){
+  return(
+    <>
+      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
+      <div style={{ border: 'solid 2px', padding: '0px', margin: '0px'}}>
+        <div style= {{width: '3px', float: 'left', border: 'solid 2px', padding: '0px', margin: '0px', height: '18px'}}> </div>
+        <label htmlFor="text">{data.label}</label>
+        <div style= {{width: '3px', float:'right', border: 'solid 2px', padding: '0px', margin: '0px', height: '18px'}}> </div>
+      </div>
+      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
+    </>
+  )
+}
 
+function ExitPointNode({ data } : { readonly data: NodeProps['data'] }) {
+  return (
+    <>
+      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
+      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px', borderStyle: 'dotted' }}>
+        <label htmlFor="text">{data.label}</label>
+      </div>
+      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
+    </>
+  );
+}
 
 const elk = new ELK();
 
@@ -142,7 +166,12 @@ const elkOptions: LayoutOptions = {
      onLayout({ direction: 'DOWN', useInitialNodes: true });
    }, []);
    /* allows to map custom types */
-   const nodeTypes = useMemo(() => ({ variableDefinitionNode: VariableDefinitionNode, useNode:UseNode }), []);
+   const nodeTypes = useMemo(() => ({ 
+    variableDefinitionNode: VariableDefinitionNode, 
+    useNode: UseNode, 
+    functionCallNode: FunctionCallNode,
+    exitPointNode: ExitPointNode
+   }), []);
 
    return (
      <ReactFlow

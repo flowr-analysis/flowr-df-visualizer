@@ -10,11 +10,11 @@ const flowrGraph: Graph = {
   rootVertices: new Set(['1', '2']),
   vertexInformation: new Map([
     ['1', {name: 'foooooooooooooooooooooooooo', tag: 'use'}],
-    ['2', {name: 'bar', tag: 'use'}],
-    ['4', {name: 'bar', tag: 'use'}],
-    ['5', {name: 'bar', tag: 'use'}],
-    ['3', {name: 'bar', tag: 'variable-definition'}],
-    ['9', {name: 'bar', tag: 'use'}],
+    ['2', {name: 'exitPoint', tag: 'exit-point'}],
+    ['4', {name: 'useNode', tag: 'use'}],
+    ['5', {name: 'functionCall', tag: 'function-call'}],
+    ['3', {name: 'variableDefinition', tag: 'variable-definition'}],
+    ['9', {name: 'functionDefinition', tag: 'function-definition'}],
   ]),
   edgeInformation: new Map([
     ['1', new Map([
