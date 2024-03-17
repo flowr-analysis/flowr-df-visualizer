@@ -115,13 +115,14 @@ const elkOptions: LayoutOptions = {
          position: { x: node.x ?? 0, y: node.y ?? 0 },
        })) ?? [],
        edges: (layoutedGraph.edges ?? []).map(e => {
+        const costumEdge: CostumElkExtendedEdge = e as CostumElkExtendedEdge
          return {
            id: e.id,
            source: e.sources[0],
            target: e.targets[0],
            sourceHandle: isHorizontal ? 'right' : 'bottom',
            targetHandle: isHorizontal ? 'left' : 'top',
-           label: e.id,
+           label: costumEdge.label,
            animated: true,
            style: { stroke: '#000' },
            arrowHeadType: 'arrowclosed',
@@ -132,11 +133,13 @@ const elkOptions: LayoutOptions = {
      }
  }
 
- function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {
+ function convertToExtendedEdges(edges: Edge[]): CostumElkExtendedEdge[] {
    return edges.map(edge => ({
      id: edge.id,
      sources: [edge.source],
      targets: [edge.target],
+     label: edge.label as string,
+     edgeType: edge.data.edgeType ?? ''
    }));
  }
 
@@ -188,4 +191,9 @@ const elkOptions: LayoutOptions = {
       <Controls />
      </ReactFlow>
    );
+ }
+
+ interface CostumElkExtendedEdge extends ElkExtendedEdge{
+  label: string
+  edgeType: string
  }
