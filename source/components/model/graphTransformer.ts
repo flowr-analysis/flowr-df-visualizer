@@ -14,7 +14,15 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
         /* position will be set by the layout later */
-        const newNode: Node = {id: nodeId, data: { label: nodeInfo.name }, position: { x: 0, y: 0 }, connectable: false, dragging: true, selectable: true, type: nodeTagMapper(nodeInfo.tag) }
+        const newNode: Node = {
+            id: nodeId, 
+            data: { label: nodeInfo.name }, 
+            position: { x: 0, y: 0 }, 
+            connectable: false, 
+            dragging: true, 
+            selectable: true, 
+            type: nodeTagMapper(nodeInfo.tag) 
+        }
         visualizationGraph.nodes.push(newNode)
     }
 
