@@ -21,16 +21,15 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes){
             for( let linkEdgeType in targetNodeInfo.types){
-                const newEdge: Edge = 
+                const newEdge: Edge =
                     {
-                        source: sourceNodeId, 
-                        target: targetNodeId, 
-                        id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`, 
-                        label: linkEdgeType, 
-                        animated: true, 
-                        style: { stroke: '#000' }, 
-                        type: 'smoothstep', 
-                        data: { label: linkEdgeType, edgeType: linkEdgeType } 
+                        source: sourceNodeId,
+                        target: targetNodeId,
+                        id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`,
+                        label: linkEdgeType,
+                        animated: true,
+                        style: { stroke: '#000' },
+                        data: { label: linkEdgeType, edgeType: linkEdgeType }
                     }
                 visualizationGraph.edges.push(newEdge)
             }

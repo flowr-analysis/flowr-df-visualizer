@@ -1,5 +1,5 @@
 import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
-import { ChangeEventHandler, useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { ChangeEventHandler, useCallback, useLayoutEffect, useMemo } from 'react';
 import ReactFlow, {
   addEdge,
   Panel,
@@ -16,33 +16,31 @@ import ReactFlow, {
   Position,
   Handle,
   NodeProps,
+  getStraightPath,
+  BaseEdge,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-
+import { HandleNodeComponent } from './model/nodes/handleNodeComponent';
 
 function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] }) {
   return (
-    <>
-      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
+    <HandleNodeComponent targetBackgroundColor='red'>
       <div style={{ border: 'solid 2px', padding: '5px', margin: '0px' }}>
         <label htmlFor="text">{data.label}</label>
       </div>
-      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
-    </>
+    </HandleNodeComponent>
   );
 }
 
 function UseNode({ data } : { readonly data: NodeProps['data'] }){
   return(
-    <>
-      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
-      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px', borderRadius: '20px'}}>
+    <HandleNodeComponent targetBackgroundColor='blue'>
+      <div className='use-node label'>
         <label htmlFor="text">{data.label}</label>
       </div>
-      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
-    </>
+    </HandleNodeComponent>
   )
 }
 
@@ -50,21 +48,23 @@ function FunctionCallNode({ data } : { readonly data: NodeProps['data'] }){
   return(
     <>
       <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
-      <div style={{ border: 'solid 2px', padding: '0px', margin: '0px'}}>
-        <div style= {{width: '3px', float: 'left', border: 'solid 2px', padding: '0px', margin: '0px', height: '18px'}}> </div>
+      <div style={{ border: 'solid 2px', padding: '0px', margin: '0px'}} className='label'>
+        <div style= {{width: '3px', float: 'left', borderRight: 'solid 2px', padding: '0px', margin: '0px', height: '22.5px'}}> </div>
         <label htmlFor="text">{data.label}</label>
-        <div style= {{width: '3px', float:'right', border: 'solid 2px', padding: '0px', margin: '0px', height: '18px'}}> </div>
+        <div style= {{width: '3px', float:'right', borderLeft: 'solid 2px', padding: '0px', margin: '0px', height: '22.5px'}}> </div>
       </div>
       <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
     </>
   )
 }
 
+let idCounter = 0
+
 function ExitPointNode({ data } : { readonly data: NodeProps['data'] }) {
   return (
     <>
       <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
-      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px', borderStyle: 'dotted' }}>
+      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px', borderStyle: 'dotted' }} id={String(idCounter++)}>
         <label htmlFor="text">{data.label}</label>
       </div>
       <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
@@ -126,7 +126,7 @@ const elkOptions: LayoutOptions = {
            animated: true,
            style: { stroke: '#000' },
            arrowHeadType: 'arrowclosed',
-           type: 'smoothstep',
+           type: 'custom-edge',
            data: { label: e.id }
          };
        })
@@ -142,6 +142,33 @@ const elkOptions: LayoutOptions = {
      edgeType: edge.data.edgeType ?? ''
    }));
  }
+
+ export default function CustomEdge({ id, sourceX, sourceY, targetX, targetY } : {
+  id: string,
+  sourceX: number,
+  sourceY: number,
+  targetX: number,
+  targetY: number
+ }) {
+  const [edgePath] = getStraightPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  });
+
+  return (
+    <>
+      <BaseEdge id={id} path={edgePath} />
+    </>
+  );
+}
+
+
+const edgeTypes = {
+  'custom-edge': CustomEdge,
+};
+
 
  export function LayoutFlow({ graph } : { readonly graph: VisualizationGraph}) {
    const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -169,9 +196,9 @@ const elkOptions: LayoutOptions = {
      onLayout({ direction: 'DOWN', useInitialNodes: true });
    }, []);
    /* allows to map custom types */
-   const nodeTypes = useMemo(() => ({ 
-    variableDefinitionNode: VariableDefinitionNode, 
-    useNode: UseNode, 
+   const nodeTypes = useMemo(() => ({
+    variableDefinitionNode: VariableDefinitionNode,
+    useNode: UseNode,
     functionCallNode: FunctionCallNode,
     exitPointNode: ExitPointNode
    }), []);
@@ -181,6 +208,7 @@ const elkOptions: LayoutOptions = {
        nodes={nodes}
        edges={edges}
        nodeTypes={nodeTypes}
+       edgeTypes={edgeTypes}
        onNodesChange={onNodesChange}
        onEdgesChange={onEdgesChange}
        proOptions={{hideAttribution: true}}

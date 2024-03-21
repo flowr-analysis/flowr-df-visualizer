@@ -15,6 +15,7 @@ const flowrGraph: Graph = {
     ['5', {name: 'functionCall', tag: 'function-call'}],
     ['3', {name: 'variableDefinition', tag: 'variable-definition'}],
     ['9', {name: 'functionDefinition', tag: 'function-definition'}],
+    ['10', {name: 'exitPoint', tag: 'exit-point'}],
   ]),
   edgeInformation: new Map([
     ['1', new Map([
@@ -38,7 +39,6 @@ const flowrGraph: Graph = {
 }
 
 // borderline graph :D
-// excerpt from https://echarts.apache.org/examples//data/asset/data/les-miserables.json
 let graph = transformToVisualizationGraph(flowrGraph)
 
 
@@ -50,7 +50,7 @@ const root = createRoot(main);
 root.render(
    <MainContainerComponent initialize={() => { console.log('Hey') }}>
       <ReactFlowProvider>
-        <LayoutFlow graph={graph}  />
+        <LayoutFlow graph={graph}/>
       </ReactFlowProvider>
    </MainContainerComponent>
 );
