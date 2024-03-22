@@ -26,7 +26,7 @@ import { HandleNodeComponent } from './model/nodes/handleNodeComponent';
 
 function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] }) {
   return (
-    <HandleNodeComponent targetBackgroundColor='red'>
+    <HandleNodeComponent>
       <div style={{ border: 'solid 2px', padding: '5px', margin: '0px' }}>
         <label htmlFor="text">{data.label}</label>
       </div>
@@ -36,8 +36,8 @@ function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] })
 
 function UseNode({ data } : { readonly data: NodeProps['data'] }){
   return(
-    <HandleNodeComponent targetBackgroundColor='blue'>
-      <div className='use-node label'>
+    <HandleNodeComponent>
+      <div className='use-node'>
         <label htmlFor="text">{data.label}</label>
       </div>
     </HandleNodeComponent>
@@ -46,15 +46,11 @@ function UseNode({ data } : { readonly data: NodeProps['data'] }){
 
 function FunctionCallNode({ data } : { readonly data: NodeProps['data'] }){
   return(
-    <>
-      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
-      <div style={{ border: 'solid 2px', padding: '0px', margin: '0px'}} className='label'>
-        <div style= {{width: '3px', float: 'left', borderRight: 'solid 2px', padding: '0px', margin: '0px', height: '22.5px'}}> </div>
+    <HandleNodeComponent>
+      <div className='function-call-node label'>
         <label htmlFor="text">{data.label}</label>
-        <div style= {{width: '3px', float:'right', borderLeft: 'solid 2px', padding: '0px', margin: '0px', height: '22.5px'}}> </div>
       </div>
-      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
-    </>
+    </HandleNodeComponent>
   )
 }
 
@@ -62,13 +58,11 @@ let idCounter = 0
 
 function ExitPointNode({ data } : { readonly data: NodeProps['data'] }) {
   return (
-    <>
-      <Handle type="target" position={Position.Top} isConnectable={false} style={{ background: 'none', border: 'none'  }} />
-      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px', borderStyle: 'dotted' }} id={String(idCounter++)}>
+    <HandleNodeComponent>
+      <div className='exit-point-node'>
         <label htmlFor="text">{data.label}</label>
       </div>
-      <Handle type="source" position={Position.Bottom} isConnectable={false}  style={{ background: 'none', border: 'none' }} />
-    </>
+    </HandleNodeComponent>
   );
 }
 
@@ -164,12 +158,6 @@ const elkOptions: LayoutOptions = {
   );
 }
 
-
-const edgeTypes = {
-  'custom-edge': CustomEdge,
-};
-
-
  export function LayoutFlow({ graph } : { readonly graph: VisualizationGraph}) {
    const [nodes, setNodes, onNodesChange] = useNodesState([]);
    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -195,13 +183,19 @@ const edgeTypes = {
    useLayoutEffect(() => {
      onLayout({ direction: 'DOWN', useInitialNodes: true });
    }, []);
-   /* allows to map custom types */
+
+   /* allows to map custom node types */
    const nodeTypes = useMemo(() => ({
     variableDefinitionNode: VariableDefinitionNode,
     useNode: UseNode,
     functionCallNode: FunctionCallNode,
     exitPointNode: ExitPointNode
    }), []);
+
+   /* allows to map custom edge types */
+   const edgeTypes = useMemo(() => ({
+    customEdge: CustomEdge,
+  }),[])
 
    return (
      <ReactFlow

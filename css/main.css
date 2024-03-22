@@ -12,15 +12,35 @@ body {
 	border-radius: 20px;
 }
 
+.function-call-node {
+	border-top: solid 2px;
+	border-bottom: solid 2px;
+	padding: 5px;
+	margin: 0px;
+	border-left: 10px double ;
+	border-right: 10px double;
+}
+
+.exit-point-node {
+	border: solid 2px;
+	padding: 5px;
+	margin: 0px;
+	border-style: dotted;
+}
+
+.node-handle.react-flow__handle{
+	background: none;
+	border: none;
+}
+
+
 .label {
-	background: green;
 	transition: 3s;
 }
 
 .label:hover {
 	transition: 3s;
-	scale: 1.5;
-	background: blue;
+	background: red;
 }
 
 
