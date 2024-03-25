@@ -22,48 +22,24 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-import { HandleNodeComponent } from './model/nodes/handleNodeComponent';
+import { BodyNodeComoponent, HandleNodeComponent } from './model/nodes/handleNodeComponent';
 
 function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] }) {
-  return (
-    <HandleNodeComponent>
-      <div style={{ border: 'solid 2px', padding: '5px', margin: '0px' }}>
-        <label htmlFor="text">{data.label}</label>
-      </div>
-    </HandleNodeComponent>
-  );
+  return <BodyNodeComoponent data={data} className='variable-definition-node'/>
 }
 
 function UseNode({ data } : { readonly data: NodeProps['data'] }){
-  return(
-    <HandleNodeComponent>
-      <div className='use-node'>
-        <label htmlFor="text">{data.label}</label>
-      </div>
-    </HandleNodeComponent>
-  )
+  return <BodyNodeComoponent data={data} className='use-node'/>
 }
 
 function FunctionCallNode({ data } : { readonly data: NodeProps['data'] }){
-  return(
-    <HandleNodeComponent>
-      <div className='function-call-node label'>
-        <label htmlFor="text">{data.label}</label>
-      </div>
-    </HandleNodeComponent>
-  )
+  return <BodyNodeComoponent data={data} className='function-call-node'/>
 }
 
 let idCounter = 0
 
 function ExitPointNode({ data } : { readonly data: NodeProps['data'] }) {
-  return (
-    <HandleNodeComponent>
-      <div className='exit-point-node'>
-        <label htmlFor="text">{data.label}</label>
-      </div>
-    </HandleNodeComponent>
-  );
+  return <BodyNodeComoponent data={data} className='exit-point-node'/>
 }
 
 const elk = new ELK();

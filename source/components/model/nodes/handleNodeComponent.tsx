@@ -1,7 +1,12 @@
-import { Handle, Position } from "reactflow";
+import { Handle, NodeProps, Position } from "reactflow";
 
 export interface HandleNodeComponentProps {
    targetBackgroundColor: string
+}
+
+export interface BodyNodeComponentProps{
+   className: string
+   data: NodeProps['data']
 }
 
 export function HandleNodeComponent(props : React.PropsWithChildren) {
@@ -10,4 +15,14 @@ export function HandleNodeComponent(props : React.PropsWithChildren) {
       {props.children}
       <Handle type="source" position={Position.Bottom} isConnectable={false} className="node-handle" />
    </>)
+}
+
+export function BodyNodeComoponent(props: React.PropsWithoutRef<BodyNodeComponentProps>){
+   return (
+      <HandleNodeComponent>
+         <div className = {props.className}>
+            <label htmlFor="text">{props.data.label}</label>
+         </div>
+      </HandleNodeComponent>
+   )
 }

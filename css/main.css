@@ -5,6 +5,13 @@ body {
 	margin: 0px;
 }
 
+.variable-definition-node {
+	border: solid 2px;
+	padding: 5px;
+	margin: 0px;
+}
+
+
 .use-node {
 	border: solid 2px;
 	padding: 5px;
