@@ -23,6 +23,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
+import { bold } from '@eagleoutice/flowr';
 
 
 
@@ -79,7 +80,7 @@ const elkOptions: LayoutOptions = {
            animated: true,
            style: { stroke: '#000' },
            arrowHeadType: 'arrowclosed',
-           type: 'custom-edge',
+           type: 'customEdge',
            data: { label: e.id }
          };
        })
