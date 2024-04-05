@@ -22,25 +22,9 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-import { BodyNodeComoponent, HandleNodeComponent } from './model/nodes/handleNodeComponent';
+import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 
-function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] }) {
-  return <BodyNodeComoponent data={data} className='variable-definition-node'/>
-}
 
-function UseNode({ data } : { readonly data: NodeProps['data'] }){
-  return <BodyNodeComoponent data={data} className='use-node'/>
-}
-
-function FunctionCallNode({ data } : { readonly data: NodeProps['data'] }){
-  return <BodyNodeComoponent data={data} className='function-call-node'/>
-}
-
-let idCounter = 0
-
-function ExitPointNode({ data } : { readonly data: NodeProps['data'] }) {
-  return <BodyNodeComoponent data={data} className='exit-point-node'/>
-}
 
 const elk = new ELK();
 
@@ -85,14 +69,13 @@ const elkOptions: LayoutOptions = {
          position: { x: node.x ?? 0, y: node.y ?? 0 },
        })) ?? [],
        edges: (layoutedGraph.edges ?? []).map(e => {
-        const costumEdge: CostumElkExtendedEdge = e as CostumElkExtendedEdge
          return {
            id: e.id,
            source: e.sources[0],
            target: e.targets[0],
            sourceHandle: isHorizontal ? 'right' : 'bottom',
            targetHandle: isHorizontal ? 'left' : 'top',
-           label: costumEdge.label,
+           label: e.id,
            animated: true,
            style: { stroke: '#000' },
            arrowHeadType: 'arrowclosed',
@@ -103,7 +86,7 @@ const elkOptions: LayoutOptions = {
      }
  }
 
- function convertToExtendedEdges(edges: Edge[]): CostumElkExtendedEdge[] {
+ function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {
    return edges.map(edge => ({
      id: edge.id,
      sources: [edge.source],
@@ -191,7 +174,3 @@ const elkOptions: LayoutOptions = {
    );
  }
 
- interface CostumElkExtendedEdge extends ElkExtendedEdge{
-  label: string
-  edgeType: string
- }
