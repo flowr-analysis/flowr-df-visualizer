@@ -48,10 +48,10 @@ document.body.appendChild(main);
 const root = createRoot(main);
 
 root.render(
-   <MainContainerComponent initialize={() => { console.log('Hey') }}>
-      <ReactFlowProvider>
+  <MainContainerComponent initialize={() => { console.log('Hey') }}>
+    <ReactFlowProvider>
         <LayoutFlow graph={graph}/>
-      </ReactFlowProvider>
-   </MainContainerComponent>
+    </ReactFlowProvider>
+  </MainContainerComponent>
 );
 
