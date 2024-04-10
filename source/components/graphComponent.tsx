@@ -19,12 +19,17 @@ import ReactFlow, {
   getStraightPath,
   BaseEdge,
   EdgeLabelRenderer,
+  getMarkerEnd,
+  MarkerType,
+  EdgeProps,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 import { bold } from '@eagleoutice/flowr';
+import CustomEdge, { ArgumentEdge, CallsEdge, DefinedByEdge, DefinedByOnCallEdge, DefinesOnCallEdge, RelatesEdge, ReturnsEdge, SameDefDefEdge, SameReadReadEdge, SideEffectOnCallEdge } from './model/edges/edgeDefinition';
+import ReadsEdge from './model/edges/edgeDefinition';
 
 
 
@@ -77,11 +82,12 @@ const elkOptions: LayoutOptions = {
            target: e.targets[0],
            sourceHandle: isHorizontal ? 'right' : 'bottom',
            targetHandle: isHorizontal ? 'left' : 'top',
-           label: e.id,
-           animated: true,
-           style: { stroke: '#000' },
-           arrowHeadType: 'arrowclosed',
-           type: 'customEdge',
+           //label: e.id,
+           //animated: true,
+           //style: { stroke: '#000' },
+           //arrowHeadType: 'arrowclosed',
+           type: 'readsEdge',
+           markerEnd: {type: MarkerType.Arrow},
            data: { label: e.id }
          };
        })
@@ -98,39 +104,7 @@ const elkOptions: LayoutOptions = {
    }));
  }
 
- export default function CustomEdge({ id, sourceX, sourceY, targetX, targetY, ...props } : {
-  id: string,
-  sourceX: number,
-  sourceY: number,
-  targetX: number,
-  targetY: number
- }) {
-  const [edgePath, labelX, labelY] = getStraightPath({
-    sourceX  ,
-    sourceY,
-    targetX,
-    targetY,
-  });
 
-  return (
-    <>
-      <BaseEdge id={id} path={edgePath} {...props} label={(<div>{id}</div>)} />
-      <EdgeLabelRenderer>
-        <div
-          style={{
-            position: 'absolute',
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            fontSize: 12,
-            pointerEvents: 'all',
-          }}
-          className="nodrag nopan"
-        >
-          {id}
-        </div>
-      </EdgeLabelRenderer>
-    </>
-  );
-}
 
  export function LayoutFlow({ graph } : { readonly graph: VisualizationGraph}) {
    const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -168,7 +142,17 @@ const elkOptions: LayoutOptions = {
 
    /* allows to map custom edge types */
    const edgeTypes = useMemo(() => ({
-    customEdge: CustomEdge,
+    readsEdge: ReadsEdge,
+    definedByEdge: DefinedByEdge,
+    sameReadReadEdge: SameReadReadEdge,
+    sameDefDefEdge: SameDefDefEdge,
+    callsEdge: CallsEdge,
+    returnsEdge: ReturnsEdge,
+    definesOnCallEdge: DefinesOnCallEdge,
+    definedByOnCallEdge: DefinedByOnCallEdge,
+    argumentEdge: ArgumentEdge,
+    sideEffectOnCallEdge: SideEffectOnCallEdge,
+    relatesEdge: RelatesEdge 
   }),[])
 
    return (

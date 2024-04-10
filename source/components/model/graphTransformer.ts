@@ -35,8 +35,8 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
                         target: targetNodeId,
                         id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`,
                         label: linkEdgeType,
-                        animated: true,
-                        style: { stroke: '#000' },
+                        //animated: true,
+                        //style: { stroke: '#000' },
                         data: { label: linkEdgeType, edgeType: linkEdgeType }
                     }
                 visualizationGraph.edges.push(newEdge)

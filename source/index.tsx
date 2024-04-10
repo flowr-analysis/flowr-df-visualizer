@@ -19,21 +19,21 @@ const flowrGraph: Graph = {
   ]),
   edgeInformation: new Map([
     ['1', new Map([
-      ['2', {types: {foo: 'foo'}}],
-      ['9', {types: {foo: 'foo'}}]
+      ['2', {types: {foo: 'bar1'}}],
+      ['9', {types: {foo: 'bar2'}}]
     ])],
     ['2', new Map([
-      ['3', {types: {foo: 'foo'}}],
-      ['4', {types: {foo: 'foo'}}]
+      ['3', {types: {foo: 'bar3'}}],
+      ['4', {types: {foo: 'bar4'}}]
     ])],
     ['4', new Map([
-      ['5', {types: {foo: 'foo'}}]
+      ['5', {types: {foo: 'bar5'}}]
     ])],
     ['5', new Map([
-      ['3', {types: {foo: 'foo'}}]
+      ['3', {types: {foo: 'bar6'}}]
     ])],
     ['9', new Map([
-      ['2', {types: {foo: 'foo'}}]
+      ['2', {types: {foo: 'bar7'}}]
     ])]
   ])
 }
