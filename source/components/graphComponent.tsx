@@ -18,6 +18,7 @@ import ReactFlow, {
   NodeProps,
   getStraightPath,
   BaseEdge,
+  EdgeLabelRenderer,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -97,15 +98,15 @@ const elkOptions: LayoutOptions = {
    }));
  }
 
- export default function CustomEdge({ id, sourceX, sourceY, targetX, targetY } : {
+ export default function CustomEdge({ id, sourceX, sourceY, targetX, targetY, ...props } : {
   id: string,
   sourceX: number,
   sourceY: number,
   targetX: number,
   targetY: number
  }) {
-  const [edgePath] = getStraightPath({
-    sourceX,
+  const [edgePath, labelX, labelY] = getStraightPath({
+    sourceX  ,
     sourceY,
     targetX,
     targetY,
@@ -113,7 +114,20 @@ const elkOptions: LayoutOptions = {
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge id={id} path={edgePath} {...props} label={(<div>{id}</div>)} />
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            position: 'absolute',
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            fontSize: 12,
+            pointerEvents: 'all',
+          }}
+          className="nodrag nopan"
+        >
+          {id}
+        </div>
+      </EdgeLabelRenderer>
     </>
   );
 }
