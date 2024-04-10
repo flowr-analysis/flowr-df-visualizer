@@ -25,14 +25,14 @@ export const VariableDefinitionNode: React.FC<NodeComponentProps> = ({ data }) =
   return <BodyNodeComponent data={data} className='variable-definition-node'/>
 }
 
-export function UseNode({ data } : NodeComponentProps){
+export const UseNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='use-node'/>
 }
 
-export function FunctionCallNode({ data } : NodeComponentProps){
+export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='function-call-node'/>
 }
 
-export function ExitPointNode({ data } : NodeComponentProps) {
+export const ExitPointNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='exit-point-node'/>
 }
