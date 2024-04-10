@@ -6,7 +6,7 @@ interface BodyNodeComponentProps{
   data: NodeProps['data']
 }
 
-export function BodyNodeComoponent(props: React.PropsWithoutRef<BodyNodeComponentProps>){
+export function BodyNodeComponent(props: React.PropsWithoutRef<BodyNodeComponentProps>){
   return (
     <HandleNodeComponent>
       <div className = {props.className}>
@@ -17,17 +17,17 @@ export function BodyNodeComoponent(props: React.PropsWithoutRef<BodyNodeComponen
 }
 
 export function VariableDefinitionNode({ data } : { readonly data: NodeProps['data'] }) {
-  return <BodyNodeComoponent data={data} className='variable-definition-node'/>
+  return <BodyNodeComponent data={data} className='variable-definition-node'/>
 }
-  
+
 export function UseNode({ data } : { readonly data: NodeProps['data'] }){
-  return <BodyNodeComoponent data={data} className='use-node'/>
+  return <BodyNodeComponent data={data} className='use-node'/>
 }
-  
+
 export function FunctionCallNode({ data } : { readonly data: NodeProps['data'] }){
-  return <BodyNodeComoponent data={data} className='function-call-node'/>
+  return <BodyNodeComponent data={data} className='function-call-node'/>
 }
 
 export function ExitPointNode({ data } : { readonly data: NodeProps['data'] }) {
-  return <BodyNodeComoponent data={data} className='exit-point-node'/>
+  return <BodyNodeComponent data={data} className='exit-point-node'/>
 }
