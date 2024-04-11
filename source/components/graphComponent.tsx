@@ -70,7 +70,7 @@ const elkOptions: LayoutOptions = {
    return {
        nodes: layoutedGraph.children?.map(node => ({
          ...node,
-         data: { label: node.labels?.[0]?.text },
+         data: { label: node.labels?.[0]?.text, id: node.id },
          // React Flow expects a position property on the node instead of `x`
          // and `y` fields.
          position: { x: node.x ?? 0, y: node.y ?? 0 },

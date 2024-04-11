@@ -15,7 +15,10 @@ export function BodyNodeComponent(props: React.PropsWithoutRef<BodyNodeComponent
   return (
     <HandleNodeComponent>
       <div className = {props.className}>
-        <span className='hover-over-text'>{props.data.label}</span>
+        <span className='hover-over-text'>
+          {props.data.label}<br/>
+          {props.data.id}
+          </span>
         <label htmlFor="text">{props.data.label}</label>
       </div>
     </HandleNodeComponent>
