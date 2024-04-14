@@ -90,7 +90,7 @@ export function DefinedByEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'black'}}
-    label = 'reads'
+    label = 'defined-by'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -109,7 +109,7 @@ export function SameReadReadEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'grey', strokeDasharray: '2,5'}}
-    label = 'reads'
+    label = 'same-read-read'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -128,7 +128,7 @@ export function SameDefDefEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '2,7'}}
-    label = 'reads'
+    label = 'same-def-def'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -147,7 +147,7 @@ export function CallsEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '3,7'}}
-    label = 'reads'
+    label = 'calls'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -166,7 +166,7 @@ export function ReturnsEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '4,7'}}
-    label = 'reads'
+    label = 'returns'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -185,7 +185,7 @@ export function DefinesOnCallEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '5,7'}}
-    label = 'reads'
+    label = 'defines-on-call'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -204,7 +204,7 @@ export function DefinedByOnCallEdge({ id, sourceX, sourceY, targetX, targetY} : 
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '6,7'}}
-    label = 'reads'
+    label = 'defined-by-on-call'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -223,7 +223,7 @@ export function ArgumentEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '7,7'}}
-    label = 'reads'
+    label = 'argument'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -242,7 +242,7 @@ export function SideEffectOnCallEdge({ id, sourceX, sourceY, targetX, targetY} :
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue'}}
-    label = 'reads'
+    label = 'side-effect-on-call'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
@@ -261,7 +261,7 @@ export function RelatesEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetX = {targetX} 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '2,3'}}
-    label = 'reads'
+    label = 'relates'
     markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
