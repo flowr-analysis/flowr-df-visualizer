@@ -1,7 +1,7 @@
 import { getStraightPath, BaseEdge, EdgeLabelRenderer, MarkerType, getMarkerEnd } from "reactflow";
 
 
-const edgeTagMap = {
+const edgeTagMap:{[index: string]:string} = {
   'reads':               'readsEdge',
   'defined-by':          'definedByEdge',
   'same-read-read':      'sameReadReadEdge',
@@ -15,7 +15,7 @@ const edgeTagMap = {
   'relates':             'relatesEdge'
 };
 
-function edgeTagMapper(edgeTag: string): string {
+export function edgeTagMapper(edgeTag: string): string {
   return edgeTagMap[edgeTag] ?? '';
 }
 
