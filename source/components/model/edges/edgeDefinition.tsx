@@ -1,21 +1,22 @@
 import { getStraightPath, BaseEdge, EdgeLabelRenderer, MarkerType, getMarkerEnd } from "reactflow";
 
 
-export function edgeTagMapper(edgeTag:string):string{
-  switch(edgeTag){
-    case 'reads': return 'readsEdge'
-    case 'defined-by': return 'definedByEdge'
-    case 'same-read-read': return 'sameReadReadEdge'
-    case 'same-def-def': return 'sameDefDefEdge'
-    case 'calls': return 'callsEdge'
-    case 'returns': return 'returnsEdge'
-    case 'defines-on-call': return 'definesOnCallEdge'
-    case 'defined-by-on-call': return 'definedByOnCallEdge'
-    case 'argument': return 'argumentEdge'
-    case 'side-effect-on-call': return 'sideEffectOnCallEdge'
-    case 'relates': return 'relatesEdge'
-  }
-  return ''
+const edgeTagMap = {
+  'reads':               'readsEdge',
+  'defined-by':          'definedByEdge',
+  'same-read-read':      'sameReadReadEdge',
+  'same-def-def':        'sameDefDefEdge',
+  'calls':               'callsEdge',
+  'returns':             'returnsEdge',
+  'defines-on-call':     'definesOnCallEdge',
+  'defined-by-on-call':  'definedByOnCallEdge',
+  'argument':            'argumentEdge',
+  'side-effect-on-call': 'sideEffectOnCallEdge',
+  'relates':             'relatesEdge'
+};
+
+function edgeTagMapper(edgeTag: string): string {
+  return edgeTagMap[edgeTag] ?? '';
 }
 
 interface BodyEdgeComponentProps {
