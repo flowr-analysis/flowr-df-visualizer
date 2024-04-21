@@ -27,7 +27,6 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
-import { bold } from '@eagleoutice/flowr';
 import CustomEdge, { ArgumentEdge, CallsEdge, DefinedByEdge, DefinedByOnCallEdge, DefinesOnCallEdge, RelatesEdge, ReturnsEdge, SameDefDefEdge, SameReadReadEdge, SideEffectOnCallEdge } from './model/edges/edgeDefinition';
 import ReadsEdge from './model/edges/edgeDefinition';
 
@@ -152,10 +151,26 @@ const elkOptions: LayoutOptions = {
     definedByOnCallEdge: DefinedByOnCallEdge,
     argumentEdge: ArgumentEdge,
     sideEffectOnCallEdge: SideEffectOnCallEdge,
-    relatesEdge: RelatesEdge 
+    relatesEdge: RelatesEdge
   }),[])
 
    return (
+    <>
+      <svg style={{ position: 'absolute', top: 0, left: 0 }}>
+        <defs>
+        <marker
+          id="triangle"
+          viewBox="0 0 10 10"
+          refX="1"
+          refY="5"
+          markerUnits="strokeWidth"
+          markerWidth="10"
+          markerHeight="10"
+          orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#f00" />
+    </marker>
+        </defs>
+      </svg>
      <ReactFlow
        nodes={nodes}
        edges={edges}
@@ -170,6 +185,7 @@ const elkOptions: LayoutOptions = {
       <MiniMap />
       <Controls />
      </ReactFlow>
+     </>
    );
  }
 

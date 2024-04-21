@@ -27,7 +27,8 @@ interface BodyEdgeComponentProps {
   readonly targetY: number,
   readonly edgeStyle: React.CSSProperties,
   readonly label: string,
-  readonly markerEnd: string
+  readonly arrowStart?: boolean;
+  readonly arrowEnd?: boolean;
 }
 
 function BodyEdgeCompontent(props: React.PropsWithoutRef<BodyEdgeComponentProps>){
@@ -39,7 +40,7 @@ function BodyEdgeCompontent(props: React.PropsWithoutRef<BodyEdgeComponentProps>
   })
   return (
     <>
-    <BaseEdge id={props.id} path={edgePath} style={props.edgeStyle} />
+    <BaseEdge id={props.id} path={edgePath} style={props.edgeStyle} markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined} />
     <EdgeLabelRenderer>
       <div
       style={{
@@ -64,15 +65,15 @@ export default function ReadsEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'black', strokeDasharray: '5,5'}}
     label = 'reads'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+    arrowEnd = {true}
   />
 }
 
@@ -83,15 +84,15 @@ export function DefinedByEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'black'}}
     label = 'defined-by'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+    arrowEnd = {true}
   />
 }
 
@@ -102,15 +103,14 @@ export function SameReadReadEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'grey', strokeDasharray: '2,5'}}
     label = 'same-read-read'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
 
@@ -121,15 +121,14 @@ export function SameDefDefEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '2,7'}}
     label = 'same-def-def'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
   />
 }
 
@@ -140,15 +139,15 @@ export function CallsEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '3,7'}}
     label = 'calls'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
 
@@ -159,15 +158,15 @@ export function ReturnsEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '4,7'}}
     label = 'returns'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
 
@@ -178,15 +177,15 @@ export function DefinesOnCallEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '5,7'}}
     label = 'defines-on-call'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
 
@@ -197,15 +196,15 @@ export function DefinedByOnCallEdge({ id, sourceX, sourceY, targetX, targetY} : 
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '6,7'}}
     label = 'defined-by-on-call'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
 
@@ -216,15 +215,15 @@ export function ArgumentEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '7,7'}}
     label = 'argument'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
 
@@ -235,15 +234,15 @@ export function SideEffectOnCallEdge({ id, sourceX, sourceY, targetX, targetY} :
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue'}}
     label = 'side-effect-on-call'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
 
@@ -254,14 +253,14 @@ export function RelatesEdge({ id, sourceX, sourceY, targetX, targetY} : {
   targetX: number,
   targetY: number
   }) {
-  return <BodyEdgeCompontent 
-    id = {id} 
+  return <BodyEdgeCompontent
+    id = {id}
     sourceX = {sourceX}
-    sourceY = {sourceY} 
-    targetX = {targetX} 
+    sourceY = {sourceY}
+    targetX = {targetX}
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '2,3'}}
     label = 'relates'
-    markerEnd = {getMarkerEnd(MarkerType.Arrow)}
+
   />
 }
