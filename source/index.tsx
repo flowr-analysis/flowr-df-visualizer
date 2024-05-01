@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import '../css/main.css';
 import { MainContainerComponent } from './components/mainContainerComponent';
-import { Graph, OtherGraph, transformToVisualizationGraph, transformToVisualizationGraphForOtherGraph } from './components/model/graphTransformer';
+import { Graph, OtherGraph, transformToVisualizationGraphForOtherGraph } from './components/model/graphTransformer';
 import { ReactFlowProvider } from 'reactflow';
 import { LayoutFlow } from './components/graphComponent';
 
@@ -12,7 +12,7 @@ const otherGraph:OtherGraph =  {
     ["0",{"tag":"use","id":"0","name":"a","environment":{"current":{"name":".GlobalEnv","id":"760","memory":[["return",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"return","nodeId":"built-in"}]],["cat",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"cat","nodeId":"built-in"}]],["print",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"print","nodeId":"built-in"}]],["source",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"source","nodeId":"built-in"}]]]},"level":0},"when":"maybe"}],
     ["2",{"tag":"use","id":"2","name":"unnamed-argument-2","environment":{"current":{"name":".GlobalEnv","id":"761","memory":[["return",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"return","nodeId":"built-in"}]],["cat",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"cat","nodeId":"built-in"}]],["print",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"print","nodeId":"built-in"}]],["source",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"source","nodeId":"built-in"}]]]},"level":0},"when":"always"}],
     ["5",{"tag":"use","id":"5","name":"unnamed-argument-5","environment":{"current":{"name":".GlobalEnv","id":"763","memory":[["return",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"return","nodeId":"built-in"}]],["cat",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"cat","nodeId":"built-in"}]],["print",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"print","nodeId":"built-in"}]],["source",[{"kind":"built-in-function","scope":".GlobalEnv","used":"always","definedAt":"built-in","name":"source","nodeId":"built-in"}]]]},"level":0},"when":"always"}]],
-    "edgeInformation":[["0",[["2",{"types":["readsMMMMMMMMMMMMM"],"attribute":"always"}],["5",{"types":["readsMMMMMMMMMMMMMM"],"attribute":"always"}]]]]};
+    "edgeInformation":[["0",[["2",{"types":["reads"],"attribute":"always"}],["5",{"types":["reads"],"attribute":"always"}]]]]};
 
 const flowrGraph: Graph = {
   rootVertices: new Set(['1', '2']),
@@ -47,10 +47,10 @@ const flowrGraph: Graph = {
 }
 
 // borderline graph :D
-let graph = transformToVisualizationGraph(flowrGraph)
+// let graph = transformToVisualizationGraph(flowrGraph)
 let graphFromOtherGraph = transformToVisualizationGraphForOtherGraph(otherGraph)
 
-console.log(graph)
+// console.log(graph)
 console.log(graphFromOtherGraph)
 
 const main = document.createElement('div');
@@ -61,7 +61,7 @@ const root = createRoot(main);
 root.render(
   <MainContainerComponent initialize={() => { console.log('Hey') }}>
     <ReactFlowProvider>
-        <LayoutFlow graph={graph}/>
+        <LayoutFlow graph={graphFromOtherGraph}/>
     </ReactFlowProvider>
   </MainContainerComponent>
 );

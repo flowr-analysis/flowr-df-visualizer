@@ -9,10 +9,10 @@ export interface Graph {
 
 export interface OtherGraph{
     "rootVertices": string[]
-    "vertexInformation": ([string, VertexInfo])[]
-    "edgeInformation": ([string, ([string, EdgeInfo])[]])[]
+    "vertexInformation": [string, VertexInfo][]
+    "edgeInformation": [string, [string, EdgeInfo][]][]
   }
-  
+
   export interface VertexInfo{
     "tag": string,
     "id":string,
@@ -20,7 +20,7 @@ export interface OtherGraph{
     "environment"?:any,
     "when":string
   }
-  
+
   export interface EdgeInfo{
     "types":string[],
     "attribute": string
@@ -31,15 +31,17 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
+        console.log(nodeId, nodeInfo);
+
         /* position will be set by the layout later */
         const newNode: Node = {
-            id: nodeId, 
-            data: { label: nodeInfo.name}, 
-            position: { x: 0, y: 0 }, 
-            connectable: false, 
-            dragging: true, 
-            selectable: true, 
-            type: nodeTagMapper(nodeInfo.tag) 
+            id: nodeId,
+            data: { label: nodeInfo.name},
+            position: { x: 0, y: 0 },
+            connectable: false,
+            dragging: true,
+            selectable: true,
+            type: nodeTagMapper(nodeInfo.tag)
         }
         visualizationGraph.nodes.push(newNode)
     }
@@ -67,18 +69,19 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
 
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
-    for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
+    for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
+        console.log(nodeId);
 
-        const nodeInfoInfo = nodeInfo[1]
+        const nodeInfoInfo = nodeInfo
         const newNode: Node = {
-            id: String(nodeId), 
-            data: { label: nodeInfoInfo.name}, 
-            position: { x: 0, y: 0 }, 
-            connectable: false, 
-            dragging: true, 
-            selectable: true, 
-            type: nodeTagMapper(nodeInfoInfo.tag) 
+            id: String(nodeId),
+            data: { label: nodeInfoInfo.name},
+            position: { x: 0, y: 0 },
+            connectable: false,
+            dragging: true,
+            selectable: true,
+            type: nodeTagMapper(nodeInfoInfo.tag)
         }
         visualizationGraph.nodes.push(newNode)
     }
