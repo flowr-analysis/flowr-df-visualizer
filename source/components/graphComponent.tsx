@@ -19,7 +19,6 @@ import ReactFlow, {
   getStraightPath,
   BaseEdge,
   EdgeLabelRenderer,
-  getMarkerEnd,
   MarkerType,
   EdgeProps,
 } from 'reactflow';
@@ -86,7 +85,6 @@ const elkOptions: LayoutOptions = {
            //style: { stroke: '#000' },
            //arrowHeadType: 'arrowclosed',
            type: edgeTagMapper(e.edgeType),
-           markerEnd: {type: MarkerType.Arrow},
            data: { label: e.id }
          };
        })

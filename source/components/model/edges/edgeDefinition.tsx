@@ -1,5 +1,4 @@
-import { getStraightPath, BaseEdge, EdgeLabelRenderer, MarkerType, getMarkerEnd } from "reactflow";
-
+import { getStraightPath, BaseEdge, EdgeLabelRenderer} from "reactflow";
 
 const edgeTagMap:{[index: string]:string} = {
   'reads':               'readsEdge',
@@ -147,7 +146,7 @@ export function CallsEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '3,7'}}
     label = 'calls'
-
+    arrowEnd = {true}
   />
 }
 
@@ -166,7 +165,7 @@ export function ReturnsEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '4,7'}}
     label = 'returns'
-
+    arrowEnd = {true}
   />
 }
 
@@ -185,7 +184,7 @@ export function DefinesOnCallEdge({ id, sourceX, sourceY, targetX, targetY} : {
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '5,7'}}
     label = 'defines-on-call'
-
+    arrowEnd = {true}
   />
 }
 
@@ -204,7 +203,7 @@ export function DefinedByOnCallEdge({ id, sourceX, sourceY, targetX, targetY} : 
     targetY = {targetY}
     edgeStyle = {{stroke: 'blue', strokeDasharray: '6,7'}}
     label = 'defined-by-on-call'
-
+    arrowEnd = {true}
   />
 }
 
