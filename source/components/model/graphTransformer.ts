@@ -109,12 +109,13 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
 
 
 function nodeTagMapper(type: string):string{
-    switch(type){
-        case 'use': return 'useNode'
-        case 'variable-definition': return 'variableDefinitionNode'
-        case 'function-call': return 'functionCallNode'
-        case 'function-definition': return 'variableDefinitionNode' //for now definition nodes look the same (function as well as variable)
-        case 'exit-point': return 'exitPointNode'
-    }
-    return ''
+    return nodeTagMap[type] ?? ''
+}
+
+const nodeTagMap:{[index: string]:string} = {
+    'use':                  'useNode',
+    'variable-definition':  'variableDefinitionNode',
+    'function-call':        'functionCallNode',
+    'function-definition':  'variableDefinitionNode', //for now definition nodes look the same (function as well as variable)
+    'exit-point':           'exitPointNode'
 }
