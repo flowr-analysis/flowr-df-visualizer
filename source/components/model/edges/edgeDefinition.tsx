@@ -51,7 +51,7 @@ function BodyEdgeCompontent(props: React.PropsWithoutRef<BodyEdgeComponentProps>
       }}
       className="nodrag nopan"
       >
-      {props.id}
+      {props.label}
       </div>
     </EdgeLabelRenderer>
     </>

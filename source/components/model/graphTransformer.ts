@@ -71,12 +71,11 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
-        console.log(nodeId);
 
         const nodeInfoInfo = nodeInfo
         const newNode: Node = {
             id: String(nodeId),
-            data: { label: nodeInfoInfo.name},
+            data: { label: nodeInfoInfo.name, when: nodeInfoInfo.when},
             position: { x: 0, y: 0 },
             connectable: false,
             dragging: true,

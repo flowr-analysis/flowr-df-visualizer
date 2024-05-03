@@ -16,8 +16,9 @@ export function BodyNodeComponent(props: React.PropsWithoutRef<BodyNodeComponent
     <HandleNodeComponent>
       <div className = {props.className}>
         <span className='hover-over-text'>
-          {props.data.label}<br/>
-          {props.data.id}
+          <div className='one-line'>name:{props.data.label}</div><br/>
+          <div className='one-line'>id:{props.data.id}</div><br/>
+          <div className='one-line'>when:{props.data.when}</div><br/>
           </span>
         <label htmlFor="text">{props.data.label}</label>
       </div>

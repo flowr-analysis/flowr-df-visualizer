@@ -27,7 +27,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
-import CustomEdge, { ArgumentEdge, CallsEdge, DefinedByEdge, DefinedByOnCallEdge, DefinesOnCallEdge, RelatesEdge, ReturnsEdge, SameDefDefEdge, SameReadReadEdge, SideEffectOnCallEdge } from './model/edges/edgeDefinition';
+import CustomEdge, { ArgumentEdge, CallsEdge, DefinedByEdge, DefinedByOnCallEdge, DefinesOnCallEdge, RelatesEdge, ReturnsEdge, SameDefDefEdge, SameReadReadEdge, SideEffectOnCallEdge, edgeTagMapper } from './model/edges/edgeDefinition';
 import ReadsEdge from './model/edges/edgeDefinition';
 
 
@@ -69,12 +69,12 @@ const elkOptions: LayoutOptions = {
    return {
        nodes: layoutedGraph.children?.map(node => ({
          ...node,
-         data: { label: node.labels?.[0]?.text, id: node.id },
+         data: { label: node.labels?.[0]?.text, id: node.id, when:(node as ExtendedElkNode).data.when},
          // React Flow expects a position property on the node instead of `x`
          // and `y` fields.
          position: { x: node.x ?? 0, y: node.y ?? 0 },
        })) ?? [],
-       edges: (layoutedGraph.edges ?? []).map(e => {
+       edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => {
          return {
            id: e.id,
            source: e.sources[0],
@@ -85,12 +85,23 @@ const elkOptions: LayoutOptions = {
            //animated: true,
            //style: { stroke: '#000' },
            //arrowHeadType: 'arrowclosed',
-           type: 'readsEdge',
+           type: edgeTagMapper(e.edgeType),
            markerEnd: {type: MarkerType.Arrow},
            data: { label: e.id }
          };
        })
      }
+ }
+
+ interface ExtendedExtendedEdge extends ElkExtendedEdge{
+  edgeType: string
+ }
+
+ interface ExtendedElkNode extends ElkNode{
+  data:{
+    label:string, 
+    when:string
+  }
  }
 
  function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {

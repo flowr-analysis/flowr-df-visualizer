@@ -51,7 +51,7 @@ const flowrGraph: Graph = {
 let graphFromOtherGraph = transformToVisualizationGraphForOtherGraph(otherGraph)
 
 // console.log(graph)
-console.log(graphFromOtherGraph)
+//console.log(graphFromOtherGraph)
 
 const main = document.createElement('div');
 main.id = 'main';
