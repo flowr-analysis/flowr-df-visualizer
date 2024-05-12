@@ -16,7 +16,7 @@ const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
     <HandleNodeComponent>
       <div className = {props.className}>
         <HoverOverComponent name={props.data.label} id={props.data.id} when= {props.data.when}/>
-      <label htmlFor="text">{props.data.label}</label>
+        <label htmlFor="text">{props.data.label}</label>
       </div>
     </HandleNodeComponent>
   )
