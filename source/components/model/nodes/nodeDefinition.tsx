@@ -11,22 +11,6 @@ interface NodeComponentProps {
   readonly data: NodeProps['data']
 }
 
-/* export function BodyNodeComponent(props: React.PropsWithoutRef<BodyNodeComponentProps>){
-  return (
-    <HandleNodeComponent>
-      <div className = {props.className}>
-        <span className='hover-over-text'>
-          <div className='one-line'>name:{props.data.label}</div><br/>
-          <div className='one-line'>id:{props.data.id}</div><br/>
-          <div className='one-line'>when:{props.data.when}</div><br/>
-        </span>
-        <label htmlFor="text">{props.data.label}</label>
-      </div>
-    </HandleNodeComponent>
-  )
-}
-*/
-
 const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
   return (
     <HandleNodeComponent>
