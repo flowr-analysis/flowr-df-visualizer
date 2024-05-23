@@ -4,6 +4,7 @@ import { MainContainerComponent } from './components/mainContainerComponent';
 import { Graph, OtherGraph, transformToVisualizationGraphForOtherGraph } from './components/model/graphTransformer';
 import { ReactFlowProvider } from 'reactflow';
 import { LayoutFlow } from './components/graphComponent';
+import { VisualizerWebsocketClient } from './components/network/visualizerWebsocketClient';
 
 
 const otherGraph:OtherGraph =  {
@@ -46,12 +47,19 @@ const flowrGraph: Graph = {
   ])
 }
 
-// borderline graph :D
-// let graph = transformToVisualizationGraph(flowrGraph)
-let graphFromOtherGraph = transformToVisualizationGraphForOtherGraph(otherGraph)
+try{
+const client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
+client.onFileAnalysisResponse = (json) => {
+  console.log(json.results.dataflow.graph)
+}
+client.sendAnalysisRequestJSON('x <- 2 * 3; x')
+} catch(e){
+  console.log(e)
+}
 
-// console.log(graph)
-//console.log(graphFromOtherGraph)
+
+// borderline graph :D
+let graphFromOtherGraph = transformToVisualizationGraphForOtherGraph(otherGraph)
 
 const main = document.createElement('div');
 main.id = 'main';

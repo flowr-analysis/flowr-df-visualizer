@@ -10,16 +10,18 @@ export class VisualizerWebsocketClient{
     this.endpoint = endpoint
     this.websocket = new WebSocket(endpoint)
     this.id = 0
-    this.websocket.onmessage = function(event) {
+    this.websocket.onmessage = (event) => {
       const parsedJson = JSON.parse(event.data)
       if(parsedJson.type === 'response-file-analysis'){
         const requestResponse: FileAnalysisResponseMessageJson = parsedJson
-        //TODO: do smth with results
+        this.onFileAnalysisResponse(requestResponse)
       }
     }
   }
 
-  sendAnalysisRequestJSON(rCode:string){
+  onFileAnalysisResponse(response:FileAnalysisResponseMessageJson){}
+  
+  sendAnalysisRequestJSON(rCode:string):void{
     const msg: FileAnalysisRequestMessage = {
       id: this.id.toString(),
       type:     'request-file-analysis',

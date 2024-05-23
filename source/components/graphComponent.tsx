@@ -26,8 +26,18 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
 import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
-import CustomEdge, { ArgumentEdge, CallsEdge, DefinedByEdge, DefinedByOnCallEdge, DefinesOnCallEdge, RelatesEdge, ReturnsEdge, SameDefDefEdge, SameReadReadEdge, SideEffectOnCallEdge, edgeTagMapper } from './model/edges/edgeDefinition';
-import ReadsEdge from './model/edges/edgeDefinition';
+import ReadsEdge from './model/edges/readsEdge';
+import { edgeTagMapper } from './model/edges/edgeBase';
+import { ArgumentEdge } from './model/edges/argumentEdge';
+import { CallsEdge } from './model/edges/callsEdge';
+import { DefinedByEdge } from './model/edges/definedByEdge';
+import { DefinedByOnCallEdge } from './model/edges/definedByOnCallEdge';
+import { DefinesOnCallEdge } from './model/edges/definesOnCallEdge';
+import { RelatesEdge } from './model/edges/relatesEdge';
+import { ReturnsEdge } from './model/edges/returnsEdge';
+import { SameDefDefEdge } from './model/edges/sameDefDefEdge';
+import { SameReadReadEdge } from './model/edges/sameReadReadEdge';
+import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge';
 
 
 
