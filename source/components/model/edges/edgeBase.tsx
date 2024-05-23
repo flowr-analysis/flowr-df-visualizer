@@ -30,7 +30,7 @@ interface BodyEdgeComponentProps {
   readonly arrowEnd?: boolean;
 }
 
-export function BodyEdgeCompontent(props: React.PropsWithoutRef<BodyEdgeComponentProps>){
+export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
   const [edgePath, labelX, labelY] = getStraightPath({
     sourceX: props.sourceX ,
     sourceY: props.sourceY,
