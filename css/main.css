@@ -88,3 +88,9 @@ body {
 .base-node:hover .hover-over-text{
 	visibility: visible;
 }
+
+.r-code-input {
+	position: absolute;
+	top: 15px; 
+	left: 15px;
+}

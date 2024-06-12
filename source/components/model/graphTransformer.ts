@@ -88,17 +88,17 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
         const listOfConnectedNodes2 = listOfConnectedNodes[1]
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
-            for( let linkEdgeType of targetNodeInfo.types){
+            // for( let linkEdgeType of targetNodeInfo.types){
                 const newEdge: Edge =
                     {
                         source: String(sourceNodeId),
                         target: String(targetNodeId),
-                        id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`,
-                        label: linkEdgeType,
-                        data: { label: linkEdgeType, edgeType: linkEdgeType }
+                        id: `${sourceNodeId}-${targetNodeId}-${0}`,
+                        label: '0',
+                        data: { label: '0', edgeType: 'use' }
                     }
                 visualizationGraph.edges.push(newEdge)
-            }
+            // }
         }
     }
 

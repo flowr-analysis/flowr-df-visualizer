@@ -6,11 +6,21 @@ export class VisualizerWebsocketClient{
   endpoint:string
   websocket:WebSocket
   id:number
+  connected: boolean;
 
   constructor(endpoint: string){
     this.endpoint = endpoint
     this.websocket = new WebSocket(endpoint)
     this.id = 0
+    this.connected = false;
+    this.websocket.onopen = () => {
+      console.log('connected')
+      this.connected = true;
+    }
+    this.websocket.onerror = (event) => {
+      console.log('error', event)
+      this.connected = false;
+    }
     this.websocket.onmessage = (event) => {
       const parsedJson = JSON.parse(event.data)
       if(parsedJson.type === 'response-file-analysis'){

@@ -1,5 +1,5 @@
 import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
-import React, { ChangeEventHandler, useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { ChangeEventHandler, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   addEdge,
   Panel,
@@ -123,17 +123,27 @@ const elkOptions: LayoutOptions = {
  }
 
 
+export interface LayoutFlowProps {
+  readonly graph: VisualizationGraph;
+  readonly assignGraphUpdater: (updater: (g: VisualizationGraph) => void) => void;
+}
 
- export function LayoutFlow({ graph } : { readonly graph: VisualizationGraph}) {
+ export function LayoutFlow({ graph, assignGraphUpdater } : LayoutFlowProps) {
+   const [currentGraph, setCurrentGraph] = useState(graph);
    const [nodes, setNodes, onNodesChange] = useNodesState([]);
    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
    const { fitView } = useReactFlow();
+   
+   assignGraphUpdater(g =>  {
+    setCurrentGraph(g)
+    onLayout({ direction: 'DOWN', useInitialNodes: true })
+  })
 
    const onLayout = useCallback(
      ({ direction , useInitialNodes = false } : { direction: string, useInitialNodes?: boolean }) => {
        const opts = { 'elk.direction': direction, ...elkOptions };
-       const ns = useInitialNodes ? graph.nodes : nodes;
-       const es = useInitialNodes ? graph.edges : edges;
+       const ns = useInitialNodes ? currentGraph.nodes : nodes;
+       const es = useInitialNodes ? currentGraph.edges : edges;
 
        getLayoutedElements(ns, convertToExtendedEdges(es), opts).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
          setNodes(layoutedNodes);
@@ -142,7 +152,7 @@ const elkOptions: LayoutOptions = {
          window.requestAnimationFrame(() => fitView());
        });
      },
-     [nodes, edges]
+     [nodes, edges, currentGraph]
    );
 
    // Calculate the initial layout on mount.
