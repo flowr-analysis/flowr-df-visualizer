@@ -6,7 +6,6 @@ import { ReactFlowProvider } from 'reactflow';
 import { LayoutFlow } from './components/graphComponent';
 import { VisualizerWebsocketClient } from './components/network/visualizerWebsocketClient';
 
-
 const otherGraph:OtherGraph =  {
   "rootVertices":["0","2","5"],
   "vertexInformation":[
@@ -47,16 +46,20 @@ const flowrGraph: Graph = {
   ])
 }
 
+let client: VisualizerWebsocketClient;
 try{
-const client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
+client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
 client.onFileAnalysisResponse = (json) => {
   console.log(json.results.dataflow.graph)
+  console.log(json.results.normalize)
 }
-client.sendAnalysisRequestJSON('x <- 2 * 3; x')
+client.onHelloMessage = (json) => {
+  console.log('hello', json);
+  client.sendAnalysisRequestJSON('x <- 2 * 3; x')
+}
 } catch(e){
   console.log(e)
 }
-
 
 // borderline graph :D
 let graphFromOtherGraph = transformToVisualizationGraphForOtherGraph(otherGraph)
