@@ -12,11 +12,29 @@ export interface OtherGraph{
     "rootVertices": number[]
     "vertexInformation": [number, VertexInfo][]
     "edgeInformation": [number, [number, EdgeInfo][]][]
-    "_idMap"?:any,
+    "_idMap": IdMapInfo,
     "functionCache"?: any
-  }
+}
 
-  export interface VertexInfo{
+export interface IdMapInfo{
+    "size": number,
+    "k2v": [number | string, VertexMapInfo][],
+    "v2k": any
+}
+
+export interface VertexMapInfo{
+    "type": string,
+    "location"?: number[],
+    "content"?: any,
+    "lexeme"?: string,
+    "info": any,
+    "lhs"?: any,
+    "rhs"?: any,
+    "operator"?:any,
+    "children"?: any
+}
+
+export interface VertexInfo{
     "tag": string,
     "id": number,
     "onlyBuiltin"?: boolean,
@@ -24,12 +42,12 @@ export interface OtherGraph{
     "environment"?: any,
     "when"?: string,
     "args"?:any
-  }
+}
 
-  export interface EdgeInfo{
+export interface EdgeInfo{
     "types": number,
     "attribute"?: string
-  }
+}
 
 export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
 
@@ -72,6 +90,13 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
 
 export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherGraph): VisualizationGraph {
 
+    const infoMap = new Map<string, string>()
+
+    dataflowGraph._idMap.k2v.forEach( ([index, key]) => {
+        if(key.lexeme !== undefined){
+            infoMap.set(String(index), key.lexeme)
+        }
+    })
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
@@ -80,7 +105,8 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
         const nodeInfoInfo = nodeInfo
         const newNode: Node = {
             id: String(nodeId),
-            data: { label: nodeInfoInfo.name, when: nodeInfoInfo.when},
+            data: {label: infoMap.get(String(nodeId)), when: nodeInfo.when},
+            //data: { label: nodeInfoInfo.name, when: nodeInfoInfo.when},
             position: { x: 0, y: 0 },
             connectable: false,
             dragging: true,
@@ -93,6 +119,7 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
         const listOfConnectedNodes2 = listOfConnectedNodes[1]
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
+            console.log(edgeTypesToNames(targetNodeInfo.types))
              for( let linkEdgeType of edgeTypesToNames(targetNodeInfo.types)){
                 const newEdge: Edge =
                     {
