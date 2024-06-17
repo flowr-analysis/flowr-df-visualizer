@@ -1,17 +1,18 @@
 import { getStraightPath, BaseEdge, EdgeLabelRenderer} from "reactflow";
 
 const edgeTagMap:{[index: string]:string} = {
-  'reads':               'readsEdge',
-  'defined-by':          'definedByEdge',
-  'same-read-read':      'sameReadReadEdge',
-  'same-def-def':        'sameDefDefEdge',
-  'calls':               'callsEdge',
-  'returns':             'returnsEdge',
-  'defines-on-call':     'definesOnCallEdge',
-  'defined-by-on-call':  'definedByOnCallEdge',
-  'argument':            'argumentEdge',
-  'side-effect-on-call': 'sideEffectOnCallEdge',
-  'relates':             'relatesEdge'
+  'reads':                   'readsEdge',
+  'defined-by':              'definedByEdge',
+  'same-read-read':          'sameReadReadEdge', //obsolete?
+  'same-def-def':            'sameDefDefEdge', // obsolete?
+  'calls':                   'callsEdge',
+  'returns':                 'returnsEdge',
+  'defines-on-call':         'definesOnCallEdge',
+  'defined-by-on-call':      'definedByOnCallEdge',
+  'argument':                'argumentEdge',
+  'side-effect-on-call':     'sideEffectOnCallEdge',
+  'relates':                 'relatesEdge', //obsolete?
+  'non-standard-evaluation': 'nonStandardEvaluationEdge'
 };
 
 export function edgeTagMapper(edgeTag: string): string {

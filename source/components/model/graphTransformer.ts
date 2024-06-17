@@ -1,5 +1,6 @@
 import { Edge, Node } from "reactflow";
 import { VisualizationGraph } from "./graph";
+import { EdgeTypeName, edgeTypesToNames } from "@eagleoutice/flowr/dataflow/graph/edge";
 
 export interface Graph {
     rootVertices: Set<string>,
@@ -8,22 +9,26 @@ export interface Graph {
 }
 
 export interface OtherGraph{
-    "rootVertices": string[]
-    "vertexInformation": [string, VertexInfo][]
-    "edgeInformation": [string, [string, EdgeInfo][]][]
+    "rootVertices": number[]
+    "vertexInformation": [number, VertexInfo][]
+    "edgeInformation": [number, [number, EdgeInfo][]][]
+    "_idMap"?:any,
+    "functionCache"?: any
   }
 
   export interface VertexInfo{
     "tag": string,
-    "id":string,
-    "name":string,
-    "environment"?:any,
-    "when":string
+    "id": number,
+    "onlyBuiltin"?: boolean,
+    "name"?: string,
+    "environment"?: any,
+    "when"?: string,
+    "args"?:any
   }
 
   export interface EdgeInfo{
-    "types":string[],
-    "attribute": string
+    "types": number,
+    "attribute"?: string
   }
 
 export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
@@ -88,17 +93,17 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
         const listOfConnectedNodes2 = listOfConnectedNodes[1]
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
-            // for( let linkEdgeType of targetNodeInfo.types){
+             for( let linkEdgeType of edgeTypesToNames(targetNodeInfo.types)){
                 const newEdge: Edge =
                     {
                         source: String(sourceNodeId),
                         target: String(targetNodeId),
                         id: `${sourceNodeId}-${targetNodeId}-${0}`,
-                        label: '0',
-                        data: { label: '0', edgeType: 'use' }
+                        label: linkEdgeType,
+                        data: { label: linkEdgeType, edgeType: linkEdgeType }
                     }
                 visualizationGraph.edges.push(newEdge)
-            // }
+             }
         }
     }
 

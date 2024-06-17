@@ -38,6 +38,7 @@ import { ReturnsEdge } from './model/edges/returnsEdge';
 import { SameDefDefEdge } from './model/edges/sameDefDefEdge';
 import { SameReadReadEdge } from './model/edges/sameReadReadEdge';
 import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge';
+import { NonStandardEvaluationEdge } from './model/edges/nonStandardEvaluationEdge';
 
 
 
@@ -180,7 +181,8 @@ export interface LayoutFlowProps {
     definedByOnCallEdge: DefinedByOnCallEdge,
     argumentEdge: ArgumentEdge,
     sideEffectOnCallEdge: SideEffectOnCallEdge,
-    relatesEdge: RelatesEdge
+    relatesEdge: RelatesEdge,
+    nonStandardEvaluationEdge: NonStandardEvaluationEdge
   }),[])
 
    return (

@@ -24,7 +24,7 @@
     "webpack-dev-server": "^4.11.0"
   },
   "dependencies": {
-    "@eagleoutice/flowr": "^1.4.1",
+    "@eagleoutice/flowr": "^2.0.9",
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "allotment": "^1.17.0",
