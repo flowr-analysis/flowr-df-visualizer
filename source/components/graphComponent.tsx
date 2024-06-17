@@ -25,7 +25,7 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-import { ExitPointNode, FunctionCallNode, UseNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
+import { ExitPointNode, FunctionCallNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 import ReadsEdge from './model/edges/readsEdge';
 import { edgeTagMapper } from './model/edges/edgeBase';
 import { ArgumentEdge } from './model/edges/argumentEdge';
@@ -166,7 +166,8 @@ export interface LayoutFlowProps {
     variableDefinitionNode: VariableDefinitionNode,
     useNode: UseNode,
     functionCallNode: FunctionCallNode,
-    exitPointNode: ExitPointNode
+    exitPointNode: ExitPointNode,
+    valueNode: ValueNode
    }), []);
 
    /* allows to map custom edge types */

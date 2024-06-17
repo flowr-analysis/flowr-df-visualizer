@@ -52,3 +52,7 @@ export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
 export const ExitPointNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='exit-point-node base-node'/>
 }
+
+export const ValueNode: React.FC<NodeComponentProps> = ({ data }) => {
+  return <BodyNodeComponent data={data} className='value-node base-node'/>
+}

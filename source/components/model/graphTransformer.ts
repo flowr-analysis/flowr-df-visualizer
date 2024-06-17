@@ -119,13 +119,12 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
         const listOfConnectedNodes2 = listOfConnectedNodes[1]
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
-            console.log(edgeTypesToNames(targetNodeInfo.types))
              for( let linkEdgeType of edgeTypesToNames(targetNodeInfo.types)){
                 const newEdge: Edge =
                     {
                         source: String(sourceNodeId),
                         target: String(targetNodeId),
-                        id: `${sourceNodeId}-${targetNodeId}-${0}`,
+                        id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`,
                         label: linkEdgeType,
                         data: { label: linkEdgeType, edgeType: linkEdgeType }
                     }
@@ -137,9 +136,6 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
     return visualizationGraph
 }
 
-
-
-
 function nodeTagMapper(type: string):string{
     return nodeTagMap[type] ?? ''
 }
@@ -149,5 +145,6 @@ const nodeTagMap:{[index: string]:string} = {
     'variable-definition':  'variableDefinitionNode',
     'function-call':        'functionCallNode',
     'function-definition':  'variableDefinitionNode', //for now definition nodes look the same (function as well as variable)
-    'exit-point':           'exitPointNode'
+    'exit-point':           'exitPointNode',
+    'value':                'valueNode'
 }
