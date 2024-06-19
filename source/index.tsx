@@ -7,6 +7,8 @@ import { LayoutFlow } from './components/graphComponent';
 import { VisualizerWebsocketClient } from './components/network/visualizerWebsocketClient';
 import { FormEvent } from 'react';
 import { VisualizationGraph } from './components/model/graph';
+import { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model';
+import { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate';
 /* old example
 const otherGraph:OtherGraph =  {
   "rootVertices":["0","2","5"],
@@ -58,7 +60,7 @@ client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
 client.onFileAnalysisResponse = (json) => {
   console.log(JSON.stringify(json.results.dataflow.graph))
   console.log(json.results.normalize)
-  updateGraph(json.results.dataflow.graph as unknown as OtherGraph)
+  updateGraph(json.results.normalize.ast, json.results.dataflow.graph as unknown as OtherGraph)
 }
 client.onHelloMessage = (json) => {
   console.log('hello', json);
@@ -77,19 +79,21 @@ function onRCodeInputChange(event: FormEvent<HTMLInputElement>) {
 function onRCodeRequest() {
   client?.sendAnalysisRequestJSON(currentValue)
 }
-let graphFromOtherGraph = transformToVisualizationGraphForOtherGraph(otherGraph)
+let graphFromOtherGraph: VisualizationGraph = {
+  edges: [],
+  nodes: []
+}
 
 let graphUpdater: ((graph: VisualizationGraph) => void) | undefined = undefined;
 function setGraphUpdater(updater: (graph: VisualizationGraph) => void) {
   graphUpdater = updater;
 }
 
-function updateGraph(graph: OtherGraph) {
+function updateGraph(ast: RNode<ParentInformation>, graph: OtherGraph) {
   // borderline graph :D
-  let newGraph = transformToVisualizationGraphForOtherGraph(graph)
+  const newGraph = transformToVisualizationGraphForOtherGraph(ast, graph)
   graphUpdater?.(newGraph);
 }
-
 
 const main = document.createElement('div');
 main.id = 'main';

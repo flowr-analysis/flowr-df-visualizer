@@ -137,15 +137,15 @@ export interface LayoutFlowProps {
    
    assignGraphUpdater(g =>  {
     setCurrentGraph(g)
-    onLayout({ direction: 'DOWN', useInitialNodes: true })
+    onLayout({ direction: 'DOWN', g })
   })
 
    const onLayout = useCallback(
-     ({ direction , useInitialNodes = false } : { direction: string, useInitialNodes?: boolean }) => {
+     ({ direction , g = undefined } : { direction: string, g?: VisualizationGraph }) => {
        const opts = { 'elk.direction': direction, ...elkOptions };
-       const ns = useInitialNodes ? currentGraph.nodes : nodes;
-       const es = useInitialNodes ? currentGraph.edges : edges;
-
+       const ns = g ? g.nodes : nodes;
+       const es = g ? g.edges : edges;
+      
        getLayoutedElements(ns, convertToExtendedEdges(es), opts).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
          setNodes(layoutedNodes);
          setEdges(layoutedEdges);
@@ -158,7 +158,7 @@ export interface LayoutFlowProps {
 
    // Calculate the initial layout on mount.
    useLayoutEffect(() => {
-     onLayout({ direction: 'DOWN', useInitialNodes: true });
+     onLayout({ direction: 'DOWN', g: currentGraph });
    }, []);
 
    /* allows to map custom node types */

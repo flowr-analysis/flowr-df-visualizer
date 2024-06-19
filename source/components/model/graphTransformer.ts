@@ -1,6 +1,10 @@
 import { Edge, Node } from "reactflow";
 import { VisualizationGraph } from "./graph";
 import { EdgeTypeName, edgeTypesToNames } from "@eagleoutice/flowr/dataflow/graph/edge";
+import { NodeId } from "@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/node-id";
+import { NormalizedAst, ParentInformation } from "@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate";
+import { visitAst } from "@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/visitor";
+import { RNode } from "@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model";
 
 export interface Graph {
     rootVertices: Set<string>,
@@ -88,15 +92,23 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
     return visualizationGraph
 }
 
-export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherGraph): VisualizationGraph {
 
-    const infoMap = new Map<string, string>()
-
-    dataflowGraph._idMap.k2v.forEach( ([index, key]) => {
-        if(key.lexeme !== undefined){
-            infoMap.set(String(index), key.lexeme)
+function constructLexemeMapping(ast: RNode<ParentInformation>): Map<NodeId, string> {
+    const infoMap = new Map<NodeId, string>()
+    visitAst(ast, node => {
+        if(node.lexeme !== undefined){
+            infoMap.set(node.info.id, node.lexeme)
         }
     })
+    
+    return infoMap
+}
+
+
+export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInformation>, dataflowGraph: OtherGraph): VisualizationGraph {
+
+    const infoMap = constructLexemeMapping(ast);
+
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
@@ -105,7 +117,7 @@ export function transformToVisualizationGraphForOtherGraph(dataflowGraph: OtherG
         const nodeInfoInfo = nodeInfo
         const newNode: Node = {
             id: String(nodeId),
-            data: {label: infoMap.get(String(nodeId)), when: nodeInfo.when},
+            data: {label: infoMap.get(nodeId), when: nodeInfo.when},
             //data: { label: nodeInfoInfo.name, when: nodeInfoInfo.when},
             position: { x: 0, y: 0 },
             connectable: false,
