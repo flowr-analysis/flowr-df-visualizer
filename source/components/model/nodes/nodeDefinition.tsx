@@ -1,6 +1,7 @@
 import { NodeProps } from "reactflow"
 import { HandleNodeComponent } from "./handleNodeComponent"
 import React from "react";
+import { ProgressPlugin } from "webpack";
 
 interface BodyNodeComponentProps{
   readonly className: string
@@ -15,7 +16,7 @@ const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
   return (
     <HandleNodeComponent>
       <div className = {props.className}>
-        <HoverOverComponent name={props.data.label} id={props.data.id} when= {props.data.when}/>
+        <HoverOverComponent name={props.data.label} id={props.data.id} nodeType= {props.data.nodeType}/>
         <label htmlFor="text">{props.data.label}</label>
       </div>
     </HandleNodeComponent>
@@ -25,14 +26,14 @@ const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
 interface HoverOverComponentProps{
   readonly name: string,
   readonly id: string,
-  readonly when: string
+  readonly nodeType: string
 }
 export const HoverOverComponent: React.FC<HoverOverComponentProps> = (props) => {
   return (
     <span className='hover-over-text'>
       <div className='one-line'>name:{props.name}</div><br/>
       <div className='one-line'>id:{props.id}</div><br/>
-      <div className='one-line'>when:{props.when}</div><br/>
+      <div className='one-line'>nodeType:{props.nodeType}</div><br/>
     </span>
   )
 }

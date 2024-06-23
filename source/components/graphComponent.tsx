@@ -79,7 +79,7 @@ const elkOptions: LayoutOptions = {
    return {
        nodes: layoutedGraph.children?.map(node => ({
          ...node,
-         data: { label: node.labels?.[0]?.text, id: node.id, when:(node as ExtendedElkNode).data.when},
+         data: { label: node.labels?.[0]?.text, id: node.id, nodeType:(node as ExtendedElkNode).data.nodeType},
          // React Flow expects a position property on the node instead of `x`
          // and `y` fields.
          position: { x: node.x ?? 0, y: node.y ?? 0 },
@@ -109,7 +109,7 @@ const elkOptions: LayoutOptions = {
  interface ExtendedElkNode extends ElkNode{
   data:{
     label:string, 
-    when:string
+    nodeType:string
   }
  }
 

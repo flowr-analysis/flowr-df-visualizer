@@ -113,12 +113,10 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
-
         const nodeInfoInfo = nodeInfo
         const newNode: Node = {
             id: String(nodeId),
-            data: {label: infoMap.get(nodeId), when: nodeInfo.when},
-            //data: { label: nodeInfoInfo.name, when: nodeInfoInfo.when},
+            data: {label: infoMap.get(nodeId), nodeType: nodeInfoInfo.tag},
             position: { x: 0, y: 0 },
             connectable: false,
             dragging: true,
