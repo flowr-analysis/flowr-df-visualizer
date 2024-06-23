@@ -59,7 +59,6 @@ try{
 client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
 client.onFileAnalysisResponse = (json) => {
   console.log(JSON.stringify(json.results.dataflow.graph))
-  console.log(json.results.normalize)
   updateGraph(json.results.normalize.ast, json.results.dataflow.graph as unknown as OtherGraph)
 }
 client.onHelloMessage = (json) => {

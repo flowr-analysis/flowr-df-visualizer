@@ -29,7 +29,7 @@ interface BodyEdgeComponentProps {
 
 export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
   const {sourceX, sourceY, targetX, targetY, id, sourcePosition, targetPosition} = props.standardEdgeInformation
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
     sourceX: sourceX ,
     sourceY: sourceY,
     targetX: targetX,
@@ -37,6 +37,9 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
     targetPosition: targetPosition,
     sourcePosition: sourcePosition
   })
+  
+  const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
+  const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
   return (
     <>
     <BaseEdge id={id} path={edgePath} style={props.edgeStyle} markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined} />
@@ -44,7 +47,7 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
       <div
       style={{
         position: 'absolute',
-        transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+        transform: `translate(-50%, -50%) translate(${labelPositionX}px,${labelPositionY}px)`,
         fontSize: 12,
         pointerEvents: 'all',
       }}
