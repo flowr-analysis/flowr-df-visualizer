@@ -1,4 +1,4 @@
-import { getStraightPath, BaseEdge, EdgeLabelRenderer} from "reactflow";
+import { getStraightPath, BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath} from "reactflow";
 
 const edgeTagMap:{[index: string]:string} = {
   'reads':                   'readsEdge',
@@ -20,11 +20,7 @@ export function edgeTagMapper(edgeTag: string): string {
 }
 
 interface BodyEdgeComponentProps {
-  readonly id: string,
-  readonly sourceX: number,
-  readonly sourceY: number,
-  readonly targetX: number,
-  readonly targetY: number,
+  readonly standardEdgeInformation: EdgeProps,
   readonly edgeStyle: React.CSSProperties,
   readonly label: string,
   readonly arrowStart?: boolean;
@@ -32,15 +28,18 @@ interface BodyEdgeComponentProps {
 }
 
 export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
-  const [edgePath, labelX, labelY] = getStraightPath({
-    sourceX: props.sourceX ,
-    sourceY: props.sourceY,
-    targetX: props.targetX,
-    targetY: props.targetY,
+  const {sourceX, sourceY, targetX, targetY, id, sourcePosition, targetPosition} = props.standardEdgeInformation
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX: sourceX ,
+    sourceY: sourceY,
+    targetX: targetX,
+    targetY: targetY,
+    targetPosition: targetPosition,
+    sourcePosition: sourcePosition
   })
   return (
     <>
-    <BaseEdge id={props.id} path={edgePath} style={props.edgeStyle} markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined} />
+    <BaseEdge id={id} path={edgePath} style={props.edgeStyle} markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined} />
     <EdgeLabelRenderer>
       <div
       style={{

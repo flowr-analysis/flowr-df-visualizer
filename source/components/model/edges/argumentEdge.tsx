@@ -1,18 +1,9 @@
+import { EdgeProps } from "reactflow"
 import { BodyEdgeCompontent } from "./edgeBase"
 
-export function ArgumentEdge({ id, sourceX, sourceY, targetX, targetY} : {
-    id: string,
-    sourceX: number,
-    sourceY: number,
-    targetX: number,
-    targetY: number
-    }) {
+export function ArgumentEdge(props:EdgeProps) {
     return <BodyEdgeCompontent
-      id = {id}
-      sourceX = {sourceX}
-      sourceY = {sourceY}
-      targetX = {targetX}
-      targetY = {targetY}
+      standardEdgeInformation={props}
       edgeStyle = {{stroke: 'blue', strokeDasharray: '7,7'}}
       label = 'argument'
   
