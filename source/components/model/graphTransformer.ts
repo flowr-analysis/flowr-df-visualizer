@@ -109,6 +109,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
     const infoMap = constructLexemeMapping(ast);
 
+    console.log(infoMap)
+
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
@@ -126,8 +128,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
         visualizationGraph.nodes.push(newNode)
     }
 
-    for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
-        const listOfConnectedNodes2 = listOfConnectedNodes[1]
+    for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
+        const listOfConnectedNodes2 = listOfConnectedNodes
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
              for( let linkEdgeType of edgeTypesToNames(targetNodeInfo.types)){
                 const newEdge: Edge =
