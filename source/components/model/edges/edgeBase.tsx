@@ -53,7 +53,7 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
       }}
       className="nodrag nopan"
       >
-      {props.label}
+      {props.standardEdgeInformation.label}
       </div>
     </EdgeLabelRenderer>
     </>

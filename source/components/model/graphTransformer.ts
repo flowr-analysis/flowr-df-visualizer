@@ -142,7 +142,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
                         target: String(targetNodeId),
                         id: `${sourceNodeId}-${targetNodeId}-${lastEdgeType}`,
                         label: labelNames,
-                        data: { label: lastEdgeType, edgeType: lastEdgeType }
+                        data: { label: labelNames, edgeType: lastEdgeType }
                     }
                 visualizationGraph.edges.push(newEdge)
         }

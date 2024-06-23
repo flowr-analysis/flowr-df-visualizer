@@ -85,18 +85,19 @@ const elkOptions: LayoutOptions = {
          position: { x: node.x ?? 0, y: node.y ?? 0 },
        })) ?? [],
        edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => {
-         return {
+        console.log(e.label) 
+        return {
            id: e.id,
            source: e.sources[0],
            target: e.targets[0],
            sourceHandle: isHorizontal ? 'right' : 'bottom',
            targetHandle: isHorizontal ? 'left' : 'top',
-           //label: e.id,
+           label: e.label,
            //animated: true,
            //style: { stroke: '#000' },
            //arrowHeadType: 'arrowclosed',
            type: edgeTagMapper(e.edgeType),
-           data: { label: e.id }
+           data: { label: e.label }
          };
        })
      }
@@ -104,6 +105,7 @@ const elkOptions: LayoutOptions = {
 
  interface ExtendedExtendedEdge extends ElkExtendedEdge{
   edgeType: string
+  label:string
  }
 
  interface ExtendedElkNode extends ElkNode{
