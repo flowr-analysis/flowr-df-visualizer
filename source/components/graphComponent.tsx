@@ -25,7 +25,7 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-import { ExitPointNode, FunctionCallNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
+import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 import ReadsEdge from './model/edges/readsEdge';
 import { edgeTagMapper } from './model/edges/edgeBase';
 import { ArgumentEdge } from './model/edges/argumentEdge';
@@ -84,8 +84,7 @@ const elkOptions: LayoutOptions = {
          // and `y` fields.
          position: { x: node.x ?? 0, y: node.y ?? 0 },
        })) ?? [],
-       edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => {
-        console.log(e.label) 
+       edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => { 
         return {
            id: e.id,
            source: e.sources[0],
@@ -213,6 +212,7 @@ export interface LayoutFlowProps {
        onNodesChange={onNodesChange}
        onEdgesChange={onEdgesChange}
        proOptions={{hideAttribution: true}}
+       connectionLineComponent={FloatingConnectionLine}
        fitView
      >
       <Background />

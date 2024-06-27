@@ -1,7 +1,63 @@
-import { NodeProps } from "reactflow"
+import { ConnectionLineComponentProps, Node, NodeProps , Position} from "reactflow"
 import { HandleNodeComponent } from "./handleNodeComponent"
 import React from "react";
 import { ProgressPlugin } from "webpack";
+
+import { getBezierPath } from 'reactflow';
+import { getEdgeParams } from "../edges/edgeBase";
+
+
+function FloatingConnectionLine(props:ConnectionLineComponentProps) {
+  const { toX, toY, fromPosition, toPosition, fromNode} = props
+  
+  if (!fromNode) {
+    return null;
+  }
+
+  const targetNode: Node = {
+    id: 'connection-target',
+    width: 1,
+    height: 1,
+    positionAbsolute: { x: toX, y: toY },
+    position: {x: toX, y: toY},
+    data:{}
+  };
+
+  const { sourceX, sourceY } = getEdgeParams(fromNode, targetNode);
+  const [edgePath] = getBezierPath({
+    sourceX: sourceX,
+    sourceY: sourceY,
+    sourcePosition: fromPosition,
+    targetPosition: toPosition,
+    targetX: toX,
+    targetY: toY
+  });
+
+  return (
+      <g>
+        <path
+            fill="none"
+            stroke="#222"
+            strokeWidth={1.5}
+            className="animated"
+            d={edgePath}
+        />
+        <circle
+            cx={toX}
+            cy={toY}
+            fill="#fff"
+            r={3}
+            stroke="#222"
+            strokeWidth={1.5}
+        />
+      </g>
+  );
+}
+
+export default FloatingConnectionLine;
+
+
+
 
 interface BodyNodeComponentProps{
   readonly className: string

@@ -58,7 +58,6 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
     const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
-        console.log(nodeId, nodeInfo);
 
         /* position will be set by the layout later */
         const newNode: Node = {

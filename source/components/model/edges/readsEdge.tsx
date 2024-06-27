@@ -1,5 +1,6 @@
-import { BaseEdge, BezierEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, getStraightPath } from "reactflow"
+import { EdgeProps} from "reactflow"
 import { BodyEdgeCompontent } from "./edgeBase"
+
 
 export default function ReadsEdge(props: EdgeProps) {
     return <BodyEdgeCompontent
