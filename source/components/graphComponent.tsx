@@ -25,7 +25,7 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
+import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, GroupNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 import ReadsEdge from './model/edges/readsEdge';
 import { edgeTagMapper } from './model/edges/edgeBase';
 import { ArgumentEdge } from './model/edges/argumentEdge';
@@ -39,6 +39,7 @@ import { SameDefDefEdge } from './model/edges/sameDefDefEdge';
 import { SameReadReadEdge } from './model/edges/sameReadReadEdge';
 import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge';
 import { NonStandardEvaluationEdge } from './model/edges/nonStandardEvaluationEdge';
+import { flattenToNodeArray, foldIntoElkHierarchy } from './graphHierachy';
 
 
 
@@ -56,34 +57,71 @@ const elkOptions: LayoutOptions = {
  };
 
 
- async function getLayoutedElements(nodes: Node[], edges: ElkExtendedEdge[], options: LayoutOptions): Promise<{ nodes: Node[]; edges: Edge[] }> {
+ async function getLayoutedElements(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions): Promise<{ nodes: Node[]; edges: Edge[] }> {
    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
+
+   const graph: ElkNode = {
+    id: 'root',
+    layoutOptions: options,
+    children: foldIntoElkHierarchy(nodes,nodeIdMap,isHorizontal),
+    edges: edges
+   };
+   /*
    const graph: ElkNode = {
      id: 'root',
      layoutOptions: options,
-     children: nodes.map(node => ({
-       ...node,
-       // Adjust the target and source handle positions based on the layout
-       // direction.
-       targetPosition: isHorizontal ? 'left' : 'top',
-       sourcePosition: isHorizontal ? 'right' : 'bottom',
-       labels: [{ text: node.data.label }],
-       // Hardcode a width and height for elk to use when layouting.
-       width: 150,
-       height: 50,
-     })),
+     children: nodes.map(node =>{ 
+      if(node.data.parentId !== undefined){
+        return ({
+          ...node,
+          // Adjust the target and source handle positions based on the layout
+          // direction.
+          targetPosition: isHorizontal ? 'left' : 'top',
+          sourcePosition: isHorizontal ? 'right' : 'bottom',
+          labels: [{ text: node.data.label }],
+          // Hardcode a width and height for elk to use when layouting.
+          width: 150,
+          height: 50,
+          parentId: node.data.parentId,
+          extent: 'parent'
+        })
+      }else{
+        return ({
+          ...node,
+          // Adjust the target and source handle positions based on the layout
+          // direction.
+          targetPosition: isHorizontal ? 'left' : 'top',
+          sourcePosition: isHorizontal ? 'right' : 'bottom',
+          labels: [{ text: node.data.label }],
+          // Hardcode a width and height for elk to use when layouting.
+          width: 150,
+          height: 50,
+        })
+      }      
+    }),
      edges: edges
    };
-
+   */
    const layoutedGraph = await elk.layout(graph)
+   console.log(layoutedGraph)
+   const newNodes = flattenToNodeArray(layoutedGraph.children ?? [])
+   console.log(newNodes) 
    return {
-       nodes: layoutedGraph.children?.map(node => ({
-         ...node,
-         data: { label: node.labels?.[0]?.text, id: node.id, nodeType:(node as ExtendedElkNode).data.nodeType},
-         // React Flow expects a position property on the node instead of `x`
-         // and `y` fields.
-         position: { x: node.x ?? 0, y: node.y ?? 0 },
-       })) ?? [],
+       nodes: newNodes
+       /* layoutedGraph.children?.map(node => ({
+        ...node,
+        data: { 
+          label: node.labels?.[0]?.text, 
+          id: node.id, 
+          nodeType:(node as ExtendedElkNode).data.nodeType, 
+          ...((node as ExtendedElkNode).data.parentId !== undefined)&&{parentId:(node as ExtendedElkNode).data.parentId},
+          ...((node as ExtendedElkNode).data.parentId !== undefined)&&{extent: 'parent'},
+        },
+        // React Flow expects a position property on the node instead of `x`
+        // and `y` fields.
+        position: { x: node.x ?? 0, y: node.y ?? 0 },
+     })) ?? []*/
+     ,
        edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => { 
         return {
            id: e.id,
@@ -94,7 +132,6 @@ const elkOptions: LayoutOptions = {
            label: e.label,
            //animated: true,
            //style: { stroke: '#000' },
-           //arrowHeadType: 'arrowclosed',
            type: edgeTagMapper(e.edgeType),
            data: { label: e.label }
          };
@@ -107,10 +144,11 @@ const elkOptions: LayoutOptions = {
   label:string
  }
 
- interface ExtendedElkNode extends ElkNode{
+ export interface ExtendedElkNode extends ElkNode{
   data:{
-    label:string, 
-    nodeType:string
+    label: string, 
+    nodeType: string,
+    parentId?: string
   }
  }
 
@@ -134,6 +172,7 @@ export interface LayoutFlowProps {
    const [currentGraph, setCurrentGraph] = useState(graph);
    const [nodes, setNodes, onNodesChange] = useNodesState([]);
    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+   const nodeMap = new Map<string,Node>() // correct Way to do it?????
    const { fitView } = useReactFlow();
    
    assignGraphUpdater(g =>  {
@@ -146,8 +185,8 @@ export interface LayoutFlowProps {
        const opts = { 'elk.direction': direction, ...elkOptions };
        const ns = g ? g.nodes : nodes;
        const es = g ? g.edges : edges;
-      
-       getLayoutedElements(ns, convertToExtendedEdges(es), opts).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+       const nm = g? g.nodeMap: nodeMap; // correct way to do it??????
+       getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
          setNodes(layoutedNodes);
          setEdges(layoutedEdges);
 
@@ -168,7 +207,8 @@ export interface LayoutFlowProps {
     useNode: UseNode,
     functionCallNode: FunctionCallNode,
     exitPointNode: ExitPointNode,
-    valueNode: ValueNode
+    valueNode: ValueNode,
+    groupNode:GroupNode
    }), []);
 
    /* allows to map custom edge types */

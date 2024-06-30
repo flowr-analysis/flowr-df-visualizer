@@ -45,7 +45,12 @@ export interface VertexInfo{
     "name"?: string,
     "environment"?: any,
     "when"?: string,
-    "args"?:any
+    "args"?:any,
+    "subflow"?: SubFlowInfo
+}
+
+interface SubFlowInfo {
+    "graph": number[]
 }
 
 export interface EdgeInfo{
@@ -55,7 +60,7 @@ export interface EdgeInfo{
 
 export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
 
-    const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
+    const visualizationGraph: VisualizationGraph = {nodes:[], edges: [], nodeMap: new Map<string, Node>()}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
 
@@ -103,26 +108,81 @@ function constructLexemeMapping(ast: RNode<ParentInformation>): Map<NodeId, stri
     return infoMap
 }
 
+export interface VisualizationNodeProps{
+    label: string
+    nodeType:string
+    parentId?: string
+    children?: string[]
+}
+
 
 export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInformation>, dataflowGraph: OtherGraph): VisualizationGraph {
 
     const infoMap = constructLexemeMapping(ast);
 
-    const visualizationGraph: VisualizationGraph = {nodes:[], edges: []}
+    const subflowMap = new Map<number, number>()
+
+    const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
+    
+    const visualizationGraph: VisualizationGraph = {nodes:[], edges: [], nodeMap:nodeIdMap}
+    
+    for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
+        /* position will be set by the layout later */
+        const nodeInfoInfo = nodeInfo
+        if(nodeInfoInfo.tag ==='function-definition' && nodeInfoInfo.subflow !== undefined){
+            const subflowArray = nodeInfoInfo.subflow.graph
+            console.log(subflowArray)
+            subflowArray.forEach((subNode) => {
+                subflowMap.set(subNode,nodeId)
+            })
+            
+            const idNewNode = String(nodeId) + '-subflow-node'
+            const newNode: Node<VisualizationNodeProps> = {
+                id: idNewNode,
+                data: {label: infoMap.get(nodeId) ?? '', nodeType: 'group', children:[]},
+                position: { x: 0, y: 0 },
+                connectable: false,
+                dragging: true,
+                selectable: true,
+                type: 'groupNode'
+            }
+            visualizationGraph.nodes.push(newNode)
+            nodeIdMap.set(idNewNode, newNode)
+        }
+    }
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
         const nodeInfoInfo = nodeInfo
-        const newNode: Node = {
-            id: String(nodeId),
-            data: {label: infoMap.get(nodeId), nodeType: nodeInfoInfo.tag},
-            position: { x: 0, y: 0 },
-            connectable: false,
-            dragging: true,
-            selectable: true,
-            type: nodeTagMapper(nodeInfoInfo.tag)
+        if(subflowMap.has(nodeId)){
+            const parentId = String(subflowMap.get(nodeId)) + '-subflow-node'
+            const idNewNode = String(nodeId)
+            const newNode: Node<VisualizationNodeProps> = {
+                id: idNewNode,
+                data: {label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag, parentId:parentId},
+                position: { x: 0, y: 0 },
+                connectable: false,
+                dragging: true,
+                selectable: true,
+                type: nodeTagMapper(nodeInfoInfo.tag)
+            }
+            visualizationGraph.nodes.push(newNode)
+            nodeIdMap.set(idNewNode, newNode)
+            nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
+        } else {
+            const idNewNode = String(nodeId)
+            const newNode: Node<VisualizationNodeProps> = {
+                id: idNewNode,
+                data: {label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag},
+                position: { x: 0, y: 0 },
+                connectable: false,
+                dragging: true,
+                selectable: true,
+                type: nodeTagMapper(nodeInfoInfo.tag),
+            }
+            visualizationGraph.nodes.push(newNode)
+            nodeIdMap.set(idNewNode, newNode)
         }
-        visualizationGraph.nodes.push(newNode)
     }
 
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
@@ -146,7 +206,6 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
                 visualizationGraph.edges.push(newEdge)
         }
     }
-
     return visualizationGraph
 }
 

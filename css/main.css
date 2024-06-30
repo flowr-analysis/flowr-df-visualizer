@@ -42,6 +42,9 @@ body {
 	border-radius: 50%;
 }
 
+.group-node{
+	border: solid 2px;
+}
 
 .node-handle.react-flow__handle{
 	background: none;

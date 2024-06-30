@@ -113,3 +113,11 @@ export const ExitPointNode: React.FC<NodeComponentProps> = ({ data }) => {
 export const ValueNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='value-node base-node'/>
 }
+
+export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
+  return ( 
+    <div className = 'group-node'>
+      {data.label}
+    </div>
+  )
+}
