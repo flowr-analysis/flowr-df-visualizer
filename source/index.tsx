@@ -80,8 +80,8 @@ function onRCodeRequest() {
 }
 let graphFromOtherGraph: VisualizationGraph = {
   edges: [],
-  nodes: [],
-  nodeMap: new Map<string,Node>()
+  nodesInfo: {nodes:[], nodeMap: new Map<string,Node>()}
+  
 }
 
 let graphUpdater: ((graph: VisualizationGraph) => void) | undefined = undefined;

@@ -1,7 +1,11 @@
 import { Edge, Node } from "reactflow";
 
 export interface VisualizationGraph {
-    nodes: Node[]
+    nodesInfo: NodeInformation
     edges: Edge[]
+}
+
+export interface NodeInformation{
+    nodes: Node[],
     nodeMap: Map<string, Node>
 }

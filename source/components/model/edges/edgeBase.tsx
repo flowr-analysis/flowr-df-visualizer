@@ -122,6 +122,10 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
 // returns the position (top,right,bottom or right) passed node compared to the intersection point
 function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
   
+  console.log(node.width)
+  console.log(node.height)
+
+
   const nodeToLookAt = { ...node.positionAbsolute, ...node };
   const nx = Math.round(nodeToLookAt.x!);
   const ny = Math.round(nodeToLookAt.y!);

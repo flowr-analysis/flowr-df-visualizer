@@ -60,7 +60,7 @@ export interface EdgeInfo{
 
 export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
 
-    const visualizationGraph: VisualizationGraph = {nodes:[], edges: [], nodeMap: new Map<string, Node>()}
+    const visualizationGraph: VisualizationGraph =  {nodesInfo : {nodes:[], nodeMap:new Map<string, Node>()}, edges: [],}
 
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
 
@@ -74,7 +74,7 @@ export function transformToVisualizationGraph(dataflowGraph: Graph): Visualizati
             selectable: true,
             type: nodeTagMapper(nodeInfo.tag)
         }
-        visualizationGraph.nodes.push(newNode)
+        visualizationGraph.nodesInfo.nodes.push(newNode)
     }
 
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
@@ -124,7 +124,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
     const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
     
-    const visualizationGraph: VisualizationGraph = {nodes:[], edges: [], nodeMap:nodeIdMap}
+    const visualizationGraph: VisualizationGraph = {nodesInfo : {nodes:[], nodeMap:nodeIdMap}, edges: [],}
     
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
@@ -146,7 +146,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
                 selectable: true,
                 type: 'groupNode'
             }
-            visualizationGraph.nodes.push(newNode)
+            visualizationGraph.nodesInfo.nodes.push(newNode)
             nodeIdMap.set(idNewNode, newNode)
         }
     }
@@ -166,7 +166,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
                 selectable: true,
                 type: nodeTagMapper(nodeInfoInfo.tag)
             }
-            visualizationGraph.nodes.push(newNode)
+            visualizationGraph.nodesInfo.nodes.push(newNode)
             nodeIdMap.set(idNewNode, newNode)
             nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
         } else {
@@ -180,7 +180,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
                 selectable: true,
                 type: nodeTagMapper(nodeInfoInfo.tag),
             }
-            visualizationGraph.nodes.push(newNode)
+            visualizationGraph.nodesInfo.nodes.push(newNode)
             nodeIdMap.set(idNewNode, newNode)
         }
     }

@@ -66,62 +66,17 @@ const elkOptions: LayoutOptions = {
     children: foldIntoElkHierarchy(nodes,nodeIdMap,isHorizontal),
     edges: edges
    };
-   /*
-   const graph: ElkNode = {
-     id: 'root',
-     layoutOptions: options,
-     children: nodes.map(node =>{ 
-      if(node.data.parentId !== undefined){
-        return ({
-          ...node,
-          // Adjust the target and source handle positions based on the layout
-          // direction.
-          targetPosition: isHorizontal ? 'left' : 'top',
-          sourcePosition: isHorizontal ? 'right' : 'bottom',
-          labels: [{ text: node.data.label }],
-          // Hardcode a width and height for elk to use when layouting.
-          width: 150,
-          height: 50,
-          parentId: node.data.parentId,
-          extent: 'parent'
-        })
-      }else{
-        return ({
-          ...node,
-          // Adjust the target and source handle positions based on the layout
-          // direction.
-          targetPosition: isHorizontal ? 'left' : 'top',
-          sourcePosition: isHorizontal ? 'right' : 'bottom',
-          labels: [{ text: node.data.label }],
-          // Hardcode a width and height for elk to use when layouting.
-          width: 150,
-          height: 50,
-        })
-      }      
-    }),
-     edges: edges
-   };
-   */
+   
    const layoutedGraph = await elk.layout(graph)
    console.log(layoutedGraph)
    const newNodes = flattenToNodeArray(layoutedGraph.children ?? [])
    console.log(newNodes) 
+   newNodes.forEach((node) => {
+    node.height = 0
+    node.width = 0
+   })
    return {
-       nodes: newNodes
-       /* layoutedGraph.children?.map(node => ({
-        ...node,
-        data: { 
-          label: node.labels?.[0]?.text, 
-          id: node.id, 
-          nodeType:(node as ExtendedElkNode).data.nodeType, 
-          ...((node as ExtendedElkNode).data.parentId !== undefined)&&{parentId:(node as ExtendedElkNode).data.parentId},
-          ...((node as ExtendedElkNode).data.parentId !== undefined)&&{extent: 'parent'},
-        },
-        // React Flow expects a position property on the node instead of `x`
-        // and `y` fields.
-        position: { x: node.x ?? 0, y: node.y ?? 0 },
-     })) ?? []*/
-     ,
+       nodes: newNodes,
        edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => { 
         return {
            id: e.id,
@@ -183,9 +138,9 @@ export interface LayoutFlowProps {
    const onLayout = useCallback(
      ({ direction , g = undefined } : { direction: string, g?: VisualizationGraph }) => {
        const opts = { 'elk.direction': direction, ...elkOptions };
-       const ns = g ? g.nodes : nodes;
+       const ns = g ? g.nodesInfo.nodes : nodes;
        const es = g ? g.edges : edges;
-       const nm = g? g.nodeMap: nodeMap; // correct way to do it??????
+       const nm = g ? g.nodesInfo.nodeMap: nodeMap;
        getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
          setNodes(layoutedNodes);
          setEdges(layoutedEdges);
