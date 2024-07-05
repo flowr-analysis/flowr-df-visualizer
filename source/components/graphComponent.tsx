@@ -21,6 +21,7 @@ import ReactFlow, {
   EdgeLabelRenderer,
   MarkerType,
   EdgeProps,
+  applyEdgeChanges,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -41,6 +42,7 @@ import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge';
 import { NonStandardEvaluationEdge } from './model/edges/nonStandardEvaluationEdge';
 import { flattenToNodeArray, foldIntoElkHierarchy } from './graphHierachy';
 import { ExtendedExtendedEdge, transformGraphForLayouting, transformGraphForShowing } from './model/graphTransition';
+import { MultiEdge } from './model/edges/multiEdge';
 
 
 
@@ -77,7 +79,8 @@ const elkOptions: LayoutOptions = {
      sources: [edge.source],
      targets: [edge.target],
      label: edge.label as string,
-     edgeType: edge.data.edgeType ?? ''
+     edgeType: edge.data.edgeType ?? '',
+     data:{...edge.data}
    }));
  }
 
@@ -98,7 +101,7 @@ export interface LayoutFlowProps {
     setCurrentGraph(g)
     onLayout({ direction: 'DOWN', g })
   })
-
+  
    const onLayout = useCallback(
      ({ direction , g = undefined } : { direction: string, g?: VisualizationGraph }) => {
        const opts = { 'elk.direction': direction, ...elkOptions };
@@ -143,7 +146,8 @@ export interface LayoutFlowProps {
     argumentEdge: ArgumentEdge,
     sideEffectOnCallEdge: SideEffectOnCallEdge,
     relatesEdge: RelatesEdge,
-    nonStandardEvaluationEdge: NonStandardEvaluationEdge
+    nonStandardEvaluationEdge: NonStandardEvaluationEdge,
+    multiEdge: MultiEdge
   }),[])
 
    return (
@@ -170,6 +174,12 @@ export interface LayoutFlowProps {
        edgeTypes={edgeTypes}
        onNodesChange={onNodesChange}
        onEdgesChange={onEdgesChange}
+       onEdgeMouseEnter={(event, edge) => {
+        edge.data.isHovered = true
+       }}
+       onEdgeMouseLeave={(event, edge) => {
+        edge.data.isHovered = false
+       }}
        proOptions={{hideAttribution: true}}
        connectionLineComponent={FloatingConnectionLine}
        fitView

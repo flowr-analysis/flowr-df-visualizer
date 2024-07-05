@@ -119,10 +119,10 @@ function foldOnVisualizationGraphNodes(currentNode: Node<VisualizationNodeProps>
 
 }
 
-export interface FinalNodeProps{
-    label: string
-    nodeType: string
-    id: string
+interface FinalNodeProps{
+  label: string
+  nodeType: string
+  id: string
 }
 
 export function flattenToNodeArray(nodeArray:ElkNode[]):Node<FinalNodeProps>[] {

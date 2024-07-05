@@ -13,7 +13,8 @@ const edgeTagMap:{[index: string]:string} = {
   'argument':                'argumentEdge',
   'side-effect-on-call':     'sideEffectOnCallEdge',
   'relates':                 'relatesEdge', //obsolete?
-  'non-standard-evaluation': 'nonStandardEvaluationEdge'
+  'non-standard-evaluation': 'nonStandardEvaluationEdge',
+  'multiEdge':               'multiEdge'
 };
 
 export function edgeTagMapper(edgeTag: string): string {
@@ -47,21 +48,10 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
     targetX: targetX,
     targetY: targetY,
   });
-
-  //const {sourceX, sourceY, targetX, targetY, id, sourcePosition, targetPosition} = props.standardEdgeInformation
   
-  /* const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
-    sourceX: sourceX ,
-    sourceY: sourceY,
-    targetX: targetX,
-    targetY: targetY,
-    targetPosition: targetPosition,
-    sourcePosition: sourcePosition
-  })*/
-  
-  const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
-  const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
-  
+  //const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
+  //const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
+   
   return (
     <>
     <BaseEdge
@@ -72,15 +62,15 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
     />
     <EdgeLabelRenderer>
       <div
-      style={{
-        position: 'absolute',
-        transform: `translate(-50%, -50%) translate(${labelPositionX}px,${labelPositionY}px)`,
-        fontSize: 12,
-        pointerEvents: 'all',
-      }}
-      className="nodrag nopan"
+        style={{
+          position: 'absolute',
+          transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+          fontSize: 12,
+          pointerEvents: 'all',
+        }}
+        className="nodrag nopan"
       >
-      {props.standardEdgeInformation.label}
+        {props.standardEdgeInformation.label}
       </div>
     </EdgeLabelRenderer>
     </>
@@ -122,10 +112,6 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
 // returns the position (top,right,bottom or right) passed node compared to the intersection point
 function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
   
-  console.log(node.width)
-  console.log(node.height)
-
-
   const nodeToLookAt = { ...node.positionAbsolute, ...node };
   const nx = Math.round(nodeToLookAt.x!);
   const ny = Math.round(nodeToLookAt.y!);

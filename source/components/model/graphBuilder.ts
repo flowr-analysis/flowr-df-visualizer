@@ -58,45 +58,6 @@ export interface EdgeInfo{
     "attribute"?: string
 }
 
-export function transformToVisualizationGraph(dataflowGraph: Graph): VisualizationGraph {
-
-    const visualizationGraph: VisualizationGraph =  {nodesInfo : {nodes:[], nodeMap:new Map<string, Node>()}, edges: [],}
-
-    for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation.entries()){
-
-        /* position will be set by the layout later */
-        const newNode: Node = {
-            id: nodeId,
-            data: { label: nodeInfo.name},
-            position: { x: 0, y: 0 },
-            connectable: false,
-            dragging: true,
-            selectable: true,
-            type: nodeTagMapper(nodeInfo.tag)
-        }
-        visualizationGraph.nodesInfo.nodes.push(newNode)
-    }
-
-    for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation.entries()){
-        for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes){
-            for( let linkEdgeType in targetNodeInfo.types){
-                const newEdge: Edge =
-                    {
-                        source: sourceNodeId,
-                        target: targetNodeId,
-                        id: `${sourceNodeId}-${targetNodeId}-${linkEdgeType}`,
-                        label: linkEdgeType,
-                        data: { label: linkEdgeType, edgeType: linkEdgeType }
-                    }
-                visualizationGraph.edges.push(newEdge)
-            }
-        }
-    }
-
-    return visualizationGraph
-}
-
-
 function constructLexemeMapping(ast: RNode<ParentInformation>): Map<NodeId, string> {
     const infoMap = new Map<NodeId, string>()
     visitAst(ast, node => {
@@ -125,7 +86,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
     const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
     
     const visualizationGraph: VisualizationGraph = {nodesInfo : {nodes:[], nodeMap:nodeIdMap}, edges: [],}
-    
+
+    //Construct subflow Map and nodeId Map
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
         const nodeInfoInfo = nodeInfo
@@ -151,6 +113,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
         }
     }
 
+    //Construct Nodes
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
         const nodeInfoInfo = nodeInfo
@@ -185,6 +148,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
         }
     }
 
+    //construct Edges
     for( let [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
         const listOfConnectedNodes2 = listOfConnectedNodes
         for(let [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
@@ -195,15 +159,14 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
                 labelNames += linkEdgeType + ' '
                 lastEdgeType = linkEdgeType
             }
-            const newEdge: Edge =
-                    {
-                        source: String(sourceNodeId),
-                        target: String(targetNodeId),
-                        id: `${sourceNodeId}-${targetNodeId}-${lastEdgeType}`,
-                        label: labelNames,
-                        data: { label: labelNames, edgeType: lastEdgeType }
-                    }
-                visualizationGraph.edges.push(newEdge)
+            const newEdge: Edge = {
+                source: String(sourceNodeId),
+                target: String(targetNodeId),
+                id: `${sourceNodeId}-${targetNodeId}`,
+                label: labelNames,
+                data: { label: labelNames, edgeType: 'multiEdge' , edgeTypes: listOfEdgeTypes }
+            }
+            visualizationGraph.edges.push(newEdge)
         }
     }
     return visualizationGraph

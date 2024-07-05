@@ -1,5 +1,5 @@
 import { ElkExtendedEdge, ElkNode, LayoutOptions } from "elkjs";
-import { flattenToNodeArray, foldIntoElkHierarchy,FinalNodeProps } from "../graphHierachy";
+import { flattenToNodeArray, foldIntoElkHierarchy} from "../graphHierachy";
 import { Edge, Node } from "reactflow"
 import { edgeTagMapper } from "./edges/edgeBase";
 
@@ -16,22 +16,25 @@ export function transformGraphForLayouting(nodes: Node[], nodeIdMap: Map<string,
 
 
 export interface ExtendedExtendedEdge extends ElkExtendedEdge{
+  data:any
   edgeType: string
   label:string
  }
 
 export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: boolean): { nodes: Node[]; edges: Edge[] }{
+  
   const newNodes = flattenToNodeArray(layoutedGraph.children ?? [])
-  console.log(newNodes) 
-  newNodes.forEach((node) => {
-  node.height = 0
-  node.width = 0
-  })
 
+  //reset node height and width so they will be correctly calculated and set afterwards
+  newNodes.forEach((node) => {
+    node.height = 0
+    node.width = 0
+  })
+  
   return {
     nodes: newNodes,
     edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => { 
-    return {
+      return {
       id: e.id,
       source: e.sources[0],
       target: e.targets[0],
@@ -41,7 +44,7 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
       //animated: true,
       //style: { stroke: '#000' },
       type: edgeTagMapper(e.edgeType),
-      data: { label: e.label }
+      data: { ...e.data, isHovered: false}
       };
     })
   }

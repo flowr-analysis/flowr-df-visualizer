@@ -50,7 +50,9 @@ body {
 	background: none;
 	border: none;
 }
-
+.edge-label {
+	visibility: hidden;
+}
 
 .label {
 	transition: 3s;
