@@ -40,6 +40,7 @@ import { SameReadReadEdge } from './model/edges/sameReadReadEdge';
 import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge';
 import { NonStandardEvaluationEdge } from './model/edges/nonStandardEvaluationEdge';
 import { flattenToNodeArray, foldIntoElkHierarchy } from './graphHierachy';
+import { ExtendedExtendedEdge, transformGraphForLayouting, transformGraphForShowing } from './model/graphTransition';
 
 
 
@@ -57,54 +58,17 @@ const elkOptions: LayoutOptions = {
  };
 
 
- async function getLayoutedElements(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions): Promise<{ nodes: Node[]; edges: Edge[] }> {
+ async function getLayoutedElements(nodes: Node[], 
+                                    nodeIdMap: Map<string,Node>, 
+                                    edges: ElkExtendedEdge[], 
+                                    options: LayoutOptions): Promise<{ nodes: Node[]; edges: Edge[] }> {
    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
 
-   const graph: ElkNode = {
-    id: 'root',
-    layoutOptions: options,
-    children: foldIntoElkHierarchy(nodes,nodeIdMap,isHorizontal),
-    edges: edges
-   };
+   const graph: ElkNode = transformGraphForLayouting(nodes,nodeIdMap, edges, options, isHorizontal)
    
    const layoutedGraph = await elk.layout(graph)
-   console.log(layoutedGraph)
-   const newNodes = flattenToNodeArray(layoutedGraph.children ?? [])
-   console.log(newNodes) 
-   newNodes.forEach((node) => {
-    node.height = 0
-    node.width = 0
-   })
-   return {
-       nodes: newNodes,
-       edges: (layoutedGraph.edges as ExtendedExtendedEdge[] ?? []).map(e => { 
-        return {
-           id: e.id,
-           source: e.sources[0],
-           target: e.targets[0],
-           sourceHandle: isHorizontal ? 'right' : 'bottom',
-           targetHandle: isHorizontal ? 'left' : 'top',
-           label: e.label,
-           //animated: true,
-           //style: { stroke: '#000' },
-           type: edgeTagMapper(e.edgeType),
-           data: { label: e.label }
-         };
-       })
-     }
- }
-
- interface ExtendedExtendedEdge extends ElkExtendedEdge{
-  edgeType: string
-  label:string
- }
-
- export interface ExtendedElkNode extends ElkNode{
-  data:{
-    label: string, 
-    nodeType: string,
-    parentId?: string
-  }
+   
+   return transformGraphForShowing(layoutedGraph, isHorizontal)
  }
 
  function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {

@@ -1,7 +1,6 @@
 import { ElkNode } from 'elkjs';
 import {CoordinateExtent, Node} from 'reactflow'
-import { VisualizationNodeProps } from './model/graphTransformer';
-import { ExtendedElkNode } from './graphComponent';
+import { VisualizationNodeProps } from './model/graphBuilder';
 
 const standardHeight = 50
 const standardWidth  = 150
@@ -50,6 +49,14 @@ export function foldIntoElkHierarchy(nodes:Node[], nodesIdMap: Map<string,Node>,
     return returnArray
     */
 }
+
+interface ExtendedElkNode extends ElkNode{
+  data:{
+    label: string, 
+    nodeType: string,
+    parentId?: string
+  }
+ }
 
 export interface HierarchyElkNode extends ElkNode {
     targetPosition: string,
