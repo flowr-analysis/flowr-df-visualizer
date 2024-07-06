@@ -51,7 +51,6 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
   
   //const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
   //const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
-   
   return (
     <>
     <BaseEdge

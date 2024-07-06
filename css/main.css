@@ -5,6 +5,20 @@ body {
 	margin: 0px;
 }
 
+svg {
+	pointer-events: none;
+}
+
+.react-flow__edge-path {
+	pointer-events: none;
+	cursor: none;
+}
+
+.react-flow__edge-interaction {
+	pointer-events: none;
+	cursor: none;
+}
+
 .variable-definition-node {
 	border: solid 2px;
 	padding: 5px;
@@ -50,8 +64,10 @@ body {
 	background: none;
 	border: none;
 }
-.edge-label {
+
+.edge-label { 
 	visibility: hidden;
+	pointer-events: none;
 }
 
 .label {

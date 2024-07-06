@@ -162,7 +162,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
             const newEdge: Edge = {
                 source: String(sourceNodeId),
                 target: String(targetNodeId),
-                id: `${sourceNodeId}-${targetNodeId}`,
+                id: `edge-${sourceNodeId}-${targetNodeId}`,
                 label: labelNames,
                 data: { label: labelNames, edgeType: 'multiEdge' , edgeTypes: listOfEdgeTypes }
             }

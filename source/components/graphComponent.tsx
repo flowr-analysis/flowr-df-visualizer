@@ -174,14 +174,6 @@ export interface LayoutFlowProps {
        edgeTypes={edgeTypes}
        onNodesChange={onNodesChange}
        onEdgesChange={onEdgesChange}
-       onEdgeMouseEnter={(event, edge) => {
-        edge.data.isHovered = true
-        console.log(edge.id, ' is hovered over')
-       }}
-       onEdgeMouseLeave={(event, edge) => {
-        edge.data.isHovered = false
-        console.log(edge.id, ' is not hovered over anymore')
-       }}
        proOptions={{hideAttribution: true}}
        connectionLineComponent={FloatingConnectionLine}
        fitView
