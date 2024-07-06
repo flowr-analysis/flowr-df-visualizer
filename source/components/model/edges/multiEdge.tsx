@@ -46,10 +46,7 @@ interface BodyMultiEdgeComponentProps {
     const edgeLabelId = props.standardEdgeInformation.id + '-edgeLabel'
     const hoverOverEdgeId = props.standardEdgeInformation.id + '-hoverover-interactive'
     var cssRule = 
-    `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}` // `#${props.standardEdgeInformation.id}:hover ~ #${edgeLabelId} {  background-color: green; }`   
-    //var styleSheet = document.createElement("style")
-    //styleSheet.textContent = cssRule
-    //document.head.appendChild(styleSheet)
+    `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
     
     return (
       <>
