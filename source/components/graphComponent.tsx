@@ -26,7 +26,7 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { VisualizationGraph } from './model/graph';
-import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, GroupNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
+import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, FunctionDefinitionNode, GroupNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 import ReadsEdge from './model/edges/readsEdge';
 import { edgeTagMapper } from './model/edges/edgeBase';
 import { ArgumentEdge } from './model/edges/argumentEdge';
@@ -60,17 +60,23 @@ const elkOptions: LayoutOptions = {
  };
 
 
- async function getLayoutedElements(nodes: Node[], 
-                                    nodeIdMap: Map<string,Node>, 
-                                    edges: ElkExtendedEdge[], 
-                                    options: LayoutOptions): Promise<{ nodes: Node[]; edges: Edge[] }> {
+ async function getLayoutedElements(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions): Promise<{ nodes: Node[]; edges: Edge[] }> {
    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
 
    const graph: ElkNode = transformGraphForLayouting(nodes,nodeIdMap, edges, options, isHorizontal)
-   
+  console.log('befor Layout:')
+  console.log(graph)
+
    const layoutedGraph = await elk.layout(graph)
-   
-   return transformGraphForShowing(layoutedGraph, isHorizontal)
+
+   console.log('aftr Layout:')
+   console.log(layoutedGraph)
+   const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal)
+
+   console.log(endGraph)
+
+
+   return endGraph
  }
 
  function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {
@@ -130,6 +136,7 @@ export interface LayoutFlowProps {
     functionCallNode: FunctionCallNode,
     exitPointNode: ExitPointNode,
     valueNode: ValueNode,
+    functionDefinitionNode: FunctionDefinitionNode,
     groupNode:GroupNode
    }), []);
 

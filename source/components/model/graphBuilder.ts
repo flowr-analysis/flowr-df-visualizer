@@ -93,20 +93,19 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
         const nodeInfoInfo = nodeInfo
         if(nodeInfoInfo.tag ==='function-definition' && nodeInfoInfo.subflow !== undefined){
             const subflowArray = nodeInfoInfo.subflow.graph
-            console.log(subflowArray)
             subflowArray.forEach((subNode) => {
                 subflowMap.set(subNode,nodeId)
             })
             
-            const idNewNode = String(nodeId) + '-subflow-node'
+            const idNewNode = String(nodeId) //+ '-subflow-node'
             const newNode: Node<VisualizationNodeProps> = {
                 id: idNewNode,
-                data: {label: infoMap.get(nodeId) ?? '', nodeType: 'group', children:[]},
+                data: {label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag, children:[]},
                 position: { x: 0, y: 0 },
                 connectable: false,
                 dragging: true,
                 selectable: true,
-                type: 'groupNode'
+                type: nodeTagMapper(nodeInfoInfo.tag)
             }
             visualizationGraph.nodesInfo.nodes.push(newNode)
             nodeIdMap.set(idNewNode, newNode)
@@ -117,6 +116,36 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
     for(let [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
         /* position will be set by the layout later */
         const nodeInfoInfo = nodeInfo
+        
+        const idNewNode = String(nodeId)
+        const newNode: Node<VisualizationNodeProps> = {
+            id: idNewNode,
+            data: {label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag},
+            position: { x: 0, y: 0 },
+            connectable: false,
+            dragging: true,
+            selectable: true,
+            type: nodeTagMapper(nodeInfoInfo.tag),
+        }
+
+        
+        if(!nodeIdMap.has(idNewNode)){
+            nodeIdMap.set(idNewNode, newNode)
+            visualizationGraph.nodesInfo.nodes.push(newNode)
+        }
+        
+        if(subflowMap.has(nodeId)){
+            const toAlterNode = nodeIdMap.get(idNewNode)
+            const parentId = String(subflowMap.get(nodeId))
+            toAlterNode!.data = {
+                ...toAlterNode!.data,
+                parentId: parentId
+            }
+            nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
+        }
+        
+        
+        /*
         if(subflowMap.has(nodeId)){
             const parentId = String(subflowMap.get(nodeId)) + '-subflow-node'
             const idNewNode = String(nodeId)
@@ -146,6 +175,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
             visualizationGraph.nodesInfo.nodes.push(newNode)
             nodeIdMap.set(idNewNode, newNode)
         }
+        */
     }
 
     //construct Edges
@@ -180,7 +210,7 @@ const nodeTagMap:{[index: string]:string} = {
     'use':                  'useNode',
     'variable-definition':  'variableDefinitionNode',
     'function-call':        'functionCallNode',
-    'function-definition':  'variableDefinitionNode', //for now definition nodes look the same (function as well as variable)
+    'function-definition':  'functionDefinitionNode',
     'exit-point':           'exitPointNode',
     'value':                'valueNode'
 }

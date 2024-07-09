@@ -1,5 +1,5 @@
 import { ElkNode } from 'elkjs';
-import {CoordinateExtent, Node} from 'reactflow'
+import {CoordinateExtent, Node, XYPosition} from 'reactflow'
 import { VisualizationNodeProps } from './model/graphBuilder';
 
 const standardHeight = 50
@@ -54,7 +54,8 @@ interface ExtendedElkNode extends ElkNode{
   data:{
     label: string, 
     nodeType: string,
-    parentId?: string
+    parentId?: string,
+    children?: string[]
   }
  }
 
@@ -123,31 +124,70 @@ interface FinalNodeProps{
   label: string
   nodeType: string
   id: string
+  estimatedMaxX: number
+  estimatedMaxY: number
+  estimatedMinX: number
+  estimatedMinY: number
 }
+
+interface FlattenReturnProperties{
+  node: Node<FinalNodeProps>
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+}
+
 
 export function flattenToNodeArray(nodeArray:ElkNode[]):Node<FinalNodeProps>[] {
-    return nodeArray.map((node) => flattenHierachyNode(node)).flat()
+    return nodeArray.map((node) => flattenHierachyNode(node,{x: 0, y: 0})).flat().map((returnProperty) => returnProperty.node)
 }
 
-function flattenHierachyNode(currentNode:ElkNode):Node<FinalNodeProps>[]{
-    let toReturnNodeArray: Node<FinalNodeProps>[] = []
+function flattenHierachyNode(currentNode: ElkNode, positionParentNode: XYPosition):FlattenReturnProperties[]{
+    let toReturnNodeArray: FlattenReturnProperties[] = []
 
+    const absolutePositionX = (currentNode.x ?? 0) + (positionParentNode.x ?? 0) 
+    const absolutePositionY = (currentNode.y ?? 0) + (positionParentNode.y ?? 0)
     const newNode: Node<FinalNodeProps> = {
         ...currentNode,
         data: { 
           label: currentNode.labels?.[0]?.text ?? '', 
           id: currentNode.id, 
-          nodeType:(currentNode as ExtendedElkNode).data.nodeType, 
+          nodeType:(currentNode as ExtendedElkNode).data.nodeType,
+          estimatedMinX: absolutePositionX,
+          estimatedMinY: absolutePositionY,
+          estimatedMaxX: absolutePositionX + (currentNode.width ?? 0),
+          estimatedMaxY: absolutePositionY + (currentNode.height ?? 0),
           ...((currentNode as ExtendedElkNode).data.parentId !== undefined)&&{parentId:(currentNode as ExtendedElkNode).data.parentId},
           ...((currentNode as ExtendedElkNode).data.parentId !== undefined)&&{extent: 'parent'},
+          ...((currentNode as ExtendedElkNode).data.children !== undefined)&&{children:(currentNode as ExtendedElkNode).data.children},
         },
         // React Flow expects a position property on the node instead of `x`
         // and `y` fields.
-        position: { x: currentNode.x ?? 0, y: currentNode.y ?? 0 },
+        //position is adapted since the position the layout generates is relative to the parent
+        position: { x: absolutePositionX, y: absolutePositionY },
     }
-    toReturnNodeArray.push(newNode)
+
+    const newFlattenedProperty: FlattenReturnProperties = {
+      node: newNode,
+      minX: newNode.data.estimatedMinX,
+      minY: newNode.data.estimatedMinY,
+      maxX: newNode.data.estimatedMaxX,
+      maxY: newNode.data.estimatedMaxY
+    }
+
+    toReturnNodeArray.push(newFlattenedProperty)
     if(currentNode.children !== undefined){
-        const flattenedChildNodes = currentNode.children.map((node) => flattenHierachyNode(node)).flat()
+        const flattenedChildNodes = currentNode.children.map((node) => flattenHierachyNode(node, newNode.position)).flat()
+        
+        //calculate dimensions for function definiton node
+        newNode.data.estimatedMaxX = flattenedChildNodes.map((flattenedProperty) => flattenedProperty.maxX).reduce((previousMax, currentMax) => {
+          return previousMax < currentMax ? currentMax : previousMax
+        }, 0)
+        newNode.data.estimatedMaxY = flattenedChildNodes.map((flattenedProperty) => flattenedProperty.maxY).reduce((previousMax, currentMax) => {
+          return previousMax < currentMax ? currentMax : previousMax
+        }, 0)
+
         toReturnNodeArray = toReturnNodeArray.concat(flattenedChildNodes)
     }
 

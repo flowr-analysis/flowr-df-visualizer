@@ -1,4 +1,4 @@
-import { ConnectionLineComponentProps, Node, NodeProps , Position} from "reactflow"
+import { ConnectionLineComponentProps, Node, NodeProps , NodeResizer, Position} from "reactflow"
 import { HandleNodeComponent } from "./handleNodeComponent"
 import React from "react";
 import { ProgressPlugin } from "webpack";
@@ -106,6 +106,28 @@ export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='function-call-node base-node'/>
 }
 
+
+export const FunctionDefinitionNode: React.FC<NodeComponentProps> = ({ data }) => {
+  const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data
+  const divStyle: React.CSSProperties = {}
+  divStyle.width = estimatedMaxX - estimatedMinX
+  divStyle.height = estimatedMaxY - estimatedMinY
+  const minWidth = estimatedMaxX - estimatedMinX
+  const minHeight = estimatedMaxY - estimatedMinY
+  //<NodeResizer minWidth={minWidth} minHeight={minHeight}/>
+  //
+  return ( 
+    <HandleNodeComponent>
+      
+      <div className = 'function-definition-node base-node' style = {divStyle}>
+        <HoverOverComponent name={data.label} id={data.id} nodeType= {data.nodeType}/>
+        <label htmlFor="text">{data.label}</label>
+      </div>
+    </HandleNodeComponent>
+  )
+}
+
+
 export const ExitPointNode: React.FC<NodeComponentProps> = ({ data }) => {
   return <BodyNodeComponent data={data} className='exit-point-node base-node'/>
 }
@@ -115,8 +137,13 @@ export const ValueNode: React.FC<NodeComponentProps> = ({ data }) => {
 }
 
 export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
+  const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data
+  const divStyle: React.CSSProperties = {}
+  divStyle.width = estimatedMaxX - estimatedMinX
+  divStyle.height = estimatedMaxY - estimatedMinY
+  
   return ( 
-    <div className = 'group-node'>
+    <div className = 'group-node' style = {divStyle}>
       {data.label}
     </div>
   )
