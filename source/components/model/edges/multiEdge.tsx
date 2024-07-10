@@ -1,22 +1,26 @@
 import { useCallback } from "react";
-import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, getBezierPath, useStore } from "reactflow";
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
 import { getEdgeParams } from "./edgeBase";
 
 export function MultiEdge(props:EdgeProps){
     return <BodyMultiEdgeCompontent
       standardEdgeInformation={props}
+      source={props.source}
+      target={props.target}
     />
 }
 
 interface BodyMultiEdgeComponentProps {
-    readonly standardEdgeInformation: EdgeProps,
+    readonly standardEdgeInformation: EdgeProps;
+    readonly arrowEnd?: boolean;
+    readonly source: string;
+    readonly target: string;
   }
   
   export const BodyMultiEdgeCompontent: React.FC<BodyMultiEdgeComponentProps> = (props) => {
-    
-    const sourceNode = useStore(useCallback((store) => store.nodeInternals.get(props.standardEdgeInformation.source), [props.standardEdgeInformation.source]));
-    const targetNode = useStore(useCallback((store) => store.nodeInternals.get(props.standardEdgeInformation.target), [props.standardEdgeInformation.target]));
   
+    const sourceNode = useInternalNode(props.source)
+    const targetNode = useInternalNode(props.target)
     if (!sourceNode || !targetNode) {
       return null;
     }
@@ -39,7 +43,7 @@ interface BodyMultiEdgeComponentProps {
     const arrowStart = false
 
     let label = ''
-    for(const singleLabel of props.standardEdgeInformation.data.edgeTypes){
+    for(const singleLabel of (props.standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
         label += singleLabel + ' '
     }
 

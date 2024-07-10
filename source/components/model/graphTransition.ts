@@ -1,6 +1,6 @@
 import { ElkExtendedEdge, ElkNode, LayoutOptions } from "elkjs";
 import { flattenToNodeArray, foldIntoElkHierarchy} from "../graphHierachy";
-import { Edge, Node } from "reactflow"
+import { Edge, Node } from '@xyflow/react'
 import { edgeTagMapper } from "./edges/edgeBase";
 
 export function transformGraphForLayouting(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions, isHorizontal: boolean):ElkNode{

@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import '../css/main.css';
 import { MainContainerComponent } from './components/mainContainerComponent';
 import { OtherGraph, transformToVisualizationGraphForOtherGraph } from './components/model/graphBuilder';
-import { ReactFlowProvider, Node } from 'reactflow';
+import { ReactFlowProvider, Node } from '@xyflow/react';
 import { LayoutFlow } from './components/graphComponent';
 import { VisualizerWebsocketClient } from './components/network/visualizerWebsocketClient';
 import { FormEvent } from 'react';

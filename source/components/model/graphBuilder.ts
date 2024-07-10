@@ -1,4 +1,4 @@
-import { Edge, Node } from "reactflow";
+import { Edge, Node } from '@xyflow/react';
 import { VisualizationGraph } from "./graph";
 import { EdgeTypeName, edgeTypesToNames } from "@eagleoutice/flowr/dataflow/graph/edge";
 import { NodeId } from "@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/node-id";
@@ -69,9 +69,10 @@ function constructLexemeMapping(ast: RNode<ParentInformation>): Map<NodeId, stri
     return infoMap
 }
 
-export interface VisualizationNodeProps{
+export interface VisualizationNodeProps extends Record<string, unknown> { 
     label: string
     nodeType:string
+    extent?: string
     parentId?: string
     children?: string[]
 }
@@ -139,7 +140,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
             const parentId = String(subflowMap.get(nodeId))
             toAlterNode!.data = {
                 ...toAlterNode!.data,
-                parentId: parentId
+                parentId: parentId,
+                extent: 'parent'
             }
             nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
         }

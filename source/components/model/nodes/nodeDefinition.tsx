@@ -1,9 +1,9 @@
-import { ConnectionLineComponentProps, Node, NodeProps , NodeResizer, Position} from "reactflow"
+import { ConnectionLineComponentProps, Node, NodeProps , NodeResizer, Position} from '@xyflow/react'
 import { HandleNodeComponent } from "./handleNodeComponent"
 import React from "react";
 import { ProgressPlugin } from "webpack";
 
-import { getBezierPath } from 'reactflow';
+import { getBezierPath } from '@xyflow/react';
 import { getEdgeParams } from "../edges/edgeBase";
 
 
@@ -18,7 +18,6 @@ function FloatingConnectionLine(props:ConnectionLineComponentProps) {
     id: 'connection-target',
     width: 1,
     height: 1,
-    positionAbsolute: { x: toX, y: toY },
     position: {x: toX, y: toY},
     data:{}
   };
@@ -72,8 +71,8 @@ const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
   return (
     <HandleNodeComponent>
       <div className = {props.className}>
-        <HoverOverComponent name={props.data.label} id={props.data.id} nodeType= {props.data.nodeType}/>
-        <label htmlFor="text">{props.data.label}</label>
+        <HoverOverComponent name={props.data.label as string} id={props.data.id as string} nodeType= {props.data.nodeType as string}/>
+        <label htmlFor="text">{props.data.label as string}</label>
       </div>
     </HandleNodeComponent>
   )
@@ -108,7 +107,12 @@ export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
 
 
 export const FunctionDefinitionNode: React.FC<NodeComponentProps> = ({ data }) => {
-  const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data
+  const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data as {
+    estimatedMinX: number,
+    estimatedMinY: number,
+    estimatedMaxX: number,
+    estimatedMaxY: number
+  }
   const divStyle: React.CSSProperties = {}
   divStyle.width = estimatedMaxX - estimatedMinX
   divStyle.height = estimatedMaxY - estimatedMinY
@@ -120,8 +124,8 @@ export const FunctionDefinitionNode: React.FC<NodeComponentProps> = ({ data }) =
     <HandleNodeComponent>
       
       <div className = 'function-definition-node base-node' style = {divStyle}>
-        <HoverOverComponent name={data.label} id={data.id} nodeType= {data.nodeType}/>
-        <label htmlFor="text">{data.label}</label>
+        <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
+        <label htmlFor="text">{data.label as string}</label>
       </div>
     </HandleNodeComponent>
   )
@@ -137,14 +141,19 @@ export const ValueNode: React.FC<NodeComponentProps> = ({ data }) => {
 }
 
 export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
-  const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data
+  const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data as {
+    estimatedMinX: number,
+    estimatedMinY: number,
+    estimatedMaxX: number,
+    estimatedMaxY: number
+  }
   const divStyle: React.CSSProperties = {}
   divStyle.width = estimatedMaxX - estimatedMinX
   divStyle.height = estimatedMaxY - estimatedMinY
   
   return ( 
     <div className = 'group-node' style = {divStyle}>
-      {data.label}
+      {data.label as string}
     </div>
   )
 }

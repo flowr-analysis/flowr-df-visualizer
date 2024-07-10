@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { getStraightPath, BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, Node, Position, useStore, XYPosition} from "reactflow";
+import { getStraightPath, BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, Node, Position, useStore, XYPosition, useInternalNode} from '@xyflow/react';
 
 const edgeTagMap:{[index: string]:string} = {
   'reads':                   'readsEdge',
@@ -27,13 +27,15 @@ interface BodyEdgeComponentProps {
   readonly label: string,
   readonly arrowStart?: boolean;
   readonly arrowEnd?: boolean;
+  readonly source: string;
+  readonly target: string;
 }
 
 export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
   
-  const sourceNode = useStore(useCallback((store) => store.nodeInternals.get(props.standardEdgeInformation.source), [props.standardEdgeInformation.source]));
-  const targetNode = useStore(useCallback((store) => store.nodeInternals.get(props.standardEdgeInformation.target), [props.standardEdgeInformation.target]));
-
+  const sourceNode = useInternalNode(props.source)
+  const targetNode = useInternalNode(props.target)
+    
   if (!sourceNode || !targetNode) {
     return null;
   }
@@ -84,10 +86,10 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
   const {
     width: intersectionNodeWidth,
     height: intersectionNodeHeight,
-    positionAbsolute: intersectionNodePosition,
+    position: intersectionNodePosition,
   } = intersectionNode;
 
-  const targetPosition = targetNode.positionAbsolute;
+  const targetPosition = targetNode.position;
 
   const w = intersectionNodeWidth! / 2;
   const h = intersectionNodeHeight! / 2;
@@ -111,16 +113,16 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
 // returns the position (top,right,bottom or right) passed node compared to the intersection point
 function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
   
-  const nodeToLookAt = { ...node.positionAbsolute, ...node };
+  const nodeToLookAt = { ...node.position, ...node };
   const nx = Math.round(nodeToLookAt.x!);
   const ny = Math.round(nodeToLookAt.y!);
   const px = Math.round(intersectionPoint.x);
   const py = Math.round(intersectionPoint.y);
 
-  const leftPosition = node.positionAbsolute!.x 
-  const rightPosition = node.positionAbsolute!.x + node.width!
-  const topPosition = node.positionAbsolute!.y
-  const buttomPosition = node.positionAbsolute!.y + node.height!
+  const leftPosition = node.position!.x 
+  const rightPosition = node.position!.x + node.width!
+  const topPosition = node.position!.y
+  const buttomPosition = node.position!.y + node.height!
   
   if(Math.abs(leftPosition - intersectionPoint.x) <= 0.1){
     return Position.Left

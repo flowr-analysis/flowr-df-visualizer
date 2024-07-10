@@ -1,4 +1,4 @@
-import { EdgeProps } from "reactflow"
+import { EdgeProps } from '@xyflow/react'
 import { BodyEdgeCompontent } from "./edgeBase"
 
 export function ArgumentEdge(props:EdgeProps) {
@@ -6,6 +6,7 @@ export function ArgumentEdge(props:EdgeProps) {
       standardEdgeInformation={props}
       edgeStyle = {{stroke: 'blue', strokeDasharray: '7,7'}}
       label = 'argument'
-  
+      source={props.source}
+      target={props.target}
     />
   }

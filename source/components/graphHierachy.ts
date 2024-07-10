@@ -1,5 +1,5 @@
 import { ElkNode } from 'elkjs';
-import {CoordinateExtent, Node, XYPosition} from 'reactflow'
+import {CoordinateExtent, Node, XYPosition} from '@xyflow/react'
 import { VisualizationNodeProps } from './model/graphBuilder';
 
 const standardHeight = 50
@@ -13,7 +13,7 @@ export function foldIntoElkHierarchy(nodes:Node[], nodesIdMap: Map<string,Node>,
     const usedMap  = new Map<string, boolean>()
     nodesIdMap.forEach((node, id) => usedMap.set(id,false))
 
-    const smthToReturn =  (nodes.map((node) => foldOnVisualizationGraphNodes(node, nodesIdMap, usedMap, isHorizontal))).filter(nonEmpty)
+    const smthToReturn =  (nodes.map((node) => foldOnVisualizationGraphNodes(node as Node<VisualizationNodeProps>, nodesIdMap as Map<string, Node<VisualizationNodeProps>>, usedMap, isHorizontal))).filter(nonEmpty)
     
     return smthToReturn
     /*
@@ -120,7 +120,7 @@ function foldOnVisualizationGraphNodes(currentNode: Node<VisualizationNodeProps>
 
 }
 
-interface FinalNodeProps{
+interface FinalNodeProps extends Record<string, unknown> {
   label: string
   nodeType: string
   id: string

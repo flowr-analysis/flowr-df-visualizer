@@ -1,6 +1,7 @@
 import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
 import React, { ChangeEventHandler, useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import ReactFlow, {
+import {
+  ReactFlow,
   addEdge,
   Panel,
   useNodesState,
@@ -22,9 +23,10 @@ import ReactFlow, {
   MarkerType,
   EdgeProps,
   applyEdgeChanges,
-} from 'reactflow';
+} from '@xyflow/react';
 
-import 'reactflow/dist/style.css';
+import '@xyflow/react/dist/style.css';
+
 import { VisualizationGraph } from './model/graph';
 import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, FunctionDefinitionNode, GroupNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition';
 import ReadsEdge from './model/edges/readsEdge';
@@ -85,7 +87,7 @@ const elkOptions: LayoutOptions = {
      sources: [edge.source],
      targets: [edge.target],
      label: edge.label as string,
-     edgeType: edge.data.edgeType ?? '',
+     edgeType: edge.data?.edgeType ?? '',
      data:{...edge.data}
    }));
  }
@@ -98,8 +100,8 @@ export interface LayoutFlowProps {
 
  export function LayoutFlow({ graph, assignGraphUpdater } : LayoutFlowProps) {
    const [currentGraph, setCurrentGraph] = useState(graph);
-   const [nodes, setNodes, onNodesChange] = useNodesState([]);
-   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
    const nodeMap = new Map<string,Node>() // correct Way to do it?????
    const { fitView } = useReactFlow();
    
@@ -117,6 +119,7 @@ export interface LayoutFlowProps {
        getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
          setNodes(layoutedNodes);
          setEdges(layoutedEdges);
+         console.log(layoutedNodes)
 
          window.requestAnimationFrame(() => fitView());
        });
