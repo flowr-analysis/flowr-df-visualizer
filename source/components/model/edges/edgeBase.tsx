@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { getStraightPath, BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, Node, Position, useStore, XYPosition, useInternalNode} from '@xyflow/react';
+import { getStraightPath, BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, Node, Position, useStore, XYPosition, useInternalNode, InternalNode} from '@xyflow/react';
 
 const edgeTagMap:{[index: string]:string} = {
   'reads':                   'readsEdge',
@@ -104,9 +104,11 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
     position: intersectionNodePosition,
   } = intersectionNode;
   */
-  const targetPosition = targetNode.position;
-  const intersectionNodePosition = intersectionNode.position
+  const targetPosition = getAbsolutePosition(targetNode);
+  const intersectionNodePosition = getAbsolutePosition(intersectionNode)
 
+  //Set position correctly because subnode position is relative to parent
+  
   const w = intersectionNodeWidth / 2;
   const h = intersectionNodeHeight / 2;
 
@@ -138,10 +140,13 @@ function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
   if(node.position.x === undefined || node.position.y === undefined || node.measured?.height === undefined || node.measured.width === undefined){
     throw Error('position or measured dimension undefined')
   }
-  const leftPosition = node.position.x 
-  const rightPosition = node.position.x + node.measured.width
-  const topPosition = node.position.y
-  const bottomPosition = node.position.y + node.measured.height
+
+  const absolutePositionNode = getAbsolutePosition(node)
+
+  const leftPosition = absolutePositionNode.x 
+  const rightPosition = absolutePositionNode.x + node.measured.width
+  const topPosition = absolutePositionNode.y
+  const bottomPosition = absolutePositionNode.y + node.measured.height
   
   if(Math.abs(leftPosition - intersectionPoint.x) <= 0.1){
     return Position.Left
@@ -178,4 +183,10 @@ export function getEdgeParams(source:Node, target: Node) {
     sourcePos,
     targetPos,
   };
+}
+
+
+function getAbsolutePosition(currentNode:Node):XYPosition{
+  const internalNode= useInternalNode(currentNode.id)
+  return internalNode?.internals.positionAbsolute ?? currentNode.position
 }

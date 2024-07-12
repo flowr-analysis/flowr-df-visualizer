@@ -13,41 +13,9 @@ export function foldIntoElkHierarchy(nodes:Node[], nodesIdMap: Map<string,Node>,
     const usedMap  = new Map<string, boolean>()
     nodesIdMap.forEach((node, id) => usedMap.set(id,false))
 
-    const smthToReturn =  (nodes.map((node) => foldOnVisualizationGraphNodes(node as Node<VisualizationNodeProps>, nodesIdMap as Map<string, Node<VisualizationNodeProps>>, usedMap, isHorizontal))).filter(nonEmpty)
+    const toReturn =  (nodes.map((node) => foldOnVisualizationGraphNodes(node as Node<VisualizationNodeProps>, nodesIdMap as Map<string, Node<VisualizationNodeProps>>, usedMap, isHorizontal))).filter(nonEmpty)
     
-    return smthToReturn
-    /*
-    const returnArray = nodes.map(node =>{ 
-        if(node.data.parentId !== undefined){
-          return ({
-            ...node,
-            // Adjust the target and source handle positions based on the layout
-            // direction.
-            targetPosition: isHorizontal ? 'left' : 'top',
-            sourcePosition: isHorizontal ? 'right' : 'bottom',
-            labels: [{ text: node.data.label }],
-            // Hardcode a width and height for elk to use when layouting.
-            width: standardWidth,
-            height: standardHeight,
-            parentId: node.data.parentId,
-            extent: 'parent'
-          })
-        }else{
-          return ({
-            ...node,
-            // Adjust the target and source handle positions based on the layout
-            // direction.
-            targetPosition: isHorizontal ? 'left' : 'top',
-            sourcePosition: isHorizontal ? 'right' : 'bottom',
-            labels: [{ text: node.data.label }],
-            // Hardcode a width and height for elk to use when layouting.
-            width: standardWidth,
-            height: standardHeight,
-          })
-        }
-      })
-    return returnArray
-    */
+    return toReturn
 }
 
 interface ExtendedElkNode extends ElkNode{
@@ -78,9 +46,12 @@ function foldOnVisualizationGraphNodes(currentNode: Node<VisualizationNodeProps>
                                        isHorizontal: boolean):HierarchyElkNode | undefined{
     if(currentNode.data.children !== undefined){
         //calculate Children of the currentNode
-        const childrenOfNode : HierarchyElkNode[]= currentNode.data.children.map((nodeId) => nodeIdMap.get(nodeId)).filter((node => node !== undefined)).map((node) => 
-            foldOnVisualizationGraphNodes(node!,nodeIdMap,usedIdsMap, isHorizontal)
-        ).filter(nonEmpty)
+        const childrenOfNode : HierarchyElkNode[]= 
+          currentNode.data.children
+          .map((nodeId) => nodeIdMap.get(nodeId))
+          .filter((node => node !== undefined))
+          .map((node) => foldOnVisualizationGraphNodes(node!,nodeIdMap,usedIdsMap, isHorizontal))
+          .filter(nonEmpty)
         const newHeight = childrenOfNode.reduce((accumulatedHeight, node) => accumulatedHeight + (node.height ?? 0), 0) + standardHeight
         const newWidth = standardWidth + 10
         const toReturn = {
@@ -165,7 +136,7 @@ function flattenHierarchyNode(currentNode: ElkNode, positionParentNode: XYPositi
         // React Flow expects a position property on the node instead of `x`
         // and `y` fields.
         //position is adapted since the position the layout generates is relative to the parent
-        position: { x: absolutePositionX, y: absolutePositionY },
+        position: { x: currentNode.x ?? 0, y: currentNode.y ?? 0 },
     }
 
     const newFlattenedProperty: FlattenReturnProperties = {
