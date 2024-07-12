@@ -1,8 +1,8 @@
 import { EdgeProps } from '@xyflow/react'
-import { BodyEdgeCompontent } from "./edgeBase"
+import { BodyEdgeComponent } from "./edgeBase"
 
 export function NonStandardEvaluationEdge(props:EdgeProps) {
-    return <BodyEdgeCompontent
+    return <BodyEdgeComponent
       standardEdgeInformation={props}
       edgeStyle = {{stroke: 'blue', strokeDasharray: '2,3'}}
       label = 'Non Standard Evaluation'

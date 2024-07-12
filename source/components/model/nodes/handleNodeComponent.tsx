@@ -1,14 +1,15 @@
 import { Handle, NodeProps, Position } from '@xyflow/react';
 
-export interface HandleNodeComponentProps {
-   targetBackgroundColor: string
+ interface HandleNodeComponentProps {
+   targetHandleId:string
+   sourceHandleId:string
 }
 
-export function HandleNodeComponent(props : React.PropsWithChildren) {
+export const HandleNodeComponent:React.FC<React.PropsWithChildren<HandleNodeComponentProps>> = (props) => {
    return (<>
-      <Handle type="target" position={Position.Top} isConnectable={false} className="node-handle"/>
+      <Handle id = {'top'} type="target" position={Position.Top} isConnectable={false} className="node-handle"/>
       {props.children}
-      <Handle type="source" position={Position.Bottom} isConnectable={false} className="node-handle" />
+      <Handle id = {'bottom'} type="source" position={Position.Bottom} isConnectable={false} className="node-handle" />
    </>)
 }
 

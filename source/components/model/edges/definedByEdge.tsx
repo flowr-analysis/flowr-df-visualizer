@@ -1,8 +1,8 @@
 import { EdgeProps } from '@xyflow/react'
-import { BodyEdgeCompontent } from "./edgeBase"
+import { BodyEdgeComponent } from "./edgeBase"
 
 export function DefinedByEdge(props:EdgeProps) {
-    return <BodyEdgeCompontent
+    return <BodyEdgeComponent
       standardEdgeInformation={props}
       edgeStyle = {{stroke: 'black'}}
       label = 'defined-by'

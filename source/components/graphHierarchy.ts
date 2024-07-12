@@ -140,10 +140,10 @@ interface FlattenReturnProperties{
 
 
 export function flattenToNodeArray(nodeArray:ElkNode[]):Node<FinalNodeProps>[] {
-    return nodeArray.map((node) => flattenHierachyNode(node,{x: 0, y: 0})).flat().map((returnProperty) => returnProperty.node)
+    return nodeArray.map((node) => flattenHierarchyNode(node,{x: 0, y: 0})).flat().map((returnProperty) => returnProperty.node)
 }
 
-function flattenHierachyNode(currentNode: ElkNode, positionParentNode: XYPosition):FlattenReturnProperties[]{
+function flattenHierarchyNode(currentNode: ElkNode, positionParentNode: XYPosition):FlattenReturnProperties[]{
     let toReturnNodeArray: FlattenReturnProperties[] = []
 
     const absolutePositionX = (currentNode.x ?? 0) + (positionParentNode.x ?? 0) 
@@ -178,9 +178,9 @@ function flattenHierachyNode(currentNode: ElkNode, positionParentNode: XYPositio
 
     toReturnNodeArray.push(newFlattenedProperty)
     if(currentNode.children !== undefined){
-        const flattenedChildNodes = currentNode.children.map((node) => flattenHierachyNode(node, newNode.position)).flat()
+        const flattenedChildNodes = currentNode.children.map((node) => flattenHierarchyNode(node, newNode.position)).flat()
         
-        //calculate dimensions for function definiton node
+        //calculate dimensions for function definition node
         newNode.data.estimatedMaxX = flattenedChildNodes.map((flattenedProperty) => flattenedProperty.maxX).reduce((previousMax, currentMax) => {
           return previousMax < currentMax ? currentMax : previousMax
         }, 0)

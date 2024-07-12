@@ -1,5 +1,5 @@
 import { ElkExtendedEdge, ElkNode, LayoutOptions } from "elkjs";
-import { flattenToNodeArray, foldIntoElkHierarchy} from "../graphHierachy";
+import { flattenToNodeArray, foldIntoElkHierarchy} from "../graphHierarchy";
 import { Edge, Node } from '@xyflow/react'
 import { edgeTagMapper } from "./edges/edgeBase";
 
@@ -26,9 +26,12 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
   const newNodes = flattenToNodeArray(layoutedGraph.children ?? [])
 
   //reset node height and width so they will be correctly calculated and set afterwards
+  
   newNodes.forEach((node) => {
-    node.height = 0
-    node.width = 0
+    delete node['height']
+    delete node['width']
+    //node.height = 0
+    //node.width = 0
   })
   
   return {

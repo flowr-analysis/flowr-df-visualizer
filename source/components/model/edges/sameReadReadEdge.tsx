@@ -1,8 +1,8 @@
 import { EdgeProps } from '@xyflow/react'
-import { BodyEdgeCompontent } from "./edgeBase"
+import { BodyEdgeComponent } from "./edgeBase"
 
 export function SameReadReadEdge(props:EdgeProps) {
-    return <BodyEdgeCompontent
+    return <BodyEdgeComponent
       standardEdgeInformation={props}
       edgeStyle = {{stroke: 'grey', strokeDasharray: '2,5'}}
       label = 'same-read-read'

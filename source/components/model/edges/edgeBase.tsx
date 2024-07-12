@@ -31,8 +31,9 @@ interface BodyEdgeComponentProps {
   readonly target: string;
 }
 
-export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
-  
+export const BodyEdgeComponent: React.FC<BodyEdgeComponentProps> = (props) => {
+
+
   const sourceNode = useInternalNode(props.source)
   const targetNode = useInternalNode(props.target)
     
@@ -41,6 +42,7 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
   }
   
   const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
+
 
   const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
     sourceX: sourceX,
@@ -83,21 +85,35 @@ export const BodyEdgeCompontent: React.FC<BodyEdgeComponentProps> = (props) => {
 // of the line between the center of the intersectionNode and the target node
 function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition {
   // https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
+  
+
+
+  const intersectionNodeWidth = intersectionNode.measured?.width
+  const intersectionNodeHeight = intersectionNode.measured?.height
+
+  const targetNodeWidth = targetNode.measured?.width
+  const targetNodeHeight = targetNode.measured?.height
+  
+  if(intersectionNodeHeight === undefined || intersectionNodeWidth === undefined || targetNodeWidth === undefined || targetNodeHeight === undefined){
+    throw Error('width or height not measured')
+  }
+  /*
   const {
     width: intersectionNodeWidth,
     height: intersectionNodeHeight,
     position: intersectionNodePosition,
   } = intersectionNode;
-
+  */
   const targetPosition = targetNode.position;
+  const intersectionNodePosition = intersectionNode.position
 
-  const w = intersectionNodeWidth! / 2;
-  const h = intersectionNodeHeight! / 2;
+  const w = intersectionNodeWidth / 2;
+  const h = intersectionNodeHeight / 2;
 
-  const x2 = intersectionNodePosition!.x + w;
-  const y2 = intersectionNodePosition!.y + h;
-  const x1 = targetPosition!.x! + targetNode.width! / 2;
-  const y1 = targetPosition!.y! + targetNode.height! / 2;
+  const x2 = intersectionNodePosition.x + w;
+  const y2 = intersectionNodePosition.y + h;
+  const x1 = targetPosition.x + targetNodeWidth / 2;
+  const y1 = targetPosition.y + targetNodeHeight / 2;
 
   const xx1 = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h);
   const yy1 = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h);
@@ -119,10 +135,13 @@ function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
   const px = Math.round(intersectionPoint.x);
   const py = Math.round(intersectionPoint.y);
 
-  const leftPosition = node.position!.x 
-  const rightPosition = node.position!.x + node.width!
-  const topPosition = node.position!.y
-  const buttomPosition = node.position!.y + node.height!
+  if(node.position.x === undefined || node.position.y === undefined || node.measured?.height === undefined || node.measured.width === undefined){
+    throw Error('position or measured dimension undefined')
+  }
+  const leftPosition = node.position.x 
+  const rightPosition = node.position.x + node.measured.width
+  const topPosition = node.position.y
+  const bottomPosition = node.position.y + node.measured.height
   
   if(Math.abs(leftPosition - intersectionPoint.x) <= 0.1){
     return Position.Left
@@ -136,7 +155,7 @@ function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
     return Position.Top
   }
 
-  if(Math.abs(buttomPosition - intersectionPoint.y) <= 0.1){
+  if(Math.abs(bottomPosition - intersectionPoint.y) <= 0.1){
     return Position.Bottom
   }
 

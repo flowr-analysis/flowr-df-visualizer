@@ -1,5 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import '../css/main.css';
+import '@xyflow/react/dist/style.css'
+import '@xyflow/react/dist/base.css'
 import { MainContainerComponent } from './components/mainContainerComponent';
 import { OtherGraph, transformToVisualizationGraphForOtherGraph } from './components/model/graphBuilder';
 import { ReactFlowProvider, Node } from '@xyflow/react';

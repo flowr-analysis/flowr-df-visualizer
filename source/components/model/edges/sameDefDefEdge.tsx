@@ -1,8 +1,8 @@
 import { EdgeProps } from '@xyflow/react'
-import { BodyEdgeCompontent } from "./edgeBase"
+import { BodyEdgeComponent } from "./edgeBase"
 
 export function SameDefDefEdge(props:EdgeProps) {
-    return <BodyEdgeCompontent
+    return <BodyEdgeComponent
       standardEdgeInformation={props}
       edgeStyle = {{stroke: 'blue', strokeDasharray: '2,7'}}
       label = 'same-def-def'

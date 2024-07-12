@@ -1,9 +1,10 @@
 import { useCallback } from "react";
-import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, InternalNode, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
 import { getEdgeParams } from "./edgeBase";
 
 export function MultiEdge(props:EdgeProps){
-    return <BodyMultiEdgeCompontent
+    
+  return <BodyMultiEdgeComponent
       standardEdgeInformation={props}
       source={props.source}
       target={props.target}
@@ -17,14 +18,15 @@ interface BodyMultiEdgeComponentProps {
     readonly target: string;
   }
   
-  export const BodyMultiEdgeCompontent: React.FC<BodyMultiEdgeComponentProps> = (props) => {
-  
+  export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (props) => {
     const sourceNode = useInternalNode(props.source)
     const targetNode = useInternalNode(props.target)
+
     if (!sourceNode || !targetNode) {
       return null;
     }
     
+
     const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
     
     const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({

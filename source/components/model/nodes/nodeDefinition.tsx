@@ -1,6 +1,6 @@
-import { ConnectionLineComponentProps, Node, NodeProps , NodeResizer, Position} from '@xyflow/react'
+import { ConnectionLineComponentProps, Node, NodeProps , NodeResizer, Position, useUpdateNodeInternals} from '@xyflow/react'
 import { HandleNodeComponent } from "./handleNodeComponent"
-import React from "react";
+import React, { useState } from "react";
 import { ProgressPlugin } from "webpack";
 
 import { getBezierPath } from '@xyflow/react';
@@ -68,8 +68,9 @@ interface NodeComponentProps {
 }
 
 const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
+ 
   return (
-    <HandleNodeComponent>
+    <HandleNodeComponent targetHandleId={props.data.id as string + '-targetHandle'} sourceHandleId={props.data.id as string + '-sourceHandle'}>
       <div className = {props.className}>
         <HoverOverComponent name={props.data.label as string} id={props.data.id as string} nodeType= {props.data.nodeType as string}/>
         <label htmlFor="text">{props.data.label as string}</label>
@@ -121,7 +122,7 @@ export const FunctionDefinitionNode: React.FC<NodeComponentProps> = ({ data }) =
   //<NodeResizer minWidth={minWidth} minHeight={minHeight}/>
   //
   return ( 
-    <HandleNodeComponent>
+    <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
       
       <div className = 'function-definition-node base-node' style = {divStyle}>
         <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>

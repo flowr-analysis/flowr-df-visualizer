@@ -42,7 +42,7 @@ import { SameDefDefEdge } from './model/edges/sameDefDefEdge';
 import { SameReadReadEdge } from './model/edges/sameReadReadEdge';
 import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge';
 import { NonStandardEvaluationEdge } from './model/edges/nonStandardEvaluationEdge';
-import { flattenToNodeArray, foldIntoElkHierarchy } from './graphHierachy';
+import { flattenToNodeArray, foldIntoElkHierarchy } from './graphHierarchy';
 import { ExtendedExtendedEdge, transformGraphForLayouting, transformGraphForShowing } from './model/graphTransition';
 import { MultiEdge } from './model/edges/multiEdge';
 
@@ -66,12 +66,12 @@ const elkOptions: LayoutOptions = {
    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
 
    const graph: ElkNode = transformGraphForLayouting(nodes,nodeIdMap, edges, options, isHorizontal)
-  console.log('befor Layout:')
+  console.log('before Layout:')
   console.log(graph)
 
    const layoutedGraph = await elk.layout(graph)
 
-   console.log('aftr Layout:')
+   console.log('after Layout:')
    console.log(layoutedGraph)
    const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal)
 
