@@ -4,15 +4,12 @@ import { getStraightPath, BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath,
 const edgeTagMap:{[index: string]:string} = {
   'reads':                   'readsEdge',
   'defined-by':              'definedByEdge',
-  'same-read-read':          'sameReadReadEdge', //obsolete?
-  'same-def-def':            'sameDefDefEdge', // obsolete?
   'calls':                   'callsEdge',
   'returns':                 'returnsEdge',
   'defines-on-call':         'definesOnCallEdge',
   'defined-by-on-call':      'definedByOnCallEdge',
   'argument':                'argumentEdge',
   'side-effect-on-call':     'sideEffectOnCallEdge',
-  'relates':                 'relatesEdge', //obsolete?
   'non-standard-evaluation': 'nonStandardEvaluationEdge',
   'multiEdge':               'multiEdge'
 };
