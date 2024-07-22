@@ -9,6 +9,68 @@ svg {
 	pointer-events: none;
 }
 
+#slide-in-legend {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 25vw;
+    height: 100vh;
+	background: white;
+}
+
+#legend-close-button-div {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+
+.button-close-legend {
+  background: #FF4742;
+  border: 1px solid #FF4742;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-block;
+  font-family: nunito,roboto,proxima-nova,"proxima nova",sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 16px;
+  min-height: 40px;
+  outline: 0;
+  padding: 12px 14px;
+  text-align: center;
+  text-rendering: geometricprecision;
+  text-transform: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+}
+
+.button-close-legend:hover,
+.button-close-legend:active {
+  background-color: initial;
+  background-position: 0 0;
+  color: #FF4742;
+}
+
+.button-close-legend:active {
+  opacity: .5;
+}
+
+.slide-in-legend-invisible {
+	transform: translate3d(-100vw, 0, 0);
+	transition: 1s;
+}
+
+.slide-in-legend-visible {
+	transform: translate3d(0, 0, 0);
+	transition: 1s;
+}
+
 .function-definition-node {
 	--b: 3px;   /* border thickness */
 	--s: .45em; /* size of the corner */
@@ -29,7 +91,9 @@ svg {
   
 	user-select: none;
 	-webkit-user-select: none;
-}  
+}
+
+
 .react-flow__edge-path {
 	pointer-events: none;
 	cursor: none;

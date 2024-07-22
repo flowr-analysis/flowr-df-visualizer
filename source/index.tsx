@@ -11,6 +11,7 @@ import { FormEvent } from 'react';
 import { VisualizationGraph } from './components/model/graph';
 import { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model';
 import { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate';
+import { LegendComponent, slideInLegend } from './components/legendComonent';
 /* old example
 const otherGraph:OtherGraph =  {
   "rootVertices":["0","2","5"],
@@ -108,9 +109,13 @@ root.render(
         <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} />
     </ReactFlowProvider>
     <div className='r-code-input'>
-    <input onChange={onRCodeInputChange}></input>
-    <button onClick={onRCodeRequest}>Send R code</button>
+      <input onChange={onRCodeInputChange}></input>
+      <button onClick={onRCodeRequest}>Send R code</button>
     </div>
+    <div id = {'legend-button-div'}>
+      <button onClick={slideInLegend}>Legend</button>
+    </div>
+    <LegendComponent/>
   </MainContainerComponent>
 );
 
