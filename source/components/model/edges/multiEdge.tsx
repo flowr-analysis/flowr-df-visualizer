@@ -190,12 +190,16 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
   const lengthOfCurve = calculateLengthOfBezierCurve(startPointBez,startControlPointBez,endControlPointBez,endPointBez)
 
   //check if curve is too small to fit many points
-  let amountOfMarkerPoints = Math.floor((lengthOfCurve - startEndDistanceToMarkers) / lengthBetweenMarkerPoints)
-  if(amountOfMarkerPoints <= props.edgeTypes.size){
-    amountOfMarkerPoints = props.edgeTypes.size
+  let amountOfMarkerPointsInBetween = Math.floor((lengthOfCurve - startEndDistanceToMarkers * 2 - 2 * lengthBetweenMarkerPoints * props.edgeTypes.size) / lengthBetweenMarkerPoints)
+  if(amountOfMarkerPointsInBetween <= 0){
+    amountOfMarkerPointsInBetween = 0
   }
 
-  const individualMarkerPoints = Math.floor(amountOfMarkerPoints / props.edgeTypes.size) 
+  const maximumOfInBetweenPoints = 4
+
+  const individualMarkerPointsInBetween = Math.floor(amountOfMarkerPointsInBetween / props.edgeTypes.size) > maximumOfInBetweenPoints ? 
+                                          maximumOfInBetweenPoints : 
+                                          Math.floor(amountOfMarkerPointsInBetween / props.edgeTypes.size) 
 
   //calculate which symbols need to be on which points
   const markerMap = new Map<number, string>()
@@ -206,14 +210,19 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
 
     //evenly space markerPoints
     let percentageArray: number[] = []
-    if(individualMarkerPoints === 1){
-      percentageArray = props.edgeTypes.size === 1 ? [0.5] : [1 / props.edgeTypes.size* (1 + indexOfMarkerType) ]
+    if(individualMarkerPointsInBetween === 0){
+      percentageArray = [1 / (1 + props.edgeTypes.size) * (1 + indexOfMarkerType) ]
     } else {
-      let nextPoint = (startEndDistanceToMarkers  + indexOfMarkerType * lengthBetweenMarkerPoints) / lengthOfCurve 
-      while (nextPoint < 1 - startEndDistanceToMarkers / lengthOfCurve){
+      let nextPoint = (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  indexOfMarkerType)/ lengthOfCurve // first Marker
+      while (nextPoint < 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  props.edgeTypes.size)/ lengthOfCurve){
         percentageArray.push(nextPoint)
-        nextPoint += lengthBetweenMarkerPoints * props.edgeTypes.size / lengthOfCurve
+        nextPoint += (props.edgeTypes.size) * //Correctly jump for each marker
+                      (1 - 2 * (startEndDistanceToMarkers + lengthBetweenMarkerPoints * props.edgeTypes.size) / lengthOfCurve) * // use in between distance as reference 
+                      1 / (individualMarkerPointsInBetween * props.edgeTypes.size + 1) //spacing between points
       }
+      // last marker
+      nextPoint = 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  (props.edgeTypes.size - (indexOfMarkerType + 1)))/ lengthOfCurve 
+      percentageArray.push(nextPoint)
     }
     
     //get points on BezierCurve
