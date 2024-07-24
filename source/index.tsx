@@ -112,9 +112,6 @@ root.render(
       <input onChange={onRCodeInputChange}></input>
       <button onClick={onRCodeRequest}>Send R code</button>
     </div>
-    <div id = {'legend-button-div'}>
-      <button onClick={slideInLegend}>Legend</button>
-    </div>
     <LegendComponent/>
   </MainContainerComponent>
 );
