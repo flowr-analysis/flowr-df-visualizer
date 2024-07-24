@@ -5,7 +5,7 @@ import { EdgeType, EdgeTypeName } from "@eagleoutice/flowr/dataflow/graph/edge";
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
-const startEndDistanceToMarkers = 5
+const startEndDistanceToMarkers = 10
 const bezierSplitConst = 1 // 0 <= bezierSplitConst <= 1
 export function MultiEdge(props:EdgeProps){
     
@@ -140,6 +140,21 @@ function calculateLengthOfBezierCurve(startingPoint:XYPosition, startControlPoin
   return intermediateResult.sum
 }
 
+function linearPercentageBezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):XYPosition{
+  const curveLengthTotal = calculateLengthOfBezierCurve(startingPoint, startControlPoint, endControlPoint, endingPoint)
+  const rangeForSamplePoints = range(0,1, amountOfSamplePointsForLength, true)
+  let approximatedLength = 0
+  for(let indexOfPercentageArray = 1; indexOfPercentageArray < rangeForSamplePoints.length; indexOfPercentageArray++){
+    const lastPoint = bezierCurve(rangeForSamplePoints[indexOfPercentageArray - 1],startingPoint, startControlPoint, endControlPoint, endingPoint)
+    const currentPoint = bezierCurve(rangeForSamplePoints[indexOfPercentageArray],startingPoint, startControlPoint, endControlPoint, endingPoint)
+    approximatedLength += Math.sqrt(Math.pow(currentPoint.x - lastPoint.x, 2) + Math.pow(currentPoint.y - lastPoint.y, 2))
+    if(approximatedLength / curveLengthTotal >= t){
+      return currentPoint
+    }
+  }
+  return endingPoint
+}
+
 function range(start: number, end: number, amountOfNumbers:number, includeEnd: boolean): number[]{
   const divideBy = includeEnd ? (amountOfNumbers - 1) : amountOfNumbers
   return Array.from(Array(amountOfNumbers).keys()).map((key) => start + (end - start) / divideBy * key)
@@ -226,7 +241,7 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
     }
     
     //get points on BezierCurve
-    const pointsOnCurve = percentageArray.map((percentage) => bezierCurve(percentage, startPointBez, startControlPointBez, endControlPointBez, endPointBez))
+    const pointsOnCurve = percentageArray.map((percentage) => linearPercentageBezierCurve(percentage, startPointBez, startControlPointBez, endControlPointBez, endPointBez))
     pointsMap.set(indexOfMarkerType, pointsOnCurve)
     indexOfMarkerType += 1
   }
