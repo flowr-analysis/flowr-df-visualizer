@@ -22,7 +22,7 @@ function FloatingConnectionLine(props:ConnectionLineComponentProps) {
     data:{}
   };
 
-  const { sourceX, sourceY } = getEdgeParams(fromNode, targetNode);
+  const { sourceX, sourceY } = getEdgeParams(fromNode, targetNode, false);
   const [edgePath] = getBezierPath({
     sourceX: sourceX,
     sourceY: sourceY,

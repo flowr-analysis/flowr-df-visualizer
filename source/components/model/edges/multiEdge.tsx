@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, EdgeTypes, InternalNode, XYPosition, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, EdgeTypes, InternalNode, ReactFlowState, XYPosition, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
 import { getEdgeParams } from "./edgeBase";
 import { EdgeType, EdgeTypeName } from "@eagleoutice/flowr/dataflow/graph/edge";
 
@@ -21,90 +21,99 @@ interface BodyMultiEdgeComponentProps {
     readonly arrowEnd?: boolean;
     readonly source: string;
     readonly target: string;
+}
+
+export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (props) => {
+  const sourceNode = useInternalNode(props.source)
+  const targetNode = useInternalNode(props.target)
+
+  if (!sourceNode || !targetNode) {
+    return null;
   }
-  
-  export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (props) => {
-    const sourceNode = useInternalNode(props.source)
-    const targetNode = useInternalNode(props.target)
 
-    if (!sourceNode || !targetNode) {
-      return null;
-    }
-    
-
-    const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode);
-    
-    const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
-      sourceX: sourceX,
-      sourceY: sourceY,
-      sourcePosition: sourcePos,
-      targetPosition: targetPos,
-      targetX: targetX,
-      targetY: targetY,
-    });
-
-    //const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
-    //const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
-    const defaultEdgeStyle: React.CSSProperties = {stroke: 'black', pointerEvents: 'none', cursor: 'none'}
-    const arrowEnd = true
-    const arrowStart = false
-
-    let label = ''
-    for(const singleLabel of (props.standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
-        label += singleLabel + ' '
-    }
-    /*
-      <BaseEdge
-        id={hoverOverEdgeId} //Interaction Edge
-        path={edgePath} 
-        style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
-      />
-      <BaseEdge
-        id={props.standardEdgeInformation.id} //Shown Edge
-        path={edgePath} 
-        style= {defaultEdgeStyle}
-        markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
-      />
-    */ 
-    const edgeLabelId = props.standardEdgeInformation.id + '-edgeLabel'
-    const hoverOverEdgeId = props.standardEdgeInformation.id + '-hoverover-interactive'
-    var cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
-    
-    const givenEdgeTypes = props.standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
-    return (
-      <>
-      <BaseEdge
-        id={hoverOverEdgeId} //Interaction Edge
-        path={edgePath} 
-        style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
-      />
-      <BaseEdge
-        id={props.standardEdgeInformation.id} //Shown Edge
-        path={edgePath} 
-        style= {defaultEdgeStyle}
-        markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
-      />
-      <EdgeSymbolComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
-      <style>
-        {cssRule}
-      </style>
-      <EdgeLabelRenderer>
-        <div
-        id = {edgeLabelId}
-        style={{
-          position: 'absolute',
-          transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-          fontSize: 12,
-        }}
-        className="nodrag nopan edge-label"
-        >
-            {label}
-        </div>
-        
-      </EdgeLabelRenderer>
-      </>
+  const isBiDirectionEdge = useStore((s: ReactFlowState) => {
+    const edgeExists = s.edges.some(
+      (e) =>
+        (e.source === props.standardEdgeInformation.target && e.target === props.standardEdgeInformation.source) ||
+        (e.target === props.standardEdgeInformation.source && e.source === props.standardEdgeInformation.target),
     );
+
+    return edgeExists;
+  });
+
+  const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode, isBiDirectionEdge);
+
+  const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
+    sourceX: sourceX,
+    sourceY: sourceY,
+    sourcePosition: sourcePos,
+    targetPosition: targetPos,
+    targetX: targetX,
+    targetY: targetY,
+  });
+
+  //const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
+  //const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
+  const defaultEdgeStyle: React.CSSProperties = {stroke: 'black', pointerEvents: 'none', cursor: 'none'}
+  const arrowEnd = true
+  const arrowStart = false
+
+  let label = ''
+  for(const singleLabel of (props.standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
+      label += singleLabel + ' '
   }
+  /*
+    <BaseEdge
+      id={hoverOverEdgeId} //Interaction Edge
+      path={edgePath} 
+      style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
+    />
+    <BaseEdge
+      id={props.standardEdgeInformation.id} //Shown Edge
+      path={edgePath} 
+      style= {defaultEdgeStyle}
+      markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
+    />
+  */ 
+  const edgeLabelId = props.standardEdgeInformation.id + '-edgeLabel'
+  const hoverOverEdgeId = props.standardEdgeInformation.id + '-hoverover-interactive'
+  var cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
+  
+  const givenEdgeTypes = props.standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
+  return (
+    <>
+    <BaseEdge
+      id={hoverOverEdgeId} //Interaction Edge
+      path={edgePath} 
+      style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
+    />
+    <BaseEdge
+      id={props.standardEdgeInformation.id} //Shown Edge
+      path={edgePath} 
+      style= {defaultEdgeStyle}
+      markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
+    />
+    <EdgeSymbolComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
+    <style>
+      {cssRule}
+    </style>
+    <EdgeLabelRenderer>
+      <div
+      id = {edgeLabelId}
+      style={{
+        position: 'absolute',
+        transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+        fontSize: 12,
+      }}
+      className="nodrag nopan edge-label"
+      >
+          {label}
+      </div>
+      
+    </EdgeLabelRenderer>
+    </>
+  );
+}
 
 //see also https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 /**
@@ -250,7 +259,7 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
   let useArray:JSX.Element[] = []
   markerMap.forEach((edgeSymbolId,offsetIndex) => {
     const pointsOfMarker = pointsMap.get(offsetIndex)
-    const useBlockArray = pointsOfMarker?.map((point) =>{return (<use id = {props.id + '-' + point.x + '-' + point.y} href={`#${edgeSymbolId}`} x={point.x} y={point.y} />)}) ?? []
+    const useBlockArray = pointsOfMarker?.map((point) =>{return (<use key = {props.id + '-' + point.x + '-' + point.y} id = {props.id + '-' + point.x + '-' + point.y} href={`#${edgeSymbolId}`} x={point.x} y={point.y} />)}) ?? []
     useArray = useArray.concat(useBlockArray)
   })
   
