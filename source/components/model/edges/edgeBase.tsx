@@ -239,7 +239,7 @@ function rotatePositionOnNodeDegrees(node:Node, intersectionPoint:XYPosition, an
   } else {
     degreeFromMiddle = Math.atan2(distanceToMiddle.y , distanceToMiddle.x)
   }
-  console.log(degreeFromMiddle)
+  
   const newAngle = degreeFromMiddle + angleInDegrees / 360 * 2 * Math.PI
   const lengthLongerFromMiddleOfNode = node.measured.height + node.measured.width
   const newReferencePoint:XYPosition = {x: Math.cos(newAngle) * lengthLongerFromMiddleOfNode + nodeMiddle.x, y: Math.sin(newAngle) * lengthLongerFromMiddleOfNode + nodeMiddle.y} 
