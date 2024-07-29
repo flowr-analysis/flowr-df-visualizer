@@ -119,15 +119,3 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = (props) => {
         <text x = {92} y = {15}>{props.edgeText}</text>
     </svg>)
 }
-
-interface OpacityRuleComponentProps{
-
-}
-
-const OpacityRuleComponent: React.FC<OpacityRuleComponentProps> = (props) => {
-    const nodeTypes = ['variable-definition-node', 'function-definition-node','value-node', 'function-call-node', 'use-node']
- 
- return(<style>
-          
- </style>)   
-}
