@@ -80,6 +80,10 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
   var cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
   
   const givenEdgeTypes = props.standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
+  //insert respective className
+  let classNameString = ''
+  givenEdgeTypes.forEach((edgeTypeName) => {classNameString += ' ' + edgeTypeName + '-edge'})
+  classNameString = classNameString.slice(1)
   return (
     <>
     <BaseEdge
@@ -89,6 +93,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
     />
     <BaseEdge
       id={props.standardEdgeInformation.id} //Shown Edge
+      className={classNameString}
       path={edgePath} 
       style= {defaultEdgeStyle}
       markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
@@ -123,7 +128,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
  * @param startControlPoint 
  * @param endControlPoint 
  * @param endingPoint 
- * @returns Point on BezierCurve equal to the percentage given in t
+ * @returns Point on BezierCurve 
  */
 function bezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):XYPosition {
   return ({
@@ -149,6 +154,15 @@ function calculateLengthOfBezierCurve(startingPoint:XYPosition, startControlPoin
   return intermediateResult.sum
 }
 
+/**
+ * calculates the percentage wise (in relation to length) point on bezier curve
+ * @param t 0 <= t <= 1
+ * @param startingPoint 
+ * @param startControlPoint 
+ * @param endControlPoint 
+ * @param endingPoint 
+ * @returns point which is approximately t percent through the bezier curve
+ */
 function linearPercentageBezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):XYPosition{
   const curveLengthTotal = calculateLengthOfBezierCurve(startingPoint, startControlPoint, endControlPoint, endingPoint)
   const rangeForSamplePoints = range(0,1, amountOfSamplePointsForLength, true)
@@ -230,7 +244,7 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
   const pointsMap = new Map<number, XYPosition[]>()
   let indexOfMarkerType = 0
   for(let value of props.edgeTypes){
-    markerMap.set(indexOfMarkerType, edgeTypeToSymbolIdMapper(value))
+    markerMap.set(indexOfMarkerType, value)
 
     //evenly space markerPoints
     let percentageArray: number[] = []
@@ -257,9 +271,9 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
   
   //create use elements
   let useArray:JSX.Element[] = []
-  markerMap.forEach((edgeSymbolId,offsetIndex) => {
+  markerMap.forEach((edgeType,offsetIndex) => {
     const pointsOfMarker = pointsMap.get(offsetIndex)
-    const useBlockArray = pointsOfMarker?.map((point) =>{return (<use key = {props.id + '-' + point.x + '-' + point.y} id = {props.id + '-' + point.x + '-' + point.y} href={`#${edgeSymbolId}`} x={point.x} y={point.y} />)}) ?? []
+    const useBlockArray = pointsOfMarker?.map((point) =>{return (<use className = {`${edgeType}-edge-symbol`}key = {props.id + '-' + point.x + '-' + point.y} id = {props.id + '-' + point.x + '-' + point.y} href={`#${edgeTypeToSymbolIdMapper(edgeType)}`} x={point.x} y={point.y} />)}) ?? []
     useArray = useArray.concat(useBlockArray)
   })
   
