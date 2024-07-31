@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { edgeTypeToSymbolIdMapper } from "./model/edges/multiEdge";
 import { SideEffectOnCallEdge } from "./model/edges/sideEffectOnCallEdge";
 
@@ -67,22 +68,26 @@ export const LegendComponent: React.FC<LegendComponentProps> = (props) => {
 
     return (
         <div className = 'slide-in-legend' id = 'slide-in-legend' >
-            <div className='variable-definition-node variable-definition-node-legend' style={{position: 'absolute',top: 0,  left: 10, display: 'inline-block'}}>variable-definition</div>
-            <div className='function-definition-node function-definition-node-legend' style={{position: 'absolute',top: 38,  left: 4, display: 'inline-block'}}>function-definition</div>
-            <div className='value-node value-node-legend' style={{position: 'absolute',top: 90,  left: 10, display: 'inline-block'}}>value-node</div>
-            <div className='function-call-node function-call-node-legend' style={{position: 'absolute',top: 130,  left: 10, display: 'inline-block'}}>function-call</div>
-            <div className='use-node use-node-legend' style={{position: 'absolute',top: 170,  left: 10, display: 'inline-block'}}>use</div>
-            <div className='exit-point-node exit-point-node-legend' style={{position: 'absolute',top: 210,  left: 10, display: 'inline-block'}}>exit-point</div>
+            <div className='legend-nodes'>
+                <div className='legend-element variable-definition-node variable-definition-node-legend'>variable-definition</div>
+                <div className='legend-element function-definition-node function-definition-node-legend'>function-definition</div>
+                <div className='legend-element value-node value-node-legend'>value-node</div>
+                <div className='legend-element function-call-node function-call-node-legend'>function-call</div>
+                <div className='legend-element use-node use-node-legend'>use</div>
+                <div className='legend-element exit-point-node exit-point-node-legend'>exit-point</div>
+            </div>
+            <div className='legend-edges'>
+                <EdgeLegendComponent symbolId={readsEdgeSymbolId} edgeType = 'reads' edgeText='reads' />
+                <EdgeLegendComponent symbolId={definedByEdgeSymbolId} edgeType='defined-by' edgeText='defined-by' />
+                <EdgeLegendComponent symbolId={callsEdgeSymbolId} edgeType='calls' edgeText='calls' />
+                <EdgeLegendComponent symbolId={returnsEdgeSymbolId} edgeType='returns' edgeText='returns' />
+                <EdgeLegendComponent symbolId={definesOnCallEdgeSymbolId} edgeType='defines-on-call' edgeText='defines-on-call' />
+                <EdgeLegendComponent symbolId={definedByOnCallEdgeSymbolId} edgeType='defined-by-on-call' edgeText='defined-by-on-call' />
+                <EdgeLegendComponent symbolId={argumentEdgeSymbolId} edgeType='argument' edgeText='argument' />
+                <EdgeLegendComponent symbolId={sideEffectOnCallEdge} edgeType='side-effect-on-call' edgeText='side-effect-on-call' />
+                <EdgeLegendComponent symbolId={nonStandardEvaluationEdge} edgeType='non-standard-evaluation' edgeText='non-standard-evaluation' />
+            </div>
             
-            <EdgeLegendComponent symbolId={readsEdgeSymbolId} edgeType = 'reads' edgeText='reads' fromTop={0} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={definedByEdgeSymbolId} edgeType='defined-by' edgeText='defined-by' fromTop={20} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={callsEdgeSymbolId} edgeType='calls' edgeText='calls' fromTop={40} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={returnsEdgeSymbolId} edgeType='returns' edgeText='returns' fromTop={60} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={definesOnCallEdgeSymbolId} edgeType='defines-on-call' edgeText='defines-on-call' fromTop={80} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={definedByOnCallEdgeSymbolId} edgeType='defined-by-on-call' edgeText='defined-by-on-call' fromTop={100} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={argumentEdgeSymbolId} edgeType='argument' edgeText='argument' fromTop={120} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={sideEffectOnCallEdge} edgeType='side-effect-on-call' edgeText='side-effect-on-call' fromTop={140} fromLeft={200}/>
-            <EdgeLegendComponent symbolId={nonStandardEvaluationEdge} edgeType='non-standard-evaluation' edgeText='non-standard-evaluation' fromTop={160} fromLeft={200}/>
             <div id = 'legend-close-button-div'>
                 <button className = {'button-close-legend'} onClick = {slideOutLegend} >X</button>
             </div>
@@ -111,15 +116,23 @@ interface EdgeLegendComponentProps {
     edgeType:string
     symbolId: string
     edgeText:string
-    fromTop: number
-    fromLeft: number
 }
+
 
 const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = (props) => {
     const classNameEdge = props.edgeType + '-edge'
     const classNameInteractiveEdge = props.edgeType + '-legend-edge-interactive' 
     
-    return(<svg style={{position: 'absolute',top: props.fromTop,  left:props.fromLeft}}>
+    
+    return(<svg
+        id={props.edgeType + '-legend'}
+        onClick={() => {
+            const l = document.getElementById(props.edgeType + '-legend');
+            if(l !== null){
+                l.classList.toggle('legend-passive')
+            }
+        }}
+    >
         <path className={props.edgeType + '-legend-edge' + ' ' + classNameEdge} d='m0 10 l80 0' markerEnd='url(#triangle)' style={{stroke:'black', strokeWidth: 1}}></path>
         <path className = {classNameInteractiveEdge} d='m0 10 l80 0' style={{pointerEvents:'all', strokeWidth: 20}}></path>
         <SymbolComponent edgeType = {props.edgeType} symbolId= {props.symbolId}/>

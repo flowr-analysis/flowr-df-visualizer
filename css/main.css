@@ -72,6 +72,11 @@ svg {
 	
 	transform: translateX(-100%);
 	transition: 300ms ease-in-out;
+	
+	display: flex;
+	flex-direction: row;
+   padding: 12px;
+	gap: 4em;
 }
 
 .slide-in-legend.visible {
@@ -215,3 +220,39 @@ svg {
 	top: 15px; 
 	left: 15px;
 }
+
+
+
+.legend-element {
+	width: 80%;
+	height: 1em;
+}
+
+.legend-nodes {
+	min-width: 15em;
+	width: 40%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.legend-edges {
+	min-width: 15em;
+	width: 40%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.legend-active {
+	opacity: 0;
+	font-weight: bold;
+}
+
+.legend-passive {
+	opacity: 0.15;
+	font-weight: normal;
+}	
