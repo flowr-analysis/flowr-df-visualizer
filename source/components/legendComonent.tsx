@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { edgeTypeToSymbolIdMapper } from "./model/edges/multiEdge";
+import { edgeTypeToMarkerIdMapper, edgeTypeToSymbolIdMapper } from "./model/edges/multiEdge";
 import { SideEffectOnCallEdge } from "./model/edges/sideEffectOnCallEdge";
 
 
@@ -112,16 +112,17 @@ interface EdgeLegendComponentProps {
 
 
 const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edgeType, isGreyedOutMap}) => {
-    const classNameEdge = edgeType + '-edge'
-    const classNameInteractiveEdge = edgeType + '-legend-edge-interactive' 
+    const classNameEdge = edgeType + '-edge' + ' legend-edge' + ' ' + edgeType + '-legend-edge'
+    const classNameInteractiveEdge = edgeType + '-legend-interactive-edge' + ' legend-interactive-edge' 
     const symbolId = edgeTypeToSymbolIdMapper(edgeType)
-    
+    const markerId = edgeTypeToMarkerIdMapper(edgeType)
+    const legendId = edgeType + '-legend'
     return(<svg
-        id={edgeType + '-legend'}
+        id={legendId}
         onClick={() => {
             const pathElements = document.getElementsByClassName(`${edgeType}-edge`) as HTMLCollectionOf<SVGPathElement>
             const symbolElements = document.getElementsByClassName(`${edgeType}-edge-symbol`) as HTMLCollectionOf<SVGUseElement>
-
+            const legendSVGElement = document.getElementById(legendId) as HTMLElement
             //get the greyed out state and set it correctly
             const isEdgeTypeGreyedOut:boolean = isGreyedOutMap.get(edgeType) ?? false
             isGreyedOutMap.set(edgeType,!isEdgeTypeGreyedOut)
@@ -134,15 +135,16 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edge
             for(const element of symbolElements){
                 element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
             }
+            legendSVGElement.classList.toggle
         }}
     >
-        <path className={edgeType + '-legend-edge' + ' ' + classNameEdge} d='m0 10 l80 0' markerEnd='url(#triangle)' style={{stroke:'black', strokeWidth: 1}}></path>
-        <path className = {classNameInteractiveEdge} d='m0 10 l80 0' style={{pointerEvents:'all', strokeWidth: 200}}></path>
-        <SymbolComponent edgeType = {edgeType} symbolId= {symbolId}/>
-        <text style = {{pointerEvents: 'all'}} className = {classNameInteractiveEdge + ' ' + classNameEdge} x = {92} y = {15}>{edgeText}</text>
+        <path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
+        <path className = {classNameInteractiveEdge} d='m0 10 l80 0' ></path>
+        
+        <text x = {92} y = {15}>{edgeText}</text>
     </svg>)
 }  
-
+//<SymbolComponent edgeType = {edgeType} symbolId= {symbolId}/>
 interface NodeLegendComponentProps{
     nodeType:string
     isGreyedOutMap: Map<string,boolean>    

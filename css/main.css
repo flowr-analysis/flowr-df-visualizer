@@ -150,6 +150,19 @@ body {
 	background: none;
 	border: none;
 }
+.react-flow__edge-path.multi-edge {
+	stroke: black;
+	stroke-width: 1px;
+	pointer-events: none;
+	cursor: none;
+}
+
+.interactive-edge {
+	stroke-width: 10px;
+	visibility: hidden;
+	pointer-events: all;
+	cursor: pointer;
+}
 
 .edge-label { 
 	visibility: hidden;
@@ -235,6 +248,20 @@ body {
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
+}
+
+.legend-edge{
+	stroke:black;
+	stroke-width: 1px;
+}
+
+.legend-interactive-edge {
+	pointer-events:all;
+	stroke-width: 20px;
+}
+
+.legend-text{
+	pointer-events: all;
 }
 
 .legend-active {

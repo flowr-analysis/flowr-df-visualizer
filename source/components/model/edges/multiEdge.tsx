@@ -62,19 +62,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
   for(const singleLabel of (props.standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
       label += singleLabel + ' '
   }
-  /*
-    <BaseEdge
-      id={hoverOverEdgeId} //Interaction Edge
-      path={edgePath} 
-      style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
-    />
-    <BaseEdge
-      id={props.standardEdgeInformation.id} //Shown Edge
-      path={edgePath} 
-      style= {defaultEdgeStyle}
-      markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
-    />
-  */ 
+
   const edgeLabelId = props.standardEdgeInformation.id + '-edgeLabel'
   const hoverOverEdgeId = props.standardEdgeInformation.id + '-hoverover-interactive'
   var cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
@@ -84,14 +72,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
   let classNameString = ''
   givenEdgeTypes.forEach((edgeTypeName) => {classNameString += ' ' + edgeTypeName + '-edge'})
   classNameString = classNameString.slice(1)
-  
-  return (
-    <>
-    <path
-      id={hoverOverEdgeId} //Interaction Edge
-      d={edgePath} 
-      style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
-    />
+  /*
     <path
       id={props.standardEdgeInformation.id} //Shown Edge
       className={classNameString + ' react-flow__edge-path'}
@@ -99,8 +80,10 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
       style = {defaultEdgeStyle}
       markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
     />
-    
-    <EdgeMarkerComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
+  */
+  return (
+    <>
+    <PathWithMarkerComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
     <style>
       {cssRule}
     </style>
@@ -192,7 +175,7 @@ interface BezierCurve {
   readonly endPoint: XYPosition,
 }
 
-interface EdgeMarkerComponentProps {
+interface PathWithMarkerComponentProps {
   edgePath: string,
   edgeTypes: Set<EdgeTypeName>
   id: string
@@ -339,7 +322,7 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
  * @param props 
  * @returns list of <use> tags which point to the corresponding symbol
  */
-const EdgeMarkerComponent : React.FC<EdgeMarkerComponentProps> = (props) => {
+const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props) => {
   //Parse 4 Points from the calculated bezier curve
   const pointArray = props.edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
   const startPointBez = {x: pointArray[0][0], y:pointArray[0][1]}
@@ -415,22 +398,30 @@ const EdgeMarkerComponent : React.FC<EdgeMarkerComponentProps> = (props) => {
     array.forEach((curve) => {
       dOfPath += `C${curve.controlPointStart.x},${curve.controlPointStart.y} ${curve.controlPointEnd.x},${curve.controlPointEnd.y} ${curve.endPoint.x},${curve.endPoint.y} `
     })
+
+    const edgeType = markerMap.get(index) ?? '' 
     dOfPath = dOfPath.trimEnd()
-    const pathId = props.id + `-${markerMap.get(index)}-marker-edge`
-    const markerEdge = (<path
+    const pathId = props.id + `-${edgeType}-marker-edge`
+    const markerEdge = (
+    <path
       key = {pathId} 
       id = {pathId}
-      className={'react-flow__edge-path'}
+      className={'react-flow__edge-path multi-edge' + ` ${edgeType}-edge`}
       d={dOfPath}
-      markerMid = {`url(#${edgeTypeToMarkerIdMapper(markerMap.get(index) ?? '')})`}
-      style= {{stroke: 'black', strokeWidth: 1, color: 'transparent'}} 
+      markerMid = {`url(#${edgeTypeToMarkerIdMapper(edgeType)})`} 
+      markerEnd = {'url(#triangle)'}
     />
     )
     markerEdgeMap.push(markerEdge)
   })
-  
+  const hoverOverEdgeId = props.id + '-hoverover-interactive'
   return (
   <>
+      <path
+      id={hoverOverEdgeId} //Interaction Edge
+      d={props.edgePath} 
+      className = 'interactive-edge' 
+    />
       {markerEdgeMap.map((self) => self)}
   </>)
 }
