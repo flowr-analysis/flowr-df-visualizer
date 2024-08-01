@@ -19,46 +19,7 @@ export function slideOutLegend(){
 
 export const LegendComponent: React.FC<LegendComponentProps> = ({}) => {
     
-    const edgeTypes = ['reads', 'defined-by','calls','returns','defines-on-call','defined-by-on-call', 'argument', 'side-effect-on-call', 'non-standard-evaluation']
-    
-    /*
-    const tempRule = 'body:has(.reads-legend-edge-interactive:hover) .function-call-node {opacity:20%}body:has(.reads-legend-edge-interactive:hover) .use-node{opacity:20%}'
-    let cssRule = ''
-    const greyOutStyle = '{opacity: 20%}'
-    const keepNormalStyle = '{opacity: 100%}'
-    
-    const nodeTypes = ['variable-definition-node', 'function-definition-node','value-node', 'function-call-node', 'use-node','exit-point-node']
-    nodeTypes.forEach((hoveredNodeType) => {
-        nodeTypes.forEach((toHideNodeType) => {
-            if(hoveredNodeType === toHideNodeType){
-                return
-            }
-            cssRule += `body:has(.${hoveredNodeType}-legend:hover) .${toHideNodeType} ${greyOutStyle}`
-        })
-        edgeTypes.forEach((toHideEdgeType) => {
-            //hide edge line
-            cssRule += `body:has(.${hoveredNodeType}-legend:hover) .${toHideEdgeType}-edge ${greyOutStyle}`
-            //hide edge symbol
-            cssRule += `body:has(.${hoveredNodeType}-legend:hover) .${toHideEdgeType}-edge-symbol ${greyOutStyle}`
-        })
-        //cssRule += `body:has(.${hoveredNodeType}-legend:hover) .${hoveredNodeType} {opacity: 100%}`
-    })
-    edgeTypes.forEach((hoveredEdgeType)=>{
-        nodeTypes.forEach((toHideNodeType)=> {
-            cssRule += `body:has(.${hoveredEdgeType}-legend-edge-interactive:hover) .${toHideNodeType} ${greyOutStyle}`
-        })
-        edgeTypes.forEach((toHideEdgeType) => {
-            if(hoveredEdgeType === toHideEdgeType){
-                return
-            }
-            //hide edge line
-            cssRule += `body:has(.${hoveredEdgeType}-legend-edge-interactive:hover) .${toHideEdgeType}-edge ${greyOutStyle}`
-            //hide edge symbol
-            cssRule += `body:has(.${hoveredEdgeType}-legend-edge-interactive:hover) .${toHideEdgeType}-edge-symbol ${greyOutStyle}`
-        })
-        cssRule += `body:has(.${hoveredEdgeType}-legend-edge-interactive:hover) .${hoveredEdgeType}-edge ${keepNormalStyle}`
-    })
-    */
+
     const isGreyedOutMap = new Map<string,boolean>()
     
     return (
@@ -87,20 +48,6 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({}) => {
                 <button className = {'button-close-legend'} onClick = {slideOutLegend} >X</button>
             </div>
         </div>
-    )
-}
-
-interface SymbolComponentProps {
-    symbolId: string
-    edgeType:string
-}
-
-const SymbolComponent: React.FC<SymbolComponentProps> = ({symbolId,edgeType}) => {
-    return(<>
-        <use className = {edgeType + '-edge-symbol'} key = {'legend-symbol-1' + symbolId} href = {`#${symbolId}`} x = {20} y = {10}></use>
-        <use className = {edgeType + '-edge-symbol'} key = {'legend-symbol-2' + symbolId} href = {`#${symbolId}`} x = {40} y = {10}></use>
-        <use className = {edgeType + '-edge-symbol'} key = {'legend-symbol-3' + symbolId} href = {`#${symbolId}`} x = {60} y = {10}></use>
-    </>    
     )
 }
 
@@ -135,7 +82,7 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edge
             for(const element of symbolElements){
                 element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
             }
-            legendSVGElement.classList.toggle
+            legendSVGElement.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
         }}
     >
         <path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
@@ -144,7 +91,7 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edge
         <text x = {92} y = {15}>{edgeText}</text>
     </svg>)
 }  
-//<SymbolComponent edgeType = {edgeType} symbolId= {symbolId}/>
+
 interface NodeLegendComponentProps{
     nodeType:string
     isGreyedOutMap: Map<string,boolean>    
