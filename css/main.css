@@ -5,11 +5,6 @@ body {
 	margin: 0px;
 }
 
-svg {
-	pointer-events: none;
-}
-
-
 #legend-close-button-div {
 	position: absolute;
 	top: 0px;
@@ -105,15 +100,9 @@ svg {
 	-webkit-user-select: none;
 }
 
-
-.react-flow__edge-path {
-	pointer-events: none;
-	cursor: none;
-}
-
-.react-flow__edge-interaction {
-	pointer-events: none;
-	cursor: none;
+.dot-marker{
+	fill:black;
+	overflow:visible;
 }
 
 .variable-definition-node {
@@ -236,6 +225,7 @@ svg {
 	gap: 12px;
 	justify-content: flex-start;
 	align-items: center;
+	text-align: center;
 }
 
 .legend-edges {

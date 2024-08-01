@@ -50,7 +50,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
     targetPosition: targetPos,
     targetX: targetX,
     targetY: targetY,
-  });
+  })
 
   //const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
   //const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
@@ -84,21 +84,23 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
   let classNameString = ''
   givenEdgeTypes.forEach((edgeTypeName) => {classNameString += ' ' + edgeTypeName + '-edge'})
   classNameString = classNameString.slice(1)
+  
   return (
     <>
-    <BaseEdge
+    <path
       id={hoverOverEdgeId} //Interaction Edge
-      path={edgePath} 
+      d={edgePath} 
       style= {{strokeWidth: 10, visibility: 'hidden', pointerEvents: 'all', cursor: 'pointer'}} 
     />
-    <BaseEdge
+    <path
       id={props.standardEdgeInformation.id} //Shown Edge
-      className={classNameString}
-      path={edgePath} 
-      style= {defaultEdgeStyle}
+      className={classNameString + ' react-flow__edge-path'}
+      d={edgePath} 
+      style = {defaultEdgeStyle}
       markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
     />
-    <EdgeSymbolComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
+    
+    <EdgeMarkerComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
     <style>
       {cssRule}
     </style>
@@ -190,7 +192,7 @@ interface BezierCurve {
   readonly endPoint: XYPosition,
 }
 
-interface EdgeSymbolComponentProps {
+interface EdgeMarkerComponentProps {
   edgePath: string,
   edgeTypes: Set<EdgeTypeName>
   id: string
@@ -212,12 +214,132 @@ export function edgeTypeToSymbolIdMapper(edgeTag: string): string {
   return edgeTypeNameMap[edgeTag] ?? '';
 }
 
+const edgeTypeNameMarkerMap:{[index: string]:string} = {
+  'reads':                   'dotMarker',
+  'defined-by':              'hexagonHollowMarker',
+  'calls':                   'starFilledMarker',
+  'returns':                 'circleHollowMarker',
+  'defines-on-call':         'rectangleHollowMarker',
+  'defined-by-on-call':      'rhombusHollowMarker',
+  'argument':                'triangleHollowMarker',
+  'side-effect-on-call':     'crossMarker',
+  'non-standard-evaluation': 'cubeFilledMarker',
+};
+
+export function edgeTypeToMarkerIdMapper(edgeTag: string): string {
+  return edgeTypeNameMarkerMap[edgeTag] ?? '';
+}
+
+/**
+ * split a cubic bezier curve into two parts using de Casteljaus Algorithm
+ * @param t point to split at 0 < t < 1
+ * @param startingPoint 
+ * @param startControlPoint 
+ * @param endControlPoint 
+ * @param endingPoint 
+ * @returns Array of two elements where the first is the first part of the split curve and second is last part of the split curve
+ */
+function splitSingleBezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):BezierCurve[] {
+  const pointArray: XYPosition[][] = [[],[],[],[]]
+  pointArray[0].push(startingPoint)
+  pointArray[0].push(startControlPoint)
+  pointArray[0].push(endControlPoint)
+  pointArray[0].push(endingPoint)
+
+  for(let algorithmIndex = 1; algorithmIndex <= 3; algorithmIndex++){
+    for(let pointIndex = 0; pointIndex <= 3 - algorithmIndex; pointIndex++){
+      const calcX = pointArray[algorithmIndex - 1][pointIndex].x * (1 - t) + pointArray[algorithmIndex - 1][pointIndex + 1].x * t
+      const calcY = pointArray[algorithmIndex - 1][pointIndex].y * (1 - t) + pointArray[algorithmIndex - 1][pointIndex + 1].y * t 
+      pointArray[algorithmIndex].push({x: calcX, y:calcY}) 
+    }
+  }
+  return ([
+    {startPoint:pointArray[0][0],controlPointStart:pointArray[1][0], controlPointEnd:pointArray[2][0], endPoint:pointArray[3][0]},
+    {startPoint:pointArray[3][0],controlPointStart:pointArray[2][1], controlPointEnd:pointArray[1][2], endPoint:pointArray[0][3]}
+  ])
+
+}
+
+/**
+ * calculate the splitted parts of a cubic bezierCurve
+ * @param t All values must follow the format 0 < t[i] < 1 && t[i] < t[i + 1]
+ * @param startingPoint 
+ * @param startControlPoint 
+ * @param endControlPoint 
+ * @param endingPoint 
+ * @returns Array of BezierCurves
+ */
+function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):BezierCurve[]{
+  
+  let A = startingPoint
+  let B = startControlPoint
+  let C = endControlPoint
+  let D = endingPoint
+
+  const returnArray:BezierCurve[] = []
+
+  
+  //Calculate linear percentages of curves.
+  const linearPercentagePoints: number[] = []
+  const curveLengthTotal = calculateLengthOfBezierCurve(startingPoint, startControlPoint, endControlPoint, endingPoint)
+  const rangeForSamplePoints = range(0,1, amountOfSamplePointsForLength, true)
+  let approximatedLength = 0
+  let indexOfTArray = 0
+  for(let indexOfPercentageArray = 1; indexOfPercentageArray < rangeForSamplePoints.length; indexOfPercentageArray++){
+    const lastPoint = bezierCurve(rangeForSamplePoints[indexOfPercentageArray - 1],startingPoint, startControlPoint, endControlPoint, endingPoint)
+    const currentPoint = bezierCurve(rangeForSamplePoints[indexOfPercentageArray],startingPoint, startControlPoint, endControlPoint, endingPoint)
+    approximatedLength += Math.sqrt(Math.pow(currentPoint.x - lastPoint.x, 2) + Math.pow(currentPoint.y - lastPoint.y, 2))
+    if(approximatedLength / curveLengthTotal >= t[indexOfTArray]){
+      linearPercentagePoints.push(rangeForSamplePoints[indexOfPercentageArray])
+      indexOfTArray++
+      if(indexOfTArray >= t.length){
+        break
+      }
+    }
+  }
+
+  let E: XYPosition = {x: 0, y: 0}
+  let F: XYPosition = {x: 0, y: 0}
+  let G: XYPosition = {x: 0, y: 0}
+  let H: XYPosition = {x: 0, y: 0}
+  let J: XYPosition = {x: 0, y: 0}
+  let K: XYPosition = {x: 0, y: 0}
+
+  let lastBezierCurve:BezierCurve = {startPoint:{x: 0, y: 0}, controlPointStart:{x: 0, y: 0}, controlPointEnd:{x: 0, y: 0}, endPoint:{x: 0, y: 0}}
+  let startPercentage: number = 0
+  for(let percentIndex = 0; percentIndex < linearPercentagePoints.length; percentIndex++){
+    let currentT = (linearPercentagePoints[percentIndex] - startPercentage) / (1 - startPercentage)
+    
+    const newCurves = splitSingleBezierCurve(currentT, A, B, C, D)
+    lastBezierCurve = newCurves[1]
+    
+    returnArray.push({
+      startPoint:newCurves[0].startPoint, 
+      controlPointStart: newCurves[0].controlPointStart, 
+      controlPointEnd: newCurves[0].controlPointEnd, 
+      endPoint: newCurves[0].endPoint})
+
+    startPercentage = linearPercentagePoints[percentIndex]
+    A = newCurves[1].startPoint
+    B = newCurves[1].controlPointStart
+    C = newCurves[1].controlPointEnd
+    D = newCurves[1].endPoint
+  }
+
+  returnArray.push({
+    startPoint:lastBezierCurve.startPoint, 
+    controlPointStart: lastBezierCurve.controlPointStart, 
+    controlPointEnd: lastBezierCurve.controlPointEnd, 
+    endPoint: lastBezierCurve.endPoint})
+  return returnArray
+}
+
 /**
  * Creates Evenly spaced Symbols to the corresponding MarkerTypes
  * @param props 
  * @returns list of <use> tags which point to the corresponding symbol
  */
-const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
+const EdgeMarkerComponent : React.FC<EdgeMarkerComponentProps> = (props) => {
   //Parse 4 Points from the calculated bezier curve
   const pointArray = props.edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
   const startPointBez = {x: pointArray[0][0], y:pointArray[0][1]}
@@ -240,8 +362,14 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
                                           Math.floor(amountOfMarkerPointsInBetween / props.edgeTypes.size) 
 
   //calculate which symbols need to be on which points
+  //index -> edgeType
   const markerMap = new Map<number, string>()
+  //index -> positionArray
   const pointsMap = new Map<number, XYPosition[]>()
+  //index -> bezierCurveArray
+  const curveMap = new Map<number, BezierCurve[]>()
+
+
   let indexOfMarkerType = 0
   for(let value of props.edgeTypes){
     markerMap.set(indexOfMarkerType, value)
@@ -266,125 +394,43 @@ const EdgeSymbolComponent : React.FC<EdgeSymbolComponentProps> = (props) => {
     //get points on BezierCurve
     const pointsOnCurve = percentageArray.map((percentage) => linearPercentageBezierCurve(percentage, startPointBez, startControlPointBez, endControlPointBez, endPointBez))
     pointsMap.set(indexOfMarkerType, pointsOnCurve)
+    curveMap.set(indexOfMarkerType, splitBezierCurve(percentageArray, startPointBez, startControlPointBez, endControlPointBez, endPointBez))
     indexOfMarkerType += 1
   }
-  
+   
   //create use elements
   let useArray:JSX.Element[] = []
   markerMap.forEach((edgeType,offsetIndex) => {
     const pointsOfMarker = pointsMap.get(offsetIndex)
     const useBlockArray = pointsOfMarker?.map((point) =>{return (<use className = {`${edgeType}-edge-symbol`}key = {props.id + '-' + point.x + '-' + point.y} id = {props.id + '-' + point.x + '-' + point.y} href={`#${edgeTypeToSymbolIdMapper(edgeType)}`} x={point.x} y={point.y} />)}) ?? []
     useArray = useArray.concat(useBlockArray)
+  }) 
+  
+  //create curve
+  const markerEdgeMap: JSX.Element[] = []
+  
+  curveMap.forEach((array, index) =>{
+    const firstBezierCurve = array[0]
+    let dOfPath = `M${firstBezierCurve.startPoint.x},${firstBezierCurve.startPoint.y} `
+    array.forEach((curve) => {
+      dOfPath += `C${curve.controlPointStart.x},${curve.controlPointStart.y} ${curve.controlPointEnd.x},${curve.controlPointEnd.y} ${curve.endPoint.x},${curve.endPoint.y} `
+    })
+    dOfPath = dOfPath.trimEnd()
+    const pathId = props.id + `-${markerMap.get(index)}-marker-edge`
+    const markerEdge = (<path
+      key = {pathId} 
+      id = {pathId}
+      className={'react-flow__edge-path'}
+      d={dOfPath}
+      markerMid = {`url(#${edgeTypeToMarkerIdMapper(markerMap.get(index) ?? '')})`}
+      style= {{stroke: 'black', strokeWidth: 1, color: 'transparent'}} 
+    />
+    )
+    markerEdgeMap.push(markerEdge)
   })
   
   return (
   <>
-    <svg width = {'100%'} height = {'100%'} style = {{overflow: 'visible'}}>
-      {useArray.map((self) => self)}
-    </svg>
+      {markerEdgeMap.map((self) => self)}
   </>)
-}
-
-
-/**
- * calculate the splitted parts of a cubic bezierCurve
- * @param t All values must follow the format 0 < t[i] < 1 && t[i] < t[i + 1]
- * @param startingPoint 
- * @param startControlPoint 
- * @param endControlPoint 
- * @param endingPoint 
- * @returns Array of BezierCurves
- */
-function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):BezierCurve[]{
-  
-  let currentStartPoint = startingPoint
-  let currentStartControlPoint = startControlPoint
-  let currentEndControlPoint = endControlPoint
-  let currentEndPoint = endingPoint
-  
-  const returnArray:BezierCurve[] = []
-  const percentageDifferenceForDerivative = 0.01 
-
-  for(let percentIndex = 0; percentIndex < t.length; percentIndex++){
-    const currentSplitPercent = t[percentIndex]
-    const splitBezierCurvePoint = bezierCurve(currentSplitPercent, startingPoint, startControlPoint, endControlPoint, endingPoint)  
-    const closeToSplitPoint = bezierCurve(currentSplitPercent + percentageDifferenceForDerivative, startingPoint, startControlPoint, endControlPoint,endingPoint)
-
-
-    const crossPoint1 = calculateIntersectionPoint(currentStartPoint, currentStartControlPoint, splitBezierCurvePoint, closeToSplitPoint) ?? 
-                        {x: currentStartPoint.x + (splitBezierCurvePoint.x - currentStartPoint.x) * 0.5,
-                        y: currentStartPoint.y + (splitBezierCurvePoint.y - currentStartPoint.y) * 0.5}
-    const newStartControlPointFirstBezierCurve: XYPosition = {x: currentStartPoint.x + (crossPoint1.x - currentStartPoint.x) * bezierSplitConst, y: currentStartPoint.y + (crossPoint1.y - currentStartPoint.y)}
-    const newEndControlPointFirstBezierCurve: XYPosition = {x: splitBezierCurvePoint.x - (splitBezierCurvePoint.x - crossPoint1.x) * bezierSplitConst, y: splitBezierCurvePoint.y - (splitBezierCurvePoint.y - crossPoint1.y) * bezierSplitConst}
-    const crossPoint2 = calculateIntersectionPoint(splitBezierCurvePoint, closeToSplitPoint, currentEndControlPoint, currentEndPoint)??
-                        {x: splitBezierCurvePoint.x + (currentEndPoint.x - splitBezierCurvePoint.x) * 0.5, 
-                        y: splitBezierCurvePoint.y + (currentEndPoint.y - splitBezierCurvePoint.y) * 0.5}
-    const newStartControlPointSecondBezierCurve: XYPosition = {x: splitBezierCurvePoint.x + (crossPoint2.x - splitBezierCurvePoint.x ) * bezierSplitConst, y: splitBezierCurvePoint.y + (crossPoint2.y - splitBezierCurvePoint.y ) * bezierSplitConst}
-    const newEndControlPointSecondBezierCurve: XYPosition = {x: currentEndPoint.x - (currentEndPoint.x - crossPoint2.x) * bezierSplitConst, y: currentEndPoint.y - (currentEndPoint.y - crossPoint2.y) * bezierSplitConst}
-    
-
-
-
-    const toPush: BezierCurve = {
-      startPoint: currentStartPoint,
-      controlPointStart: newStartControlPointFirstBezierCurve,
-      controlPointEnd: newEndControlPointFirstBezierCurve,
-      endPoint: splitBezierCurvePoint
-    }
-    returnArray.push(toPush)
-
-    currentStartPoint = splitBezierCurvePoint
-    currentStartControlPoint = newStartControlPointSecondBezierCurve
-    currentEndControlPoint = newEndControlPointSecondBezierCurve
-    currentEndPoint = endingPoint
-    
-  }
-  returnArray.push({
-    startPoint: currentStartPoint,
-    controlPointStart: currentStartControlPoint,
-    controlPointEnd: currentEndControlPoint,
-    endPoint: currentEndPoint
-  })
-  return returnArray
-}
-
-// from https://paulbourke.net/geometry/pointlineplane/javascript.txt
-// line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
-// Determine the intersection point of two line segments
-// Return FALSE if the lines don't intersect
-function calculateIntersectionPoint(point1Line1:XYPosition, point2line1:XYPosition, point1line2:XYPosition, point2line2:XYPosition):XYPosition | undefined{
-
-  const {x:x1, y:y1} = point1Line1
-  const {x:x2, y:y2} = point2line1
-  const {x:x3, y:y3} = point1line2
-  const {x:x4, y:y4} = point2line2
-
-  // Check if none of the lines are of length 0
-	if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
-    throw Error('lines are of length 0')
-
-	}
-
-	const denominator = ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1))
-
-  // Lines are parallel
-	if (denominator === 0) {
-		//throw Error('lines are parallel')
-    return undefined
-	}
-
-	let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator
-	let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator
-
-  // is the intersection along the segments
-	/*
-  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
-		throw Error('intersection not along segments')
-	}
-  */
-  // Return a object with the x and y coordinates of the intersection
-	let x = x1 + ua * (x2 - x1)
-	let y = y1 + ua * (y2 - y1)
-
-	return {x, y}
 }
