@@ -45,7 +45,7 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({visualStateMode
                 <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
             </div>
             
-            <div>
+            <div className = 'legend-control-elements'>
                 <div style={{whiteSpace: 'nowrap'}}>
                     <input type='checkbox' id='show-id-checkbox' onClick={() => {
                         const checkbox = document.getElementById('show-id-checkbox') as HTMLInputElement ?? new HTMLInputElement()
@@ -53,7 +53,7 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({visualStateMode
                         visualStateModel.isNodeIdShown = isChecked
                         setIsNodeIdShownReactFlow(isChecked)
                     }}/>
-                    <label >Show Node Id (NodeId)</label>
+                    <label >(NodeId)</label>
                 </div>
             </div>
 
