@@ -2,12 +2,13 @@ import { ElkExtendedEdge, ElkNode, LayoutOptions } from "elkjs";
 import { flattenToNodeArray, foldIntoElkHierarchy} from "../graphHierarchy";
 import { Edge, Node } from '@xyflow/react'
 import { edgeTagMapper } from "./edges/edgeBase";
+import { ViewModel } from "./viewModel";
 
 export function transformGraphForLayouting(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions, isHorizontal: boolean):ElkNode{
   const toReturn: ElkNode = {
     id: 'root',
     layoutOptions: options,
-    children: foldIntoElkHierarchy(nodes,nodeIdMap,isHorizontal),
+    children: foldIntoElkHierarchy(nodes, nodeIdMap, isHorizontal),
     edges: edges
     };
 
@@ -19,9 +20,9 @@ export interface ExtendedExtendedEdge extends ElkExtendedEdge{
   data:any
   edgeType: string
   label:string
- }
+}
 
-export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: boolean): { nodes: Node[]; edges: Edge[] }{
+export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: boolean, viewModel: ViewModel): { nodes: Node[]; edges: Edge[] }{
   
   const newNodes = flattenToNodeArray(layoutedGraph.children ?? [])
 
@@ -30,8 +31,7 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
   newNodes.forEach((node) => {
     delete node['height']
     delete node['width']
-    //node.height = 0
-    //node.width = 0
+    node.data = {...node.data, viewModel: viewModel}
   })
   
   return {
@@ -47,7 +47,7 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
       //animated: true,
       //style: { stroke: '#000' },
       type: edgeTagMapper(e.edgeType),
-      data: { ...e.data, isHovered: false}
+      data: { ...e.data, isHovered: false, viewModel: viewModel}
       };
     })
   }

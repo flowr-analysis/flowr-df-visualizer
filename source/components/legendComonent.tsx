@@ -1,10 +1,11 @@
 import { useRef } from "react";
 import { edgeTypeToMarkerIdMapper, edgeTypeToSymbolIdMapper } from "./model/edges/multiEdge";
 import { SideEffectOnCallEdge } from "./model/edges/sideEffectOnCallEdge";
+import { ViewModel } from "./model/viewModel";
 
 
 interface LegendComponentProps {
-    
+    viewModel: ViewModel
 }
 
 export function slideInLegend() {
@@ -17,10 +18,10 @@ export function slideOutLegend(){
     element.classList.toggle('visible');
 }
 
-export const LegendComponent: React.FC<LegendComponentProps> = ({}) => {
+export const LegendComponent: React.FC<LegendComponentProps> = ({viewModel}) => {
     
 
-    const isGreyedOutMap = new Map<string,boolean>()
+    const isGreyedOutMap = viewModel.isGreyedOutMap
     
     return (
         <div className = 'slide-in-legend' id = 'slide-in-legend' >
@@ -61,7 +62,6 @@ interface EdgeLegendComponentProps {
 const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edgeType, isGreyedOutMap}) => {
     const classNameEdge = edgeType + '-edge' + ' legend-edge' + ' ' + edgeType + '-legend-edge'
     const classNameInteractiveEdge = edgeType + '-legend-interactive-edge' + ' legend-interactive-edge' 
-    const symbolId = edgeTypeToSymbolIdMapper(edgeType)
     const markerId = edgeTypeToMarkerIdMapper(edgeType)
     const legendId = edgeType + '-legend'
     return(<svg
@@ -70,6 +70,7 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edge
             const pathElements = document.getElementsByClassName(`${edgeType}-edge`) as HTMLCollectionOf<SVGPathElement>
             const symbolElements = document.getElementsByClassName(`${edgeType}-edge-symbol`) as HTMLCollectionOf<SVGUseElement>
             const legendSVGElement = document.getElementById(legendId) as HTMLElement
+            
             //get the greyed out state and set it correctly
             const isEdgeTypeGreyedOut:boolean = isGreyedOutMap.get(edgeType) ?? false
             isGreyedOutMap.set(edgeType,!isEdgeTypeGreyedOut)

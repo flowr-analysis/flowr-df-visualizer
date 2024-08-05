@@ -5,6 +5,7 @@ import { ProgressPlugin } from "webpack";
 
 import { getBezierPath } from '@xyflow/react';
 import { getEdgeParams } from "../edges/edgeBase";
+import { ViewModel } from '../viewModel';
 
 
 function FloatingConnectionLine(props:ConnectionLineComponentProps) {
@@ -67,13 +68,15 @@ interface NodeComponentProps {
   readonly data: NodeProps['data']
 }
 
-const BodyNodeComponent: React.FC<BodyNodeComponentProps> = (props) => {
- 
+const BodyNodeComponent: React.FC<BodyNodeComponentProps> = ({data, className}) => {
+  const viewModel = data.viewModel as ViewModel ?? new ViewModel()
+  const isGreyedOut = viewModel.isGreyedOutMap.get(data.nodeType as string ?? '') ?? false
+  const bodyClassName = className + (isGreyedOut ? ' legend-passive' : '')
   return (
-    <HandleNodeComponent targetHandleId={props.data.id as string + '-targetHandle'} sourceHandleId={props.data.id as string + '-sourceHandle'}>
-      <div className = {props.className}>
-        <HoverOverComponent name={props.data.label as string} id={props.data.id as string} nodeType= {props.data.nodeType as string}/>
-        <label htmlFor="text">{props.data.label as string}</label>
+    <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
+      <div className = {bodyClassName}>
+        <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
+        <label htmlFor="text">{data.label as string}</label>
       </div>
     </HandleNodeComponent>
   )
@@ -84,12 +87,12 @@ interface HoverOverComponentProps{
   readonly id: string,
   readonly nodeType: string
 }
-export const HoverOverComponent: React.FC<HoverOverComponentProps> = (props) => {
+export const HoverOverComponent: React.FC<HoverOverComponentProps> = ({name, id , nodeType}) => {
   return (
     <span className='hover-over-text'>
-      <div className='one-line'>name:{props.name}</div><br/>
-      <div className='one-line'>id:{props.id}</div><br/>
-      <div className='one-line'>nodeType:{props.nodeType}</div><br/>
+      <div className='one-line'>name:{name}</div><br/>
+      <div className='one-line'>id:{id}</div><br/>
+      <div className='one-line'>nodeType:{nodeType}</div><br/>
     </span>
   )
 }
@@ -148,6 +151,7 @@ export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
     estimatedMaxX: number,
     estimatedMaxY: number
   }
+
   const divStyle: React.CSSProperties = {}
   divStyle.width = estimatedMaxX - estimatedMinX
   divStyle.height = estimatedMaxY - estimatedMinY

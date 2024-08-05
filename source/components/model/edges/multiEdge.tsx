@@ -2,11 +2,12 @@ import { useCallback } from "react";
 import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, EdgeTypes, InternalNode, ReactFlowState, XYPosition, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
 import { getEdgeParams } from "./edgeBase";
 import { EdgeType, EdgeTypeName } from "@eagleoutice/flowr/dataflow/graph/edge";
+import { ViewModel } from "../viewModel";
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
 const startEndDistanceToMarkers = 10
-const bezierSplitConst = 1 // 0 <= bezierSplitConst <= 1
+
 export function MultiEdge(props:EdgeProps){
     
   return <BodyMultiEdgeComponent
@@ -23,9 +24,9 @@ interface BodyMultiEdgeComponentProps {
     readonly target: string;
 }
 
-export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (props) => {
-  const sourceNode = useInternalNode(props.source)
-  const targetNode = useInternalNode(props.target)
+export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({standardEdgeInformation, arrowEnd, source, target}) => {
+  const sourceNode = useInternalNode(source)
+  const targetNode = useInternalNode(target)
 
   if (!sourceNode || !targetNode) {
     return null;
@@ -34,8 +35,8 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
   const isBiDirectionEdge = useStore((s: ReactFlowState) => {
     const edgeExists = s.edges.some(
       (e) =>
-        (e.source === props.standardEdgeInformation.target && e.target === props.standardEdgeInformation.source) ||
-        (e.target === props.standardEdgeInformation.source && e.source === props.standardEdgeInformation.target),
+        (e.source === standardEdgeInformation.target && e.target === standardEdgeInformation.source) ||
+        (e.target === standardEdgeInformation.source && e.source === standardEdgeInformation.target),
     );
 
     return edgeExists;
@@ -55,35 +56,27 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = (pr
   //const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
   //const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
   const defaultEdgeStyle: React.CSSProperties = {stroke: 'black', pointerEvents: 'none', cursor: 'none'}
-  const arrowEnd = true
   const arrowStart = false
 
   let label = ''
-  for(const singleLabel of (props.standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
+  for(const singleLabel of (standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
       label += singleLabel + ' '
   }
 
-  const edgeLabelId = props.standardEdgeInformation.id + '-edgeLabel'
-  const hoverOverEdgeId = props.standardEdgeInformation.id + '-hoverover-interactive'
+  const edgeLabelId = standardEdgeInformation.id + '-edgeLabel'
+  const hoverOverEdgeId = standardEdgeInformation.id + '-hoverover-interactive'
   var cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
   
-  const givenEdgeTypes = props.standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
+  const givenEdgeTypes = standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
+  
   //insert respective className
   let classNameString = ''
   givenEdgeTypes.forEach((edgeTypeName) => {classNameString += ' ' + edgeTypeName + '-edge'})
   classNameString = classNameString.slice(1)
-  /*
-    <path
-      id={props.standardEdgeInformation.id} //Shown Edge
-      className={classNameString + ' react-flow__edge-path'}
-      d={edgePath} 
-      style = {defaultEdgeStyle}
-      markerEnd={arrowEnd ? 'url(#triangle)' : undefined} markerStart={arrowStart ? 'url(#triangle)' : undefined} 
-    />
-  */
+  
   return (
     <>
-    <PathWithMarkerComponent id={props.standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath}/>
+    <PathWithMarkerComponent id={standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath} viewModel={standardEdgeInformation.data?.viewModel as ViewModel ?? new ViewModel()}/>
     <style>
       {cssRule}
     </style>
@@ -179,6 +172,7 @@ interface PathWithMarkerComponentProps {
   edgePath: string,
   edgeTypes: Set<EdgeTypeName>
   id: string
+  viewModel: ViewModel
 }
 
 const edgeTypeNameMap:{[index: string]:string} = {
@@ -317,14 +311,10 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
   return returnArray
 }
 
-/**
- * Creates Evenly spaced Symbols to the corresponding MarkerTypes
- * @param props 
- * @returns list of <use> tags which point to the corresponding symbol
- */
-const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props) => {
+/** */
+const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({edgePath, edgeTypes, id, viewModel}) => {
   //Parse 4 Points from the calculated bezier curve
-  const pointArray = props.edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
+  const pointArray = edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
   const startPointBez = {x: pointArray[0][0], y:pointArray[0][1]}
   const startControlPointBez = {x: pointArray[1][0], y:pointArray[1][1]}
   const endControlPointBez = {x: pointArray[2][0], y:pointArray[2][1]}
@@ -333,16 +323,16 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props)
   const lengthOfCurve = calculateLengthOfBezierCurve(startPointBez,startControlPointBez,endControlPointBez,endPointBez)
 
   //check if curve is too small to fit many points
-  let amountOfMarkerPointsInBetween = Math.floor((lengthOfCurve - startEndDistanceToMarkers * 2 - 2 * lengthBetweenMarkerPoints * props.edgeTypes.size) / lengthBetweenMarkerPoints)
+  let amountOfMarkerPointsInBetween = Math.floor((lengthOfCurve - startEndDistanceToMarkers * 2 - 2 * lengthBetweenMarkerPoints * edgeTypes.size) / lengthBetweenMarkerPoints)
   if(amountOfMarkerPointsInBetween <= 0){
     amountOfMarkerPointsInBetween = 0
   }
 
   const maximumOfInBetweenPoints = 4
 
-  const individualMarkerPointsInBetween = Math.floor(amountOfMarkerPointsInBetween / props.edgeTypes.size) > maximumOfInBetweenPoints ? 
+  const individualMarkerPointsInBetween = Math.floor(amountOfMarkerPointsInBetween / edgeTypes.size) > maximumOfInBetweenPoints ? 
                                           maximumOfInBetweenPoints : 
-                                          Math.floor(amountOfMarkerPointsInBetween / props.edgeTypes.size) 
+                                          Math.floor(amountOfMarkerPointsInBetween / edgeTypes.size) 
 
   //calculate which symbols need to be on which points
   //index -> edgeType
@@ -354,23 +344,23 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props)
 
 
   let indexOfMarkerType = 0
-  for(let value of props.edgeTypes){
+  for(let value of edgeTypes){
     markerMap.set(indexOfMarkerType, value)
 
     //evenly space markerPoints
     let percentageArray: number[] = []
     if(individualMarkerPointsInBetween === 0){
-      percentageArray = [1 / (1 + props.edgeTypes.size) * (1 + indexOfMarkerType) ]
+      percentageArray = [1 / (1 + edgeTypes.size) * (1 + indexOfMarkerType) ]
     } else {
       let nextPoint = (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  indexOfMarkerType)/ lengthOfCurve // first Marker
-      while (nextPoint < 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  props.edgeTypes.size)/ lengthOfCurve){
+      while (nextPoint < 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  edgeTypes.size)/ lengthOfCurve){
         percentageArray.push(nextPoint)
-        nextPoint += (props.edgeTypes.size) * //Correctly jump for each marker
-                      (1 - 2 * (startEndDistanceToMarkers + lengthBetweenMarkerPoints * props.edgeTypes.size) / lengthOfCurve) * // use in between distance as reference 
-                      1 / (individualMarkerPointsInBetween * props.edgeTypes.size + 1) //spacing between points
+        nextPoint += (edgeTypes.size) * //Correctly jump for each marker
+                      (1 - 2 * (startEndDistanceToMarkers + lengthBetweenMarkerPoints * edgeTypes.size) / lengthOfCurve) * // use in between distance as reference 
+                      1 / (individualMarkerPointsInBetween * edgeTypes.size + 1) //spacing between points
       }
       // last marker
-      nextPoint = 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  (props.edgeTypes.size - (indexOfMarkerType + 1)))/ lengthOfCurve 
+      nextPoint = 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  (edgeTypes.size - (indexOfMarkerType + 1)))/ lengthOfCurve 
       percentageArray.push(nextPoint)
     }
     
@@ -385,7 +375,7 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props)
   let useArray:JSX.Element[] = []
   markerMap.forEach((edgeType,offsetIndex) => {
     const pointsOfMarker = pointsMap.get(offsetIndex)
-    const useBlockArray = pointsOfMarker?.map((point) =>{return (<use className = {`${edgeType}-edge-symbol`}key = {props.id + '-' + point.x + '-' + point.y} id = {props.id + '-' + point.x + '-' + point.y} href={`#${edgeTypeToSymbolIdMapper(edgeType)}`} x={point.x} y={point.y} />)}) ?? []
+    const useBlockArray = pointsOfMarker?.map((point) =>{return (<use className = {`${edgeType}-edge-symbol`}key = {id + '-' + point.x + '-' + point.y} id = {id + '-' + point.x + '-' + point.y} href={`#${edgeTypeToSymbolIdMapper(edgeType)}`} x={point.x} y={point.y} />)}) ?? []
     useArray = useArray.concat(useBlockArray)
   }) 
   
@@ -401,12 +391,12 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props)
 
     const edgeType = markerMap.get(index) ?? '' 
     dOfPath = dOfPath.trimEnd()
-    const pathId = props.id + `-${edgeType}-marker-edge`
+    const pathId = id + `-${edgeType}-marker-edge`
     const markerEdge = (
     <path
       key = {pathId} 
       id = {pathId}
-      className={'react-flow__edge-path multi-edge' + ` ${edgeType}-edge`}
+      className={'react-flow__edge-path multi-edge' + ` ${edgeType}-edge` + ((viewModel.isGreyedOutMap.get(edgeType) ?? false) ? ' legend-passive': '')}
       d={dOfPath}
       markerMid = {`url(#${edgeTypeToMarkerIdMapper(edgeType)})`} 
       markerEnd = {'url(#triangle)'}
@@ -414,12 +404,12 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = (props)
     )
     markerEdgeMap.push(markerEdge)
   })
-  const hoverOverEdgeId = props.id + '-hoverover-interactive'
+  const hoverOverEdgeId = id + '-hoverover-interactive'
   return (
   <>
       <path
       id={hoverOverEdgeId} //Interaction Edge
-      d={props.edgePath} 
+      d={edgePath} 
       className = 'interactive-edge' 
     />
       {markerEdgeMap.map((self) => self)}

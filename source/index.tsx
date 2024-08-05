@@ -12,6 +12,7 @@ import { VisualizationGraph } from './components/model/graph';
 import { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model';
 import { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate';
 import { LegendComponent, slideInLegend } from './components/legendComonent';
+import { ViewModel } from './components/model/viewModel';
 /* old example
 const otherGraph:OtherGraph =  {
   "rootVertices":["0","2","5"],
@@ -102,17 +103,18 @@ const main = document.createElement('div');
 main.id = 'main';
 document.body.appendChild(main);
 const root = createRoot(main);
+const viewModel = new ViewModel()
 
 root.render(
   <MainContainerComponent initialize={() => { console.log('Hey') }}>
     <ReactFlowProvider>
-        <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} />
+      <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} viewModel={viewModel}/>
     </ReactFlowProvider>
     <div className='r-code-input'>
       <input onChange={onRCodeInputChange}></input>
       <button onClick={onRCodeRequest}>Send R code</button>
     </div>
-    <LegendComponent/>
+    <LegendComponent viewModel={viewModel}/>
   </MainContainerComponent>
 );
 
