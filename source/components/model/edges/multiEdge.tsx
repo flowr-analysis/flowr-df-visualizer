@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeProps, EdgeTypes, InternalNode, ReactFlowState, XYPosition, getBezierPath, useInternalNode, useStore } from '@xyflow/react';
 import { getEdgeParams } from "./edgeBase";
 import { EdgeType, EdgeTypeName } from "@eagleoutice/flowr/dataflow/graph/edge";
-import { ViewModel } from "../viewModel";
+import { VisualStateModel } from "../visualStateModel";
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
@@ -76,7 +76,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({s
   
   return (
     <>
-    <PathWithMarkerComponent id={standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath} viewModel={standardEdgeInformation.data?.viewModel as ViewModel ?? new ViewModel()}/>
+    <PathWithMarkerComponent id={standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>
     <style>
       {cssRule}
     </style>
@@ -172,7 +172,7 @@ interface PathWithMarkerComponentProps {
   edgePath: string,
   edgeTypes: Set<EdgeTypeName>
   id: string
-  viewModel: ViewModel
+  visualStateModel: VisualStateModel
 }
 
 const edgeTypeNameMap:{[index: string]:string} = {
@@ -312,7 +312,7 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
 }
 
 /** */
-const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({edgePath, edgeTypes, id, viewModel}) => {
+const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({edgePath, edgeTypes, id, visualStateModel}) => {
   //Parse 4 Points from the calculated bezier curve
   const pointArray = edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
   const startPointBez = {x: pointArray[0][0], y:pointArray[0][1]}
@@ -396,7 +396,7 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({edgeP
     <path
       key = {pathId} 
       id = {pathId}
-      className={'react-flow__edge-path multi-edge' + ` ${edgeType}-edge` + ((viewModel.isGreyedOutMap.get(edgeType) ?? false) ? ' legend-passive': '')}
+      className={'react-flow__edge-path multi-edge' + ` ${edgeType}-edge` + ((visualStateModel.isGreyedOutMap.get(edgeType) ?? false) ? ' legend-passive': '')}
       d={dOfPath}
       markerMid = {`url(#${edgeTypeToMarkerIdMapper(edgeType)})`} 
       markerEnd = {'url(#triangle)'}

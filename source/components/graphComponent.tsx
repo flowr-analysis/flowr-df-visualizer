@@ -1,5 +1,5 @@
 import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
-import React, { ChangeEventHandler, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { ChangeEventHandler, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   ReactFlow,
   addEdge,
@@ -48,7 +48,7 @@ import { ExtendedExtendedEdge, transformGraphForLayouting, transformGraphForShow
 import { MultiEdge } from './model/edges/multiEdge';
 import { slideInLegend } from './legendComonent';
 import { SvgDefinitionsComponent } from './svgDefinitions';
-import { ViewModel } from './model/viewModel';
+import { VisualStateModel } from './model/visualStateModel';
 
 
 
@@ -70,7 +70,7 @@ const elkOptions: LayoutOptions = {
                                     nodeIdMap: Map<string,Node>, 
                                     edges: ElkExtendedEdge[], 
                                     options: LayoutOptions,
-                                    viewModel: ViewModel): Promise<{ nodes: Node[]; edges: Edge[] }> {
+                                    visualStateModel: VisualStateModel): Promise<{ nodes: Node[]; edges: Edge[] }> {
    const isHorizontal = options?.['elk.direction'] === 'RIGHT';
 
    const graph: ElkNode = transformGraphForLayouting(nodes,nodeIdMap, edges, options, isHorizontal)
@@ -81,7 +81,7 @@ const elkOptions: LayoutOptions = {
 
    //console.log('after Layout:')
    //console.log(layoutedGraph)
-   const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal, viewModel)
+   const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal, visualStateModel)
 
    console.log(endGraph)
 
@@ -104,16 +104,35 @@ const elkOptions: LayoutOptions = {
 export interface LayoutFlowProps {
   readonly graph: VisualizationGraph;
   readonly assignGraphUpdater: (updater: (g: VisualizationGraph) => void) => void;
-  readonly viewModel: ViewModel
+  readonly visualStateModel: VisualStateModel
 }
+export let setIsNodeIdShownReactFlow: React.Dispatch<React.SetStateAction<boolean>> = () => {}
 
- export function LayoutFlow({ graph, assignGraphUpdater, viewModel } : LayoutFlowProps) {
+ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel} : LayoutFlowProps) {
    const [currentGraph, setCurrentGraph] = useState(graph);
    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
    const nodeMap = new Map<string,Node>()
    const { fitView } = useReactFlow();
+
+   const [isNodeIdShown, setIsNodeIdShown] = useState(false)
    
+   setIsNodeIdShownReactFlow = setIsNodeIdShown
+
+
+   useEffect(() => {
+    setNodes((currentNodes) =>
+      currentNodes.map((node) =>{ 
+        node.data.isNodeIdShown = isNodeIdShown
+        return ({
+        ...node
+      })}),
+    );
+   }, [isNodeIdShown,setNodes])
+
+
+
+
    assignGraphUpdater(g =>  {
     setCurrentGraph(g)
     onLayout({ direction: 'DOWN', g })
@@ -125,7 +144,7 @@ export interface LayoutFlowProps {
        const ns = g ? g.nodesInfo.nodes : nodes;
        const es = g ? g.edges : edges;
        const nm = g ? g.nodesInfo.nodeMap: nodeMap;
-       getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, viewModel).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+       getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, visualStateModel).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
          setNodes(layoutedNodes);
          setEdges(layoutedEdges);
 

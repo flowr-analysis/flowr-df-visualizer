@@ -1,11 +1,12 @@
 import { useRef } from "react";
 import { edgeTypeToMarkerIdMapper, edgeTypeToSymbolIdMapper } from "./model/edges/multiEdge";
 import { SideEffectOnCallEdge } from "./model/edges/sideEffectOnCallEdge";
-import { ViewModel } from "./model/viewModel";
+import { VisualStateModel } from "./model/visualStateModel";
+import { setIsNodeIdShownReactFlow } from "./graphComponent";
 
 
 interface LegendComponentProps {
-    viewModel: ViewModel
+    visualStateModel: VisualStateModel
 }
 
 export function slideInLegend() {
@@ -18,9 +19,9 @@ export function slideOutLegend(){
     element.classList.toggle('visible');
 }
 
-export const LegendComponent: React.FC<LegendComponentProps> = ({viewModel}) => {
+export const LegendComponent: React.FC<LegendComponentProps> = ({visualStateModel}) => {
     
-    const isGreyedOutMap = viewModel.isGreyedOutMap
+    const isGreyedOutMap = visualStateModel.isGreyedOutMap
     
     return (
         <div className = 'slide-in-legend' id = 'slide-in-legend' >
@@ -44,6 +45,18 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({viewModel}) => 
                 <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
             </div>
             
+            <div>
+                <div style={{whiteSpace: 'nowrap'}}>
+                    <input type='checkbox' id='show-id-checkbox' onClick={() => {
+                        const checkbox = document.getElementById('show-id-checkbox') as HTMLInputElement ?? new HTMLInputElement()
+                        const isChecked = checkbox.checked
+                        visualStateModel.isNodeIdShown = isChecked
+                        setIsNodeIdShownReactFlow(isChecked)
+                    }}/>
+                    <label >Show Node Id (NodeId)</label>
+                </div>
+            </div>
+
             <div id = 'legend-close-button-div'>
                 <button className = {'button-close-legend'} onClick = {slideOutLegend} >X</button>
             </div>
