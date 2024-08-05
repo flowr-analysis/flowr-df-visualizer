@@ -71,12 +71,13 @@ interface NodeComponentProps {
 const BodyNodeComponent: React.FC<BodyNodeComponentProps> = ({data, className}) => {
   const viewModel = data.viewModel as ViewModel ?? new ViewModel()
   const isGreyedOut = viewModel.isGreyedOutMap.get(data.nodeType as string ?? '') ?? false
+  const isNodeIdShown = viewModel.isNodeIdShown
   const bodyClassName = className + (isGreyedOut ? ' legend-passive' : '')
   return (
     <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
       <div className = {bodyClassName}>
         <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
-        <label htmlFor="text">{data.label as string}</label>
+        <label htmlFor="text">{data.label as string}{isNodeIdShown ? ' (' + data.id + ')': ''}</label>
       </div>
     </HandleNodeComponent>
   )
@@ -110,7 +111,7 @@ export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
 }
 
 
-export const FunctionDefinitionNode: React.FC<NodeComponentProps> = ({ data }) => {
+export const FunctionDefinitionNode: React.FC<NodeProps> = ({ data, selected }) => {
   const {estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY} = data as {
     estimatedMinX: number,
     estimatedMinY: number,
@@ -123,15 +124,18 @@ export const FunctionDefinitionNode: React.FC<NodeComponentProps> = ({ data }) =
   const minWidth = estimatedMaxX - estimatedMinX
   const minHeight = estimatedMaxY - estimatedMinY
   //<NodeResizer minWidth={minWidth} minHeight={minHeight}/>
-  //
-  return ( 
+  // style = {divStyle}
+  // style={{ height: '100%', width:'100%'}}
+  return (
+    <>
+    <NodeResizer lineClassName='function-definition-node function-definition-node-resizer-line' handleClassName='function-definition-node function-definition-node-resizer-edge-dot' />
     <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
-      
-      <div className = 'function-definition-node base-node' style = {divStyle}>
+      <div className = 'function-definition-node base-node' >
         <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
         <label htmlFor="text">{data.label as string}</label>
       </div>
     </HandleNodeComponent>
+    </>
   )
 }
 

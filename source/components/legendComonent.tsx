@@ -20,7 +20,6 @@ export function slideOutLegend(){
 
 export const LegendComponent: React.FC<LegendComponentProps> = ({viewModel}) => {
     
-
     const isGreyedOutMap = viewModel.isGreyedOutMap
     
     return (
@@ -34,15 +33,15 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({viewModel}) => 
                 <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'exit-point'/>
             </div>
             <div className='legend-edges'>
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'reads' edgeText='reads' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='defined-by' edgeText='defined-by' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='calls' edgeText='calls' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='returns' edgeText='returns' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='defines-on-call' edgeText='defines-on-call' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='defined-by-on-call' edgeText='defined-by-on-call' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='argument' edgeText='argument' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='side-effect-on-call' edgeText='side-effect-on-call' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType='non-standard-evaluation' edgeText='non-standard-evaluation' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'reads' edgeText ='reads' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defined-by' edgeText ='defined-by' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'calls' edgeText = 'calls' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'returns' edgeText='returns' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defines-on-call' edgeText='defines-on-call' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defined-by-on-call' edgeText='defined-by-on-call' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'argument' edgeText='argument' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'side-effect-on-call' edgeText='side-effect-on-call' />
+                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
             </div>
             
             <div id = 'legend-close-button-div'>

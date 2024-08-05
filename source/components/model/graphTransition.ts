@@ -32,6 +32,12 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
     delete node['height']
     delete node['width']
     node.data = {...node.data, viewModel: viewModel}
+    
+    //size needs to be defined for size of function definiton to make sense
+    if(node.data.nodeType === 'function-definition'){
+      node.width = node.data.estimatedMaxX - node.data.estimatedMinX
+      node.height = node.data.estimatedMaxY - node.data.estimatedMinY
+    }
   })
   
   return {
