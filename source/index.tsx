@@ -13,6 +13,7 @@ import { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model';
 import { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate';
 import { LegendComponent, slideInLegend } from './components/legendComonent';
 import { VisualStateModel } from './components/model/visualStateModel';
+import * as monaco from 'monaco-editor'
 /* old example
 const otherGraph:OtherGraph =  {
   "rootVertices":["0","2","5"],
@@ -105,16 +106,39 @@ document.body.appendChild(main);
 const root = createRoot(main);
 const visualStateModel = new VisualStateModel()
 
+const firstValue = 'x <- 42'
+
+
+
 root.render(
   <MainContainerComponent initialize={() => { console.log('Hey') }}>
-    <ReactFlowProvider>
-      <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} visualStateModel={visualStateModel}/>
-    </ReactFlowProvider>
-    <div className='r-code-input'>
-      <input onChange={onRCodeInputChange}></input>
-      <button onClick={onRCodeRequest}>Send R code</button>
+    <div id='editor-target' className = 'editor-div'> </div>
+    <div className = 'reactflow-div'>
+      <ReactFlowProvider>
+        <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} visualStateModel={visualStateModel}/>
+      </ReactFlowProvider>
+      <div className='r-code-input'>
+        <input onChange={onRCodeInputChange}></input>
+        <button onClick={onRCodeRequest}>Send R code</button>
+      </div>
+      <LegendComponent visualStateModel={visualStateModel}/>
     </div>
-    <LegendComponent visualStateModel={visualStateModel}/>
+    
   </MainContainerComponent>
 );
+
+window.MonacoEnvironment = {
+  getWorker: (workerId, label) => {
+    return new Worker('monaco-editor/vs/base/worker/workerMain.js')
+  }
+}
+
+window.onload = () => {
+  monaco.editor.create((document.getElementById('editor-target') as HTMLElement), {
+    value: firstValue,
+    language: 'r',
+    automaticLayout: true,
+  });
+}
+
 

@@ -179,11 +179,21 @@ body {
 
 .main-container {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	margin: 0px;
 	height: 100vh;
 	width: 100vw;
 	overflow-y: hidden;
+}
+
+.editor-div{
+	height: 100%;
+	width: 30%;
+}
+
+.reactflow-div{
+	height: 100%;
+	width: 70%;
 }
 
 /* from https://www.w3schools.com/css/css_tooltip.asp */
