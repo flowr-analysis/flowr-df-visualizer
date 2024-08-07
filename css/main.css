@@ -190,7 +190,7 @@ body {
 
 .editor-div{
 	height: 100%;
-	width: 30%;
+	width: 100%;
 	background: #fff;
 	z-index: 99;
 }
@@ -231,13 +231,12 @@ body {
 }
 
 .r-code-input {
-	position: absolute;
-	top: 15px; 
-	left: 15px;
 	display: flex;
 	flex-direction: row;
 	height: 1.5em;
 	gap: 12px;
+	background-color: white;
+	padding: 15px;
 }
 
 
@@ -296,3 +295,11 @@ body {
 	opacity: 0.15;
 	font-weight: normal;
 }	
+
+.left-side {
+	height: 100%;
+	width: 30%;
+	display: flex;
+	flex-direction: column;
+	gap: 0px;
+}
