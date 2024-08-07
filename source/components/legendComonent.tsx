@@ -1,6 +1,4 @@
-import { useRef } from "react";
-import { edgeTypeToMarkerIdMapper, edgeTypeToSymbolIdMapper } from "./model/edges/multiEdge";
-import { SideEffectOnCallEdge } from "./model/edges/sideEffectOnCallEdge";
+import { edgeTypeToMarkerIdMapper } from "./model/edges/multiEdge";
 import { VisualStateModel } from "./model/visualStateModel";
 import { setIsNodeIdShownReactFlow } from "./graphComponent";
 
@@ -47,13 +45,16 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({visualStateMode
             
             <div className = 'legend-control-elements'>
                 <div style={{whiteSpace: 'nowrap'}}>
-                    <input type='checkbox' id='show-id-checkbox' onClick={() => {
+                    <input 
+                        type='checkbox' 
+                        id='show-id-checkbox' 
+                        onClick={() => {
                         const checkbox = document.getElementById('show-id-checkbox') as HTMLInputElement ?? new HTMLInputElement()
                         const isChecked = checkbox.checked
                         visualStateModel.isNodeIdShown = isChecked
                         setIsNodeIdShownReactFlow(isChecked)
                     }}/>
-                    <label >(NodeId)</label>
+                    <label htmlFor='show-id-checkbox' >(NodeId)</label>
                 </div>
             </div>
 

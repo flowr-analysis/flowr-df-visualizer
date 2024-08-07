@@ -71,12 +71,11 @@ interface NodeComponentProps {
 const BodyNodeComponent: React.FC<BodyNodeComponentProps> = ({data, className}) => {
   const visualStateModel = data.visualStateModel as VisualStateModel ?? new VisualStateModel()
   const isGreyedOut = visualStateModel.isGreyedOutMap.get(data.nodeType as string ?? '') ?? false
-  const isNodeIdShown = visualStateModel.isNodeIdShown
   const bodyClassName = className + (isGreyedOut ? ' legend-passive' : '')
   const shownLabel = data.label as string + (data.isNodeIdShown ? ' (' + data.id + ')': '')
   return (
     <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
-      <div className = {bodyClassName}>
+      <div className = {bodyClassName} id={`in-graph-node-${data.id}`}>
         <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
         <label htmlFor="text">{shownLabel}</label>
       </div>

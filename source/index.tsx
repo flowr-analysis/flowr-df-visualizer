@@ -114,12 +114,14 @@ root.render(
   <MainContainerComponent initialize={() => { console.log('Hey') }}>
     <div id='editor-target' className = 'editor-div'> </div>
     <div className = 'reactflow-div'>
+      <div style={{ position: 'relative', top: 0, right: 0, width: '100%', height: '100%'}}>
       <ReactFlowProvider>
         <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} visualStateModel={visualStateModel}/>
       </ReactFlowProvider>
       <div className='r-code-input'>
         <input onChange={onRCodeInputChange}></input>
         <button onClick={onRCodeRequest}>Send R code</button>
+      </div>
       </div>
       <LegendComponent visualStateModel={visualStateModel}/>
     </div>
