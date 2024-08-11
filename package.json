@@ -5,7 +5,24 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --mode=development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "lint-local": "npx eslint --version && npx eslint source/ --rule \"no-warning-comments: off\"",
+    "lint": "npx eslint --version && npx eslint source/"
+  },
+  "eslintConfig": {
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [
+            ".ts"
+          ]
+        }
+      }
+    },
+    "extends": [
+      "@eagleoutice/eslint-config-flowr"
+    ],
+    "rules": {}
   },
   "repository": {
     "type": "git",
@@ -14,8 +31,18 @@
   "author": "Florian Sihler",
   "license": "ISC",
   "devDependencies": {
+    "@eagleoutice/eslint-config-flowr": "^1.0.8",
+    "@stylistic/eslint-plugin": "^2.6.2",
+    "@stylistic/eslint-plugin-plus": "^2.6.2",
+    "@stylistic/eslint-plugin-ts": "^2.6.2",
     "@types/uuid": "^9.0.2",
     "copy-webpack-plugin": "^11.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-check-file": "^2.8.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^17.10.2",
+    "eslint-plugin-promise": "^6.6.0",
+    "eslint-plugin-tsdoc": "^0.2.17",
     "html-webpack-plugin": "^5.5.0",
     "ts-loader": "^9.3.1",
     "ts-node": "^10.9.1",

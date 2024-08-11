@@ -1,6 +1,6 @@
-import { edgeTypeToMarkerIdMapper } from "./model/edges/multiEdge";
-import { VisualStateModel } from "./model/visualStateModel";
-import { setIsNodeIdShownReactFlow } from "./graphComponent";
+import { edgeTypeToMarkerIdMapper } from './model/edges/multiEdge'
+import type { VisualStateModel } from './model/visualStateModel'
+import { setIsNodeIdShownReactFlow } from './graphComponent'
 
 
 interface LegendComponentProps {
@@ -8,120 +8,120 @@ interface LegendComponentProps {
 }
 
 export function slideInLegend() {
-    const element: HTMLDivElement = document.getElementById('slide-in-legend') as HTMLDivElement ?? new HTMLDivElement()
-    element.classList.toggle('visible');
+	const element: HTMLDivElement = document.getElementById('slide-in-legend') as HTMLDivElement ?? new HTMLDivElement()
+	element.classList.toggle('visible')
 }
 
 export function slideOutLegend(){
-    const element: HTMLDivElement = document.getElementById('slide-in-legend') as HTMLDivElement ?? new HTMLDivElement()
-    element.classList.toggle('visible');
+	const element: HTMLDivElement = document.getElementById('slide-in-legend') as HTMLDivElement ?? new HTMLDivElement()
+	element.classList.toggle('visible')
 }
 
-export const LegendComponent: React.FC<LegendComponentProps> = ({visualStateModel}) => {
+export const LegendComponent: React.FC<LegendComponentProps> = ({ visualStateModel }) => {
     
-    const isGreyedOutMap = visualStateModel.isGreyedOutMap
+	const isGreyedOutMap = visualStateModel.isGreyedOutMap
     
-    return (
-        <div className = 'slide-in-legend' id = 'slide-in-legend' >
-            <div className='legend-nodes'>
-                <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'variable-definition'/>
-                <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'function-definition'/>
-                <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'value'/>
-                <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'function-call'/>
-                <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'use'/>
-                <NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'exit-point'/>
-            </div>
-            <div className='legend-edges'>
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'reads' edgeText ='reads' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defined-by' edgeText ='defined-by' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'calls' edgeText = 'calls' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'returns' edgeText='returns' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defines-on-call' edgeText='defines-on-call' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defined-by-on-call' edgeText='defined-by-on-call' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'argument' edgeText='argument' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'side-effect-on-call' edgeText='side-effect-on-call' />
-                <EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
-            </div>
+	return (
+		<div className = 'slide-in-legend' id = 'slide-in-legend' >
+			<div className='legend-nodes'>
+				<NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'variable-definition'/>
+				<NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'function-definition'/>
+				<NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'value'/>
+				<NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'function-call'/>
+				<NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'use'/>
+				<NodeLegendComponent isGreyedOutMap = {isGreyedOutMap} nodeType = 'exit-point'/>
+			</div>
+			<div className='legend-edges'>
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'reads' edgeText ='reads' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defined-by' edgeText ='defined-by' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'calls' edgeText = 'calls' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'returns' edgeText='returns' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defines-on-call' edgeText='defines-on-call' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'defined-by-on-call' edgeText='defined-by-on-call' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'argument' edgeText='argument' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'side-effect-on-call' edgeText='side-effect-on-call' />
+				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
+			</div>
             
-            <div className = 'legend-control-elements'>
-                <div style={{whiteSpace: 'nowrap'}}>
-                    <input 
-                        type='checkbox' 
-                        id='show-id-checkbox' 
-                        onClick={() => {
-                        const checkbox = document.getElementById('show-id-checkbox') as HTMLInputElement ?? new HTMLInputElement()
-                        const isChecked = checkbox.checked
-                        visualStateModel.isNodeIdShown = isChecked
-                        setIsNodeIdShownReactFlow(isChecked)
-                    }}/>
-                    <label htmlFor='show-id-checkbox' >(NodeId)</label>
-                </div>
-            </div>
+			<div className = 'legend-control-elements'>
+				<div style={{ whiteSpace: 'nowrap' }}>
+					<input 
+						type='checkbox' 
+						id='show-id-checkbox' 
+						onClick={() => {
+							const checkbox = document.getElementById('show-id-checkbox') as HTMLInputElement ?? new HTMLInputElement()
+							const isChecked = checkbox.checked
+							visualStateModel.isNodeIdShown = isChecked
+							setIsNodeIdShownReactFlow(isChecked)
+						}}/>
+					<label htmlFor='show-id-checkbox' >(NodeId)</label>
+				</div>
+			</div>
 
-            <div id = 'legend-close-button-div'>
-                <button className = {'button-close-legend'} onClick = {slideOutLegend} >X</button>
-            </div>
-        </div>
-    )
+			<div id = 'legend-close-button-div'>
+				<button className = {'button-close-legend'} onClick = {slideOutLegend} >X</button>
+			</div>
+		</div>
+	)
 }
 
 interface EdgeLegendComponentProps {
-    edgeType:string
-    edgeText:string
-    isGreyedOutMap:Map<string,boolean>
+    edgeType:       string
+    edgeText:       string
+    isGreyedOutMap: Map<string,boolean>
 }
 
 
-const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({edgeText, edgeType, isGreyedOutMap}) => {
-    const classNameEdge = edgeType + '-edge' + ' legend-edge' + ' ' + edgeType + '-legend-edge'
-    const classNameInteractiveEdge = edgeType + '-legend-interactive-edge' + ' legend-interactive-edge' 
-    const markerId = edgeTypeToMarkerIdMapper(edgeType)
-    const legendId = edgeType + '-legend'
-    return(<svg
-        id={legendId}
-        onClick={() => {
-            const pathElements = document.getElementsByClassName(`${edgeType}-edge`) as HTMLCollectionOf<SVGPathElement>
-            const symbolElements = document.getElementsByClassName(`${edgeType}-edge-symbol`) as HTMLCollectionOf<SVGUseElement>
-            const legendSVGElement = document.getElementById(legendId) as HTMLElement
+const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({ edgeText, edgeType, isGreyedOutMap }) => {
+	const classNameEdge = edgeType + '-edge' + ' legend-edge' + ' ' + edgeType + '-legend-edge'
+	const classNameInteractiveEdge = edgeType + '-legend-interactive-edge' + ' legend-interactive-edge' 
+	const markerId = edgeTypeToMarkerIdMapper(edgeType)
+	const legendId = edgeType + '-legend'
+	return (<svg
+		id={legendId}
+		onClick={() => {
+			const pathElements = document.getElementsByClassName(`${edgeType}-edge`) as HTMLCollectionOf<SVGPathElement>
+			const symbolElements = document.getElementsByClassName(`${edgeType}-edge-symbol`) as HTMLCollectionOf<SVGUseElement>
+			const legendSVGElement = document.getElementById(legendId) as HTMLElement
             
-            //get the greyed out state and set it correctly
-            const isEdgeTypeGreyedOut:boolean = isGreyedOutMap.get(edgeType) ?? false
-            isGreyedOutMap.set(edgeType,!isEdgeTypeGreyedOut)
+			//get the greyed out state and set it correctly
+			const isEdgeTypeGreyedOut:boolean = isGreyedOutMap.get(edgeType) ?? false
+			isGreyedOutMap.set(edgeType,!isEdgeTypeGreyedOut)
 
-            //for all elements set the node state
-            for(const element of pathElements){
-                element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
-            }
+			//for all elements set the node state
+			for(const element of pathElements){
+				element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
+			}
             
-            for(const element of symbolElements){
-                element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
-            }
-            legendSVGElement.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
-        }}
-    >
-        <path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
-        <path className = {classNameInteractiveEdge} d='m0 10 l80 0' ></path>
+			for(const element of symbolElements){
+				element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
+			}
+			legendSVGElement.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
+		}}
+	>
+		<path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
+		<path className = {classNameInteractiveEdge} d='m0 10 l80 0' ></path>
         
-        <text x = {92} y = {15}>{edgeText}</text>
-    </svg>)
+		<text x = {92} y = {15}>{edgeText}</text>
+	</svg>)
 }  
 
 interface NodeLegendComponentProps{
-    nodeType:string
+    nodeType:       string
     isGreyedOutMap: Map<string,boolean>    
 }
 
-const NodeLegendComponent: React.FC<NodeLegendComponentProps> = ({nodeType, isGreyedOutMap}) => {
-    return (
-        <div onClick = {() => {
-            const elements = document.getElementsByClassName(`${nodeType}-node`) as HTMLCollectionOf<HTMLDivElement>
-            //get the greyed out state and set it correctly
-            const isNodeTypeGreyedOut:boolean =  isGreyedOutMap.get(nodeType) ?? false
-            isGreyedOutMap.set(nodeType,!isNodeTypeGreyedOut)
-            //for all elements set the node state
-            for(const element of elements){
-                element.classList.toggle('legend-passive', !isNodeTypeGreyedOut)
-            }
-        }}className={`legend-element ${nodeType}-node ${nodeType}-node-legend`}>{nodeType}</div>
-    )
+const NodeLegendComponent: React.FC<NodeLegendComponentProps> = ({ nodeType, isGreyedOutMap }) => {
+	return (
+		<div onClick = {() => {
+			const elements = document.getElementsByClassName(`${nodeType}-node`) as HTMLCollectionOf<HTMLDivElement>
+			//get the greyed out state and set it correctly
+			const isNodeTypeGreyedOut:boolean =  isGreyedOutMap.get(nodeType) ?? false
+			isGreyedOutMap.set(nodeType,!isNodeTypeGreyedOut)
+			//for all elements set the node state
+			for(const element of elements){
+				element.classList.toggle('legend-passive', !isNodeTypeGreyedOut)
+			}
+		}}className={`legend-element ${nodeType}-node ${nodeType}-node-legend`}>{nodeType}</div>
+	)
 }
