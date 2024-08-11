@@ -1,6 +1,5 @@
-import { useCallback } from 'react'
 import type { EdgeProps, Node, XYPosition } from '@xyflow/react'
-import { getStraightPath, BaseEdge, EdgeLabelRenderer, getBezierPath, Position, useStore, useInternalNode, InternalNode } from '@xyflow/react'
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, Position, useInternalNode } from '@xyflow/react'
 
 const edgeTagMap:{[index: string]: string} = {
 	'reads':                   'readsEdge',
@@ -34,15 +33,15 @@ export const BodyEdgeComponent: React.FC<BodyEdgeComponentProps> = (props) => {
 
 	const sourceNode = useInternalNode(props.source)
 	const targetNode = useInternalNode(props.target)
-    
+
 	if(!sourceNode || !targetNode) {
 		return null
 	}
-  
+
 	const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode,false)
 
 
-	const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
+	const [edgePath, labelX, labelY] = getBezierPath({
 		sourceX:        sourceX,
 		sourceY:        sourceY,
 		sourcePosition: sourcePos,
@@ -50,16 +49,16 @@ export const BodyEdgeComponent: React.FC<BodyEdgeComponentProps> = (props) => {
 		targetX:        targetX,
 		targetY:        targetY,
 	})
-  
-	//const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
+
+	//const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2
 	//const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
 	return (
 		<>
 			<BaseEdge
-				id={props.standardEdgeInformation.id} 
-				path={edgePath} 
-				style={props.edgeStyle} 
-				markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined} 
+				id={props.standardEdgeInformation.id}
+				path={edgePath}
+				style={props.edgeStyle}
+				markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined}
 			/>
 			<EdgeLabelRenderer>
 				<div
@@ -83,7 +82,7 @@ export const BodyEdgeComponent: React.FC<BodyEdgeComponentProps> = (props) => {
 // of the line between the center of the intersectionNode and the target node
 function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition {
 	// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
-  
+
 
 
 	const intersectionNodeWidth = intersectionNode.measured?.width
@@ -91,7 +90,7 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
 
 	const targetNodeWidth = targetNode.measured?.width
 	const targetNodeHeight = targetNode.measured?.height
-  
+
 	if(intersectionNodeHeight === undefined || intersectionNodeWidth === undefined || targetNodeWidth === undefined || targetNodeHeight === undefined){
 		throw Error('width or height not measured')
 	}
@@ -106,7 +105,7 @@ function getNodeIntersection(intersectionNode:Node, targetNode:Node):XYPosition 
 	const intersectionNodePosition = getAbsolutePosition(intersectionNode)
 
 	//Set position correctly because subnode position is relative to parent
-  
+
 	const w = intersectionNodeWidth / 2
 	const h = intersectionNodeHeight / 2
 
@@ -133,22 +132,22 @@ function getNodeIntersectionForTargetPosition(intersectionNode:Node, targetPosit
 	const intersectionNodeWidth = intersectionNode.measured?.width
 	const intersectionNodeHeight = intersectionNode.measured?.height
 
-  
+
 	if(intersectionNodeHeight === undefined || intersectionNodeWidth === undefined){
 		throw Error('width or height not measured')
 	}
-  
+
 	const intersectionNodePosition = getAbsolutePosition(intersectionNode)
 
 	//Set position correctly because subnode position is relative to parent
-  
+
 	const w = intersectionNodeWidth / 2
 	const h = intersectionNodeHeight / 2
 
 	const x2 = intersectionNodePosition.x + w
 	const y2 = intersectionNodePosition.y + h
-	const x1 = targetPosition.x 
-	const y1 = targetPosition.y 
+	const x1 = targetPosition.x
+	const y1 = targetPosition.y
 
 	const xx1 = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h)
 	const yy1 = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h)
@@ -164,7 +163,7 @@ function getNodeIntersectionForTargetPosition(intersectionNode:Node, targetPosit
 
 // returns the position (top,right,bottom or right) passed node compared to the intersection point
 function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
-  
+
 
 	if(node.position.x === undefined || node.position.y === undefined || node.measured?.height === undefined || node.measured.width === undefined){
 		throw Error('position or measured dimension undefined')
@@ -172,11 +171,11 @@ function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
 
 	const absolutePositionNode = getAbsolutePosition(node)
 
-	const leftPosition = absolutePositionNode.x 
+	const leftPosition = absolutePositionNode.x
 	const rightPosition = absolutePositionNode.x + node.measured.width
 	const topPosition = absolutePositionNode.y
 	const bottomPosition = absolutePositionNode.y + node.measured.height
-  
+
 	if(Math.abs(leftPosition - intersectionPoint.x) <= 0.1){
 		return Position.Left
 	}
@@ -232,17 +231,17 @@ function rotatePositionOnNodeDegrees(node:Node, intersectionPoint:XYPosition, an
 		throw Error('position or measured dimension undefined')
 	}
 	const nodeMiddle:XYPosition = { x: node.position.x + 1/2 * node.measured.width, y: node.position.y + 1/2 * node.measured.height }
-  
+
 	const distanceToMiddle:XYPosition = { x: intersectionPoint.x - nodeMiddle.x, y: intersectionPoint.y - nodeMiddle.y }
 	let degreeFromMiddle  = 0
 	if(distanceToMiddle.x === 0){
-		degreeFromMiddle = distanceToMiddle.y >= 0 ?  Math.PI / 2 : Math.PI * 3/2 
+		degreeFromMiddle = distanceToMiddle.y >= 0 ?  Math.PI / 2 : Math.PI * 3/2
 	} else {
 		degreeFromMiddle = Math.atan2(distanceToMiddle.y , distanceToMiddle.x)
 	}
-  
+
 	const newAngle = degreeFromMiddle + angleInDegrees / 360 * 2 * Math.PI
 	const lengthLongerFromMiddleOfNode = node.measured.height + node.measured.width
-	const newReferencePoint:XYPosition = { x: Math.cos(newAngle) * lengthLongerFromMiddleOfNode + nodeMiddle.x, y: Math.sin(newAngle) * lengthLongerFromMiddleOfNode + nodeMiddle.y } 
+	const newReferencePoint:XYPosition = { x: Math.cos(newAngle) * lengthLongerFromMiddleOfNode + nodeMiddle.x, y: Math.sin(newAngle) * lengthLongerFromMiddleOfNode + nodeMiddle.y }
 	return getNodeIntersectionForTargetPosition(node, newReferencePoint)
 }

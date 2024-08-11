@@ -1,5 +1,5 @@
 import type { EdgeProps } from '@xyflow/react'
-import { BodyEdgeComponent } from './edgeBase'
+import { BodyEdgeComponent } from './edge-base'
 
 
 export default function ReadsEdge(props: EdgeProps) {
@@ -13,4 +13,3 @@ export default function ReadsEdge(props: EdgeProps) {
 	/>
 }
 
- 

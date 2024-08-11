@@ -1,17 +1,10 @@
 import type { Edge, Node } from '@xyflow/react'
 import type { VisualizationGraph } from './graph'
-import { EdgeTypeName, edgeTypesToNames } from '@eagleoutice/flowr/dataflow/graph/edge'
+import { edgeTypesToNames } from '@eagleoutice/flowr/dataflow/graph/edge'
 import type { NodeId } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/node-id'
 import type { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate'
-import { NormalizedAst } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate'
 import { visitAst } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/visitor'
 import type { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model'
-
-export interface Graph {
-    rootVertices:      Set<string>,
-    vertexInformation: Map<string, {name: string, tag: string}>,
-    edgeInformation:   Map<string, Map<string, {types: {[key: string]: string}}>>
-}
 
 export interface OtherGraph{
     'rootVertices':      number[]
@@ -66,11 +59,11 @@ function constructLexemeMapping(ast: RNode<ParentInformation>): Map<NodeId, stri
 			infoMap.set(node.info.id, node.lexeme)
 		}
 	})
-    
+
 	return infoMap
 }
 
-export interface VisualizationNodeProps extends Record<string, unknown> { 
+export interface VisualizationNodeProps extends Record<string, unknown> {
     label:     string
     nodeType:  string
     extent?:   string
@@ -86,7 +79,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	const subflowMap = new Map<number, number>()
 
 	const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
-    
+
 	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap }, edges: [], }
 
 	//Construct subflow Map and nodeId Map
@@ -98,7 +91,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			subflowArray.forEach((subNode) => {
 				subflowMap.set(subNode,nodeId)
 			})
-            
+
 			const idNewNode = String(nodeId) //+ '-subflow-node'
 			const newNode: Node<VisualizationNodeProps> = {
 				id:          idNewNode,
@@ -118,7 +111,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	for(const [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
 		/* position will be set by the layout later */
 		const nodeInfoInfo = nodeInfo
-        
+
 		const idNewNode = String(nodeId)
 		const newNode: Node<VisualizationNodeProps> = {
 			id:          idNewNode,
@@ -130,12 +123,12 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			type:        nodeTagMapper(nodeInfoInfo.tag),
 		}
 
-        
+
 		if(!nodeIdMap.has(idNewNode)){
 			nodeIdMap.set(idNewNode, newNode)
 			visualizationGraph.nodesInfo.nodes.push(newNode)
 		}
-        
+
 		if(subflowMap.has(nodeId)){
 			const toAlterNode = nodeIdMap.get(idNewNode)
 			const parentId = String(subflowMap.get(nodeId))
@@ -146,8 +139,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
             }
             nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
 		}
-        
-        
+
+
 		/*
         if(subflowMap.has(nodeId)){
             const parentId = String(subflowMap.get(nodeId)) + '-subflow-node'
@@ -187,10 +180,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		for(const [targetNodeId, targetNodeInfo] of listOfConnectedNodes2){
 			const listOfEdgeTypes = edgeTypesToNames(targetNodeInfo.types)
 			let labelNames:string = ''
-			let lastEdgeType:string = ''
 			for( const linkEdgeType of listOfEdgeTypes){
 				labelNames += linkEdgeType + ' '
-				lastEdgeType = linkEdgeType
 			}
 			const newEdge: Edge = {
 				source: String(sourceNodeId),

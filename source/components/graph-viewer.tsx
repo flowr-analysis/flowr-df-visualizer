@@ -1,56 +1,39 @@
 import type { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js'
 import ELK from 'elkjs/lib/elk.bundled.js'
-import React, { ChangeEventHandler, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import type {
-	Edge,
-	Node } from '@xyflow/react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import type { Edge, Node } from '@xyflow/react'
 import {
 	ReactFlow,
-	addEdge,
-	Panel,
 	useNodesState,
 	useEdgesState,
 	useReactFlow,
-	Connection,
 	MiniMap,
-	NodeToolbar,
 	Controls,
 	Background,
-	Position,
-	Handle,
-	NodeProps,
-	getStraightPath,
-	BaseEdge,
-	EdgeLabelRenderer,
-	MarkerType,
-	EdgeProps,
-	applyEdgeChanges,
 	ControlButton,
 } from '@xyflow/react'
 
 import '@xyflow/react/dist/style.css'
 
 import type { VisualizationGraph } from './model/graph'
-import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, FunctionDefinitionNode, GroupNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/nodeDefinition'
-import ReadsEdge from './model/edges/readsEdge'
-import { edgeTagMapper } from './model/edges/edgeBase'
-import { ArgumentEdge } from './model/edges/argumentEdge'
-import { CallsEdge } from './model/edges/callsEdge'
-import { DefinedByEdge } from './model/edges/definedByEdge'
-import { DefinedByOnCallEdge } from './model/edges/definedByOnCallEdge'
-import { DefinesOnCallEdge } from './model/edges/definesOnCallEdge'
-import { RelatesEdge } from './model/edges/relatesEdge'
-import { ReturnsEdge } from './model/edges/returnsEdge'
-import { SameDefDefEdge } from './model/edges/sameDefDefEdge'
-import { SameReadReadEdge } from './model/edges/sameReadReadEdge'
-import { SideEffectOnCallEdge } from './model/edges/sideEffectOnCallEdge'
-import { NonStandardEvaluationEdge } from './model/edges/nonStandardEvaluationEdge'
-import { flattenToNodeArray, foldIntoElkHierarchy } from './graphHierarchy'
-import { ExtendedExtendedEdge, transformGraphForLayouting, transformGraphForShowing } from './model/graphTransition'
-import { MultiEdge } from './model/edges/multiEdge'
-import { slideInLegend } from './legendComonent'
-import { SvgDefinitionsComponent } from './svgDefinitions'
-import type { VisualStateModel } from './model/visualStateModel'
+import FloatingConnectionLine, { ExitPointNode, FunctionCallNode, FunctionDefinitionNode, GroupNode, UseNode, ValueNode, VariableDefinitionNode } from './model/nodes/node-definition'
+import ReadsEdge from './model/edges/reads-edge'
+import { ArgumentEdge } from './model/edges/argument-edge'
+import { CallsEdge } from './model/edges/calls-edge'
+import { DefinedByEdge } from './model/edges/defined-by-edge'
+import { DefinedByOnCallEdge } from './model/edges/defined-by-on-call-edge'
+import { DefinesOnCallEdge } from './model/edges/defines-on-call-edge'
+import { RelatesEdge } from './model/edges/relates-edge'
+import { ReturnsEdge } from './model/edges/returns-edge'
+import { SameDefDefEdge } from './model/edges/same-def-def-edge'
+import { SameReadReadEdge } from './model/edges/same-read-read-edge'
+import { SideEffectOnCallEdge } from './model/edges/side-effect-on-call-edge'
+import { NonStandardEvaluationEdge } from './model/edges/non-standard-evaluation-edge'
+import { transformGraphForLayouting, transformGraphForShowing } from './model/graph-transition'
+import { MultiEdge } from './model/edges/multi-edge'
+import { slideInLegend } from './graph-legend'
+import { SvgDefinitionsComponent } from './svg-definitions'
+import type { VisualStateModel } from './model/visual-state-model'
 
 
 
@@ -69,8 +52,8 @@ const elkOptions: LayoutOptions = {
 
 
 async function getLayoutedElements(nodes: Node[],
-																																			nodeIdMap: Map<string,Node>, 
-																																			edges: ElkExtendedEdge[], 
+																																			nodeIdMap: Map<string,Node>,
+																																			edges: ElkExtendedEdge[],
 																																			options: LayoutOptions,
 																																			visualStateModel: VisualStateModel): Promise<{ nodes: Node[]; edges: Edge[] }> {
 	const isHorizontal = options?.['elk.direction'] === 'RIGHT'
@@ -118,13 +101,13 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 	const { fitView } = useReactFlow()
 
 	const [isNodeIdShown, setIsNodeIdShown] = useState(false)
-   
+
 	setIsNodeIdShownReactFlow = setIsNodeIdShown
 
 
 	useEffect(() => {
 		setNodes((currentNodes) =>
-			currentNodes.map((node) =>{ 
+			currentNodes.map((node) =>{
 				node.data.isNodeIdShown = isNodeIdShown
 				return ({
 					...node
@@ -140,19 +123,20 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 		setCurrentGraph(g)
 		onLayout({ direction: 'DOWN', g })
 	})
-  
+
 	const onLayout = useCallback(
 		({ direction , g = undefined } : { direction: string, g?: VisualizationGraph }) => {
 			const opts = { 'elk.direction': direction, ...elkOptions }
 			const ns = g ? g.nodesInfo.nodes : nodes
 			const es = g ? g.edges : edges
 			const nm = g ? g.nodesInfo.nodeMap: nodeMap
-			getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, visualStateModel).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
-				setNodes(layoutedNodes)
-				setEdges(layoutedEdges)
+			void getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, visualStateModel)
+				.then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+					setNodes(layoutedNodes)
+					setEdges(layoutedEdges)
 
-				window.requestAnimationFrame(() => fitView())
-			})
+					window.requestAnimationFrame(() => void fitView())
+				})
 		},
 		[nodes, edges, currentGraph]
 	)
@@ -162,7 +146,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 		onLayout({ direction: 'DOWN', g: currentGraph })
 	}, [])
 
-	/* allows to map custom node types */
+	/* mapping custom node types */
 	const nodeTypes = useMemo(() => ({
 		variableDefinitionNode: VariableDefinitionNode,
 		useNode:                UseNode,

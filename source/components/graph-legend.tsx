@@ -1,6 +1,6 @@
-import { edgeTypeToMarkerIdMapper } from './model/edges/multiEdge'
-import type { VisualStateModel } from './model/visualStateModel'
-import { setIsNodeIdShownReactFlow } from './graphComponent'
+import { edgeTypeToMarkerIdMapper } from './model/edges/multi-edge'
+import type { VisualStateModel } from './model/visual-state-model'
+import { setIsNodeIdShownReactFlow } from './graph-viewer'
 
 
 interface LegendComponentProps {
@@ -18,9 +18,9 @@ export function slideOutLegend(){
 }
 
 export const LegendComponent: React.FC<LegendComponentProps> = ({ visualStateModel }) => {
-    
+
 	const isGreyedOutMap = visualStateModel.isGreyedOutMap
-    
+
 	return (
 		<div className = 'slide-in-legend' id = 'slide-in-legend' >
 			<div className='legend-nodes'>
@@ -42,12 +42,12 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({ visualStateMod
 				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'side-effect-on-call' edgeText='side-effect-on-call' />
 				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
 			</div>
-            
+
 			<div className = 'legend-control-elements'>
 				<div style={{ whiteSpace: 'nowrap' }}>
-					<input 
-						type='checkbox' 
-						id='show-id-checkbox' 
+					<input
+						type='checkbox'
+						id='show-id-checkbox'
 						onClick={() => {
 							const checkbox = document.getElementById('show-id-checkbox') as HTMLInputElement ?? new HTMLInputElement()
 							const isChecked = checkbox.checked
@@ -74,7 +74,7 @@ interface EdgeLegendComponentProps {
 
 const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({ edgeText, edgeType, isGreyedOutMap }) => {
 	const classNameEdge = edgeType + '-edge' + ' legend-edge' + ' ' + edgeType + '-legend-edge'
-	const classNameInteractiveEdge = edgeType + '-legend-interactive-edge' + ' legend-interactive-edge' 
+	const classNameInteractiveEdge = edgeType + '-legend-interactive-edge' + ' legend-interactive-edge'
 	const markerId = edgeTypeToMarkerIdMapper(edgeType)
 	const legendId = edgeType + '-legend'
 	return (<svg
@@ -83,7 +83,7 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({ edgeText, edg
 			const pathElements = document.getElementsByClassName(`${edgeType}-edge`) as HTMLCollectionOf<SVGPathElement>
 			const symbolElements = document.getElementsByClassName(`${edgeType}-edge-symbol`) as HTMLCollectionOf<SVGUseElement>
 			const legendSVGElement = document.getElementById(legendId) as HTMLElement
-            
+
 			//get the greyed out state and set it correctly
 			const isEdgeTypeGreyedOut:boolean = isGreyedOutMap.get(edgeType) ?? false
 			isGreyedOutMap.set(edgeType,!isEdgeTypeGreyedOut)
@@ -92,7 +92,7 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({ edgeText, edg
 			for(const element of pathElements){
 				element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
 			}
-            
+
 			for(const element of symbolElements){
 				element.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
 			}
@@ -101,14 +101,14 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({ edgeText, edg
 	>
 		<path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
 		<path className = {classNameInteractiveEdge} d='m0 10 l80 0' ></path>
-        
+
 		<text x = {92} y = {15}>{edgeText}</text>
 	</svg>)
-}  
+}
 
 interface NodeLegendComponentProps{
     nodeType:       string
-    isGreyedOutMap: Map<string,boolean>    
+    isGreyedOutMap: Map<string,boolean>
 }
 
 const NodeLegendComponent: React.FC<NodeLegendComponentProps> = ({ nodeType, isGreyedOutMap }) => {

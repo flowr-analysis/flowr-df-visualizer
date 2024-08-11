@@ -1,16 +1,15 @@
 import type { ConnectionLineComponentProps, Node, NodeProps } from '@xyflow/react'
-import { NodeResizer, Position, useUpdateNodeInternals , getBezierPath } from '@xyflow/react'
-import { HandleNodeComponent } from './handleNodeComponent'
-import React, { useState } from 'react'
-import { ProgressPlugin } from 'webpack'
+import { NodeResizer, getBezierPath } from '@xyflow/react'
+import { HandleNodeComponent } from './handle-node-component'
+import React from 'react'
 
-import { getEdgeParams } from '../edges/edgeBase'
-import { VisualStateModel } from '../visualStateModel'
+import { getEdgeParams } from '../edges/edge-base'
+import { VisualStateModel } from '../visual-state-model'
 
 
-function FloatingConnectionLine(props:ConnectionLineComponentProps) {
+function FloatingConnectionLine(props: ConnectionLineComponentProps) {
 	const { toX, toY, fromPosition, toPosition, fromNode } = props
-  
+
 	if(!fromNode) {
 		return null
 	}
@@ -121,12 +120,10 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ data, selected }) 
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
-	const minWidth = estimatedMaxX - estimatedMinX
-	const minHeight = estimatedMaxY - estimatedMinY
 	//<NodeResizer minWidth={minWidth} minHeight={minHeight}/>
 	// style = {divStyle}
 	// style={{ height: '100%', width:'100%'}}
-	/* 
+	/*
     <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
       <div className = 'function-definition-node base-node' >
         <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
@@ -163,8 +160,8 @@ export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
-  
-	return ( 
+
+	return (
 		<div className = 'group-node' style = {divStyle}>
 			{data.label as string}
 		</div>

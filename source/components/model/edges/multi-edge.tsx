@@ -1,17 +1,15 @@
-import { useCallback } from 'react'
 import type { EdgeProps, ReactFlowState, XYPosition } from '@xyflow/react'
-import { BaseEdge, Edge, EdgeLabelRenderer, EdgeMouseHandler, EdgeTypes, InternalNode, getBezierPath, useInternalNode, useStore } from '@xyflow/react'
-import { getEdgeParams } from './edgeBase'
+import { EdgeLabelRenderer, getBezierPath, useInternalNode, useStore } from '@xyflow/react'
+import { getEdgeParams } from './edge-base'
 import type { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
-import { EdgeType } from '@eagleoutice/flowr/dataflow/graph/edge'
-import { VisualStateModel } from '../visualStateModel'
+import { VisualStateModel } from '../visual-state-model'
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
 const startEndDistanceToMarkers = 10
 
 export function MultiEdge(props:EdgeProps){
-    
+
 	return <BodyMultiEdgeComponent
 		standardEdgeInformation={props}
 		source={props.source}
@@ -26,7 +24,7 @@ interface BodyMultiEdgeComponentProps {
     readonly target:                  string;
 }
 
-export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ standardEdgeInformation, arrowEnd, source, target }) => {
+export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ standardEdgeInformation, source, target }) => {
 	const sourceNode = useInternalNode(source)
 	const targetNode = useInternalNode(target)
 
@@ -36,7 +34,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 
 	const isBiDirectionEdge = useStore((s: ReactFlowState) => {
 		const edgeExists = s.edges.some(
-			(e) =>
+			e =>
 				(e.source === standardEdgeInformation.target && e.target === standardEdgeInformation.source) ||
         (e.target === standardEdgeInformation.source && e.source === standardEdgeInformation.target),
 		)
@@ -46,7 +44,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 
 	const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode, isBiDirectionEdge)
 
-	const [edgePath, labelX, labelY, offsetX, offsetY] = getBezierPath({
+	const [edgePath, labelX, labelY] = getBezierPath({
 		sourceX:        sourceX,
 		sourceY:        sourceY,
 		sourcePosition: sourcePos,
@@ -54,11 +52,6 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 		targetX:        targetX,
 		targetY:        targetY,
 	})
-
-	//const labelPositionX = targetX - sourceX > 0 ? labelX + offsetX / 2 : labelX - offsetX / 2 
-	//const labelPositionY = targetY - sourceY > 0 ? labelY + offsetY / 2 : labelY - offsetY / 2
-	const defaultEdgeStyle: React.CSSProperties = { stroke: 'black', pointerEvents: 'none', cursor: 'none' }
-	const arrowStart = false
 
 	let label = ''
 	for(const singleLabel of (standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
@@ -68,16 +61,9 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 	const edgeLabelId = standardEdgeInformation.id + '-edgeLabel'
 	const hoverOverEdgeId = standardEdgeInformation.id + '-hoverover-interactive'
 	const cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
-  
+
 	const givenEdgeTypes = standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
-  
-	//insert respective className
-	let classNameString = ''
-	givenEdgeTypes.forEach((edgeTypeName) => {
-		classNameString += ' ' + edgeTypeName + '-edge'
-	})
-	classNameString = classNameString.slice(1)
-  
+
 	return (
 		<>
 			<PathWithMarkerComponent id={standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>
@@ -96,7 +82,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 				>
 					{label}
 				</div>
-      
+
 			</EdgeLabelRenderer>
 		</>
 	)
@@ -104,13 +90,8 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 
 //see also https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 /**
- * Calculates Point on BezierCurve 
- * @param t 0 <= t <= 1
- * @param startingPoint 
- * @param startControlPoint 
- * @param endControlPoint 
- * @param endingPoint 
- * @returns Point on BezierCurve 
+ * Calculates Point on BezierCurve. `t - 0 <= t <= 1`
+ * @returns Point on BezierCurve
  */
 function bezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):XYPosition {
 	return ({
@@ -137,13 +118,9 @@ function calculateLengthOfBezierCurve(startingPoint:XYPosition, startControlPoin
 }
 
 /**
- * calculates the percentage wise (in relation to length) point on bezier curve
- * @param t 0 <= t <= 1
- * @param startingPoint 
- * @param startControlPoint 
- * @param endControlPoint 
- * @param endingPoint 
- * @returns point which is approximately t percent through the bezier curve
+ * calculates the percentage wise (in relation to length) point on bezier-curve.
+ * `t` must be in the range of `0 <= t <= 1`
+ * @returns point which is approximately t percent through the bezier-curve
  */
 function linearPercentageBezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):XYPosition{
 	const curveLengthTotal = calculateLengthOfBezierCurve(startingPoint, startControlPoint, endControlPoint, endingPoint)
@@ -212,12 +189,8 @@ export function edgeTypeToMarkerIdMapper(edgeTag: string): string {
 }
 
 /**
- * split a cubic bezier curve into two parts using de Casteljaus Algorithm
- * @param t point to split at 0 < t < 1
- * @param startingPoint 
- * @param startControlPoint 
- * @param endControlPoint 
- * @param endingPoint 
+ * split a cubic bezier-curve into two parts using de Casteljaus Algorithm.
+ * `t` must be in the range of `0 < t < 1`
  * @returns Array of two elements where the first is the first part of the split curve and second is last part of the split curve
  */
 function splitSingleBezierCurve(t:number, startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):BezierCurve[] {
@@ -230,8 +203,8 @@ function splitSingleBezierCurve(t:number, startingPoint:XYPosition, startControl
 	for(let algorithmIndex = 1; algorithmIndex <= 3; algorithmIndex++){
 		for(let pointIndex = 0; pointIndex <= 3 - algorithmIndex; pointIndex++){
 			const calcX = pointArray[algorithmIndex - 1][pointIndex].x * (1 - t) + pointArray[algorithmIndex - 1][pointIndex + 1].x * t
-			const calcY = pointArray[algorithmIndex - 1][pointIndex].y * (1 - t) + pointArray[algorithmIndex - 1][pointIndex + 1].y * t 
-			pointArray[algorithmIndex].push({ x: calcX, y: calcY }) 
+			const calcY = pointArray[algorithmIndex - 1][pointIndex].y * (1 - t) + pointArray[algorithmIndex - 1][pointIndex + 1].y * t
+			pointArray[algorithmIndex].push({ x: calcX, y: calcY })
 		}
 	}
 	return ([
@@ -242,16 +215,12 @@ function splitSingleBezierCurve(t:number, startingPoint:XYPosition, startControl
 }
 
 /**
- * calculate the splitted parts of a cubic bezierCurve
- * @param t All values must follow the format 0 < t[i] < 1 && t[i] < t[i + 1]
- * @param startingPoint 
- * @param startControlPoint 
- * @param endControlPoint 
- * @param endingPoint 
+ * Calculate the split parts of a cubic bezierCurve.
+ * All values from `t` must follow the format `0 < t[i] < 1 && t[i] < t[i + 1]`
  * @returns Array of BezierCurves
  */
 function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoint:XYPosition, endControlPoint: XYPosition, endingPoint:XYPosition):BezierCurve[]{
-  
+
 	let A = startingPoint
 	let B = startControlPoint
 	let C = endControlPoint
@@ -259,7 +228,7 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
 
 	const returnArray:BezierCurve[] = []
 
-  
+
 	//Calculate linear percentages of curves.
 	const linearPercentagePoints: number[] = []
 	const curveLengthTotal = calculateLengthOfBezierCurve(startingPoint, startControlPoint, endControlPoint, endingPoint)
@@ -279,25 +248,18 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
 		}
 	}
 
-	const E: XYPosition = { x: 0, y: 0 }
-	const F: XYPosition = { x: 0, y: 0 }
-	const G: XYPosition = { x: 0, y: 0 }
-	const H: XYPosition = { x: 0, y: 0 }
-	const J: XYPosition = { x: 0, y: 0 }
-	const K: XYPosition = { x: 0, y: 0 }
-
 	let lastBezierCurve:BezierCurve = { startPoint: { x: 0, y: 0 }, controlPointStart: { x: 0, y: 0 }, controlPointEnd: { x: 0, y: 0 }, endPoint: { x: 0, y: 0 } }
 	let startPercentage: number = 0
 	for(let percentIndex = 0; percentIndex < linearPercentagePoints.length; percentIndex++){
 		const currentT = (linearPercentagePoints[percentIndex] - startPercentage) / (1 - startPercentage)
-    
+
 		const newCurves = splitSingleBezierCurve(currentT, A, B, C, D)
 		lastBezierCurve = newCurves[1]
-    
+
 		returnArray.push({
-			startPoint:        newCurves[0].startPoint, 
-			controlPointStart: newCurves[0].controlPointStart, 
-			controlPointEnd:   newCurves[0].controlPointEnd, 
+			startPoint:        newCurves[0].startPoint,
+			controlPointStart: newCurves[0].controlPointStart,
+			controlPointEnd:   newCurves[0].controlPointEnd,
 			endPoint:          newCurves[0].endPoint })
 
 		startPercentage = linearPercentagePoints[percentIndex]
@@ -308,16 +270,16 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
 	}
 
 	returnArray.push({
-		startPoint:        lastBezierCurve.startPoint, 
-		controlPointStart: lastBezierCurve.controlPointStart, 
-		controlPointEnd:   lastBezierCurve.controlPointEnd, 
+		startPoint:        lastBezierCurve.startPoint,
+		controlPointStart: lastBezierCurve.controlPointStart,
+		controlPointEnd:   lastBezierCurve.controlPointEnd,
 		endPoint:          lastBezierCurve.endPoint })
 	return returnArray
 }
 
 /** */
 const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edgePath, edgeTypes, id, visualStateModel }) => {
-	//Parse 4 Points from the calculated bezier curve
+	//Parse 4 Points from the calculated bezier-curve
 	const pointArray = edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
 	const startPointBez = { x: pointArray[0][0], y: pointArray[0][1] }
 	const startControlPointBez = { x: pointArray[1][0], y: pointArray[1][1] }
@@ -326,7 +288,7 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 
 	const lengthOfCurve = calculateLengthOfBezierCurve(startPointBez,startControlPointBez,endControlPointBez,endPointBez)
 
-	//check if curve is too small to fit many points
+	//check if the curve is too small to fit many points
 	let amountOfMarkerPointsInBetween = Math.floor((lengthOfCurve - startEndDistanceToMarkers * 2 - 2 * lengthBetweenMarkerPoints * edgeTypes.size) / lengthBetweenMarkerPoints)
 	if(amountOfMarkerPointsInBetween <= 0){
 		amountOfMarkerPointsInBetween = 0
@@ -334,9 +296,9 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 
 	const maximumOfInBetweenPoints = 4
 
-	const individualMarkerPointsInBetween = Math.floor(amountOfMarkerPointsInBetween / edgeTypes.size) > maximumOfInBetweenPoints ? 
-		maximumOfInBetweenPoints : 
-		Math.floor(amountOfMarkerPointsInBetween / edgeTypes.size) 
+	const individualMarkerPointsInBetween = Math.floor(amountOfMarkerPointsInBetween / edgeTypes.size) > maximumOfInBetweenPoints ?
+		maximumOfInBetweenPoints :
+		Math.floor(amountOfMarkerPointsInBetween / edgeTypes.size)
 
 	//calculate which symbols need to be on which points
 	//index -> edgeType
@@ -360,21 +322,21 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 			while(nextPoint < 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  edgeTypes.size)/ lengthOfCurve){
 				percentageArray.push(nextPoint)
 				nextPoint += (edgeTypes.size) * //Correctly jump for each marker
-                      (1 - 2 * (startEndDistanceToMarkers + lengthBetweenMarkerPoints * edgeTypes.size) / lengthOfCurve) * // use in between distance as reference 
+                      (1 - 2 * (startEndDistanceToMarkers + lengthBetweenMarkerPoints * edgeTypes.size) / lengthOfCurve) * // use in between distance as reference
                       1 / (individualMarkerPointsInBetween * edgeTypes.size + 1) //spacing between points
 			}
 			// last marker
-			nextPoint = 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  (edgeTypes.size - (indexOfMarkerType + 1)))/ lengthOfCurve 
+			nextPoint = 1 - (startEndDistanceToMarkers + lengthBetweenMarkerPoints *  (edgeTypes.size - (indexOfMarkerType + 1)))/ lengthOfCurve
 			percentageArray.push(nextPoint)
 		}
-    
+
 		//get points on BezierCurve
 		const pointsOnCurve = percentageArray.map((percentage) => linearPercentageBezierCurve(percentage, startPointBez, startControlPointBez, endControlPointBez, endPointBez))
 		pointsMap.set(indexOfMarkerType, pointsOnCurve)
 		curveMap.set(indexOfMarkerType, splitBezierCurve(percentageArray, startPointBez, startControlPointBez, endControlPointBez, endPointBez))
 		indexOfMarkerType += 1
 	}
-   
+
 	//create use elements
 	let useArray:JSX.Element[] = []
 	markerMap.forEach((edgeType,offsetIndex) => {
@@ -383,11 +345,11 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 			return (<use className = {`${edgeType}-edge-symbol`}key = {id + '-' + point.x + '-' + point.y} id = {id + '-' + point.x + '-' + point.y} href={`#${edgeTypeToSymbolIdMapper(edgeType)}`} x={point.x} y={point.y} />)
 		}) ?? []
 		useArray = useArray.concat(useBlockArray)
-	}) 
-  
+	})
+
 	//create curve
 	const markerEdgeMap: JSX.Element[] = []
-  
+
 	curveMap.forEach((array, index) =>{
 		const firstBezierCurve = array[0]
 		let dOfPath = `M${firstBezierCurve.startPoint.x},${firstBezierCurve.startPoint.y} `
@@ -395,16 +357,16 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 			dOfPath += `C${curve.controlPointStart.x},${curve.controlPointStart.y} ${curve.controlPointEnd.x},${curve.controlPointEnd.y} ${curve.endPoint.x},${curve.endPoint.y} `
 		})
 
-		const edgeType = markerMap.get(index) ?? '' 
+		const edgeType = markerMap.get(index) ?? ''
 		dOfPath = dOfPath.trimEnd()
 		const pathId = id + `-${edgeType}-marker-edge`
 		const markerEdge = (
 			<path
-				key = {pathId} 
+				key = {pathId}
 				id = {pathId}
 				className={'react-flow__edge-path multi-edge' + ` ${edgeType}-edge` + ((visualStateModel.isGreyedOutMap.get(edgeType) ?? false) ? ' legend-passive': '')}
 				d={dOfPath}
-				markerMid = {`url(#${edgeTypeToMarkerIdMapper(edgeType)})`} 
+				markerMid = {`url(#${edgeTypeToMarkerIdMapper(edgeType)})`}
 				markerEnd = {'url(#triangle)'}
 			/>
 		)
@@ -415,8 +377,8 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 		<>
 			<path
 				id={hoverOverEdgeId} //Interaction Edge
-				d={edgePath} 
-				className = 'interactive-edge' 
+				d={edgePath}
+				className = 'interactive-edge'
 			/>
 			{markerEdgeMap.map((self) => self)}
 		</>)

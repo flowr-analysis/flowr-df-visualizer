@@ -1,5 +1,5 @@
 import type { EdgeProps } from '@xyflow/react'
-import { BodyEdgeComponent } from './edgeBase'
+import { BodyEdgeComponent } from './edge-base'
 
 export function CallsEdge(props:EdgeProps){
 	return <BodyEdgeComponent
