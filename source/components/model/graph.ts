@@ -1,6 +1,11 @@
-import { Edge, Node } from "reactflow";
+import type { Edge, Node } from '@xyflow/react'
 
 export interface VisualizationGraph {
-    nodes: Node[]
-    edges: Edge[]
+    nodesInfo: NodeInformation
+    edges:     Edge[]
+}
+
+export interface NodeInformation{
+    nodes:   Node[],
+    nodeMap: Map<string, Node>
 }
