@@ -34,6 +34,7 @@ import { MultiEdge } from './model/edges/multi-edge'
 import { slideInLegend } from './graph-legend'
 import { SvgDefinitionsComponent } from './svg-definitions'
 import type { VisualStateModel } from './model/visual-state-model'
+import { client, monacoEditor } from '..'
 
 
 
@@ -197,6 +198,12 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 				<Controls>
 					<ControlButton onClick={slideInLegend}>
 						☰
+					</ControlButton>
+					<ControlButton className = 'refresh-button' onClick={() => {
+						const textInEditor = monacoEditor?.getValue() ?? ''
+						client?.sendAnalysisRequestJSON(textInEditor)
+					}}>
+						⟳
 					</ControlButton>
 				</Controls>
 			</ReactFlow>

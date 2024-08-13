@@ -17,7 +17,9 @@ import { LegendComponent } from './components/graph-legend'
 import { VisualStateModel } from './components/model/visual-state-model'
 import * as monaco from 'monaco-editor'
 
-let client: VisualizerWebsocketClient | undefined = undefined
+
+const firstValueInEditor = 'x <- 2 * 3; x'
+export let client: VisualizerWebsocketClient | undefined = undefined
 try {
 	client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
 	client.onFileAnalysisResponse = (json) => {
@@ -26,7 +28,7 @@ try {
 	}
 	client.onHelloMessage = (json) => {
 		console.log('hello', json)
-		client?.sendAnalysisRequestJSON('x <- 2 * 3; x')
+		client?.sendAnalysisRequestJSON(firstValueInEditor)
 	}
 } catch(e){
 	console.log(e)
@@ -64,8 +66,6 @@ document.body.appendChild(main)
 const root = createRoot(main)
 const visualStateModel = new VisualStateModel()
 
-const firstValue = 'x <- 42'
-
 
 
 root.render(
@@ -73,10 +73,6 @@ root.render(
 		console.log('Hey')
 	}}>
 		<div className='left-side'>
-			<div className='r-code-input'>
-				<input onChange={onRCodeInputChange}></input>
-				<button onClick={onRCodeRequest}>Send R code</button>
-			</div>
 			<div id='editor-target' className = 'editor-div'> </div>
 		</div>
 		<div className = 'reactflow-div'>
@@ -96,10 +92,11 @@ window.MonacoEnvironment = {
 		return new Worker('monaco-editor/vs/base/worker/workerMain.js')
 	}
 }
+export let monacoEditor:monaco.editor.IStandaloneCodeEditor
 
 window.onload = () => {
-	monaco.editor.create((document.getElementById('editor-target') as HTMLElement), {
-		value:           firstValue,
+	monacoEditor = monaco.editor.create((document.getElementById('editor-target') as HTMLElement), {
+		value:           firstValueInEditor,
 		language:        'r',
 		automaticLayout: true,
 	})

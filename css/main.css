@@ -51,6 +51,10 @@ body {
   background: #9b0f0b;
 }
 
+.refresh-button{
+	background-color: #9b0f0b;
+}
+
 .legend-control-elements{
 	display: flex;
 	flex-direction: column;
