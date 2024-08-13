@@ -16,6 +16,7 @@ import type { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast
 import { LegendComponent } from './components/graph-legend'
 import { VisualStateModel } from './components/model/visual-state-model'
 import * as monaco from 'monaco-editor'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 
 const firstValueInEditor = 'x <- 2 * 3; x'
@@ -72,18 +73,22 @@ root.render(
 	<MainContainerComponent initialize={() => {
 		console.log('Hey')
 	}}>
-		<div className='left-side'>
+    <PanelGroup direction='horizontal'>
+      <Panel className = 'left-side' defaultSize = {30}>  
 			<div id='editor-target' className = 'editor-div'> </div>
-		</div>
-		<div className = 'reactflow-div'>
-			<div style={{ position: 'relative', top: 0, right: 0, width: '100%', height: '100%' }}>
-				<ReactFlowProvider>
-					<LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} visualStateModel={visualStateModel}/>
-				</ReactFlowProvider>
-			</div>
-			<LegendComponent visualStateModel={visualStateModel}/>
-		</div>
-
+      </Panel>
+    
+      <PanelResizeHandle/>
+      <Panel className = 'reactflow-div'>
+        <div style={{ position: 'relative', top: 0, right: 0, width: '100%', height: '100%' }}>
+          <ReactFlowProvider>
+            <LayoutFlow graph={graphFromOtherGraph} assignGraphUpdater={setGraphUpdater} visualStateModel={visualStateModel}/>
+          </ReactFlowProvider>
+        </div>
+        <LegendComponent visualStateModel={visualStateModel}/>
+        
+      </Panel>
+    </PanelGroup>
 	</MainContainerComponent>
 )
 

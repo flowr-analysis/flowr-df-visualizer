@@ -307,3 +307,8 @@ body {
 	flex-direction: column;
 	gap: 0px;
 }
+
+.editor-graph-window-resize-handle{
+	background: black;
+	width: 10px;
+}
