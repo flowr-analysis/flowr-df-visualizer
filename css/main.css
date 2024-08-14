@@ -44,6 +44,7 @@ body {
   background-color: initial;
   background-position: 0 0;
   color: #FF4742;
+  overflow: hidden;
 }
 
 .button-close-legend:active {
@@ -52,7 +53,18 @@ body {
 }
 
 .refresh-button{
-	background-color: #9b0f0b;
+	background-color: #9b0f0b !important;
+	color: white !important;
+	transition: 150ms ease-in-out;
+}
+
+.refresh-button:hover, .refresh-button:focus {
+	background-color: #5a0a0b !important;
+}
+
+
+.refresh-button:active {
+	background-color: #000 !important;
 }
 
 .legend-control-elements{
