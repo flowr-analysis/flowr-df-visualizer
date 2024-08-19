@@ -25,6 +25,7 @@ interface ExtendedElkNode extends ElkNode {
   data:{
     label:     string,
     nodeType:  string,
+	nodeCount: number,
     parentId?: string,
     children?: string[]
   }
@@ -43,10 +44,7 @@ function nonEmpty<TValue>(value:TValue| null| undefined): value is TValue{
 }
 
 
-function foldOnVisualizationGraphNodes(currentNode: Node<VisualizationNodeProps>,
-																																							nodeIdMap: Map<string, Node<VisualizationNodeProps>>,
-																																							usedIdsMap: Map<string,boolean>,
-																																							isHorizontal: boolean):HierarchyElkNode | undefined{
+function foldOnVisualizationGraphNodes(currentNode: Node<VisualizationNodeProps>, nodeIdMap: Map<string, Node<VisualizationNodeProps>>, usedIdsMap: Map<string,boolean>, isHorizontal: boolean):HierarchyElkNode | undefined{
 	if(currentNode.data.children !== undefined){
 		//calculate Children of the currentNode
 		const childrenOfNode : HierarchyElkNode[]=
@@ -124,6 +122,7 @@ function flattenHierarchyNode(currentNode: ElkNode, positionParentNode: XYPositi
 			label:         currentNode.labels?.[0]?.text ?? '',
 			id:            currentNode.id,
 			nodeType:      (currentNode as ExtendedElkNode).data.nodeType,
+			nodeCount:     (currentNode as ExtendedElkNode).data.nodeCount,
 			estimatedMinX: absolutePositionX,
 			estimatedMinY: absolutePositionY,
 			estimatedMaxX: absolutePositionX + (currentNode.width ?? 0),

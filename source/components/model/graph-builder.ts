@@ -95,7 +95,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			const idNewNode = String(nodeId) //+ '-subflow-node'
 			const newNode: Node<VisualizationNodeProps> = {
 				id:          idNewNode,
-				data:        { label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag, children: [] },
+				data:        { label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag, children: [], nodeCount: dataflowGraph.vertexInformation.length},
 				position:    { x: 0, y: 0 },
 				connectable: false,
 				dragging:    true,
@@ -115,7 +115,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		const idNewNode = String(nodeId)
 		const newNode: Node<VisualizationNodeProps> = {
 			id:          idNewNode,
-			data:        { label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag },
+			data:        { label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag,  nodeCount: dataflowGraph.vertexInformation.length},
 			position:    { x: 0, y: 0 },
 			connectable: false,
 			dragging:    true,
@@ -188,7 +188,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 				target: String(targetNodeId),
 				id:     `edge-${sourceNodeId}-${targetNodeId}`,
 				label:  labelNames,
-				data:   { label: labelNames, edgeType: 'multiEdge' , edgeTypes: listOfEdgeTypes }
+				data:   { label: labelNames, edgeType: 'multiEdge' , edgeTypes: listOfEdgeTypes, nodeCount: dataflowGraph.vertexInformation.length }
 			}
 			visualizationGraph.edges.push(newEdge)
 		}

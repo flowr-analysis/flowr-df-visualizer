@@ -67,10 +67,11 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 	const cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
 
 	const givenEdgeTypes = standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
-
+	const nodeCount = standardEdgeInformation.data?.nodeCount as number
 	return (
 		<>
-			<PathWithMarkerComponent id={standardEdgeInformation.id} edgeTypes={givenEdgeTypes} edgePath={edgePath} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>
+			{nodeCount < 200  && <PathWithMarkerComponent id={standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} edgeTypes={givenEdgeTypes} edgePath={edgePath} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>}
+			{nodeCount >= 200 && <SimplePathComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY}/>}
 			<style>
 				{cssRule}
 			</style>
@@ -158,6 +159,7 @@ interface PathWithMarkerComponentProps {
   edgeTypes:        Set<EdgeTypeName>
   id:               string
   visualStateModel: VisualStateModel
+  hoverOverEdgeId:  string
 }
 
 const edgeTypeNameMap:{[index: string]: string} = {
@@ -171,6 +173,8 @@ const edgeTypeNameMap:{[index: string]: string} = {
 	'side-effect-on-call':     'crossSymbol',
 	'non-standard-evaluation': 'cubeFilledSymbol',
 }
+
+
 
 export function edgeTypeToSymbolIdMapper(edgeTag: string): string {
 	return edgeTypeNameMap[edgeTag] ?? ''
@@ -279,6 +283,30 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
 		controlPointEnd:   lastBezierCurve.controlPointEnd,
 		endPoint:          lastBezierCurve.endPoint })
 	return returnArray
+}
+
+interface SimplePathComponentProps{
+	id: string
+	sourceX: number
+	sourceY: number
+	targetX: number
+	targetY: number
+	hoverOverEdgeId: string
+}
+
+const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, sourceY, targetX, targetY, hoverOverEdgeId}) => {
+	
+	const dPath = useMemo(() => `M${sourceX},${sourceY} L${targetX},${targetY}`, [sourceX, sourceY, targetX, targetY])
+	return (<>
+	<path
+		id={hoverOverEdgeId} //Interaction Edge
+		d={dPath}
+		className = 'interactive-edge'
+	/>
+	<path id = {id + '-simple-path'} d = {dPath} className='react-flow__edge-path multi-edge' markerEnd = {'url(#triangle)'} />
+	</>
+
+	)
 }
 
 /** */

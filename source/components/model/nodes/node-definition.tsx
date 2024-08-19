@@ -75,7 +75,7 @@ const BodyNodeComponent: React.FC<BodyNodeComponentProps> = ({ data, className }
 	return (
 		<HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
 			<div className = {bodyClassName} id={`in-graph-node-${data.id}`}>
-				<HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
+				{(data.nodeCount as number < 200) && <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>}
 				<label htmlFor="text">{shownLabel}</label>
 			</div>
 		</HandleNodeComponent>

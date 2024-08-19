@@ -51,7 +51,6 @@ const elkOptions: LayoutOptions = {
 	'elk.spacing.nodeNode':                      '80'
 }
 
-
 async function getLayoutedElements(nodes: Node[],
 								   nodeIdMap: Map<string,Node>,
 								   edges: ElkExtendedEdge[],
@@ -105,7 +104,6 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 
 	setIsNodeIdShownReactFlow = setIsNodeIdShown
 
-
 	useEffect(() => {
 		setNodes((currentNodes) =>
 			currentNodes.map((node) =>{
@@ -115,7 +113,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 				})
 			}),
 		)
-	}, [isNodeIdShown,setNodes])
+	}, [isNodeIdShown, setNodes])
 
 
 
