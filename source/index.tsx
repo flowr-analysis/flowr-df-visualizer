@@ -19,7 +19,7 @@ import * as monaco from 'monaco-editor'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 
-const firstValueInEditor = 'x <- 2 * 3; x'
+const firstValueInEditor = localStorage.getItem('monaco-text') ?? 'x <- 2 * 3; x'
 export let client: VisualizerWebsocketClient | undefined = undefined
 try {
 	client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
