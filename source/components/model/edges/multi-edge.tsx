@@ -3,12 +3,16 @@ import { EdgeLabelRenderer, getBezierPath, useInternalNode, useStore } from '@xy
 import { getEdgeParams } from './edge-base'
 import type { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
 import { VisualStateModel } from '../visual-state-model'
+import { useMemo } from 'react'
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
 const startEndDistanceToMarkers = 10
 
 export function MultiEdge(props:EdgeProps){
+
+	console.log('Multi edge new')
+
 
 	return <BodyMultiEdgeComponent
 		standardEdgeInformation={props}
@@ -279,6 +283,20 @@ function splitBezierCurve(t:number[], startingPoint:XYPosition, startControlPoin
 
 /** */
 const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edgePath, edgeTypes, id, visualStateModel }) => {
+	const {markerEdgeMap} = useMemo(() => calculateMarkerPaths(edgePath, edgeTypes, id, visualStateModel), [edgePath, edgeTypes, id, visualStateModel])
+	const hoverOverEdgeId = id + '-hoverover-interactive'
+	return (
+		<>
+			<path
+				id={hoverOverEdgeId} //Interaction Edge
+				d={edgePath}
+				className = 'interactive-edge'
+			/>
+			{markerEdgeMap.map((self) => self)}
+		</>)
+}
+
+function calculateMarkerPaths(edgePath:string, edgeTypes: Set<EdgeTypeName>, id:string , visualStateModel:VisualStateModel):{markerEdgeMap: JSX.Element[]}{
 	//Parse 4 Points from the calculated bezier-curve
 	const pointArray = edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
 	const startPointBez = { x: pointArray[0][0], y: pointArray[0][1] }
@@ -372,14 +390,6 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 		)
 		markerEdgeMap.push(markerEdge)
 	})
-	const hoverOverEdgeId = id + '-hoverover-interactive'
-	return (
-		<>
-			<path
-				id={hoverOverEdgeId} //Interaction Edge
-				d={edgePath}
-				className = 'interactive-edge'
-			/>
-			{markerEdgeMap.map((self) => self)}
-		</>)
+	return {markerEdgeMap}
 }
+
