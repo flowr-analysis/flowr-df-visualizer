@@ -1,9 +1,9 @@
-import type { EdgeProps, ReactFlowState, XYPosition } from '@xyflow/react'
-import { EdgeLabelRenderer, getBezierPath, useInternalNode, useStore } from '@xyflow/react'
+import type { EdgeProps, InternalNode, ReactFlowState, XYPosition } from '@xyflow/react'
+import { EdgeLabelRenderer, Position, getBezierPath, useInternalNode, useStore } from '@xyflow/react'
 import { getEdgeParams } from './edge-base'
 import type { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
 import { VisualStateModel } from '../visual-state-model'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
@@ -29,34 +29,45 @@ interface BodyMultiEdgeComponentProps {
 }
 
 export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ standardEdgeInformation, source, target }) => {
-	const sourceNode = useInternalNode(source)
-	const targetNode = useInternalNode(target)
+	const sourceNode = useInternalNode(source) as InternalNode
+	const targetNode = useInternalNode(target) as InternalNode
+	let [bidirectionalEdge, setBidirectionalEdge] = useState<boolean | undefined>(undefined)
 
-	if(!sourceNode || !targetNode) {
-		return null
-	}
+	// TODO: pass this informatiohn when create the edge
+	// useStore((s: ReactFlowState) => {
+	// 	if(bidirectionalEdge === undefined) {
+	// 		setBidirectionalEdge(s.edges.some(
+	// 			e =>
+	// 				(e.source === standardEdgeInformation.target && e.target === standardEdgeInformation.source) ||
+	// 		(e.target === standardEdgeInformation.source && e.source === standardEdgeInformation.target),
+	// 		))
+	// 	}
+	// })
 
-	const isBiDirectionEdge = useStore((s: ReactFlowState) => {
-		const edgeExists = s.edges.some(
-			e =>
-				(e.source === standardEdgeInformation.target && e.target === standardEdgeInformation.source) ||
-        (e.target === standardEdgeInformation.source && e.source === standardEdgeInformation.target),
-		)
-
-		return edgeExists
-	})
-
-	const {  sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = getEdgeParams(sourceNode, targetNode, isBiDirectionEdge)
+	const { sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = useMemo(() =>
+		sourceNode && targetNode ? getEdgeParams(sourceNode, targetNode, bidirectionalEdge) : {
+			sourceX: 0,
+			sourceY: 0,
+			targetX: 0,
+			targetY: 0,
+			sourcePos: Position.Left,
+			targetPos: Position.Left
+		}
+	, [sourceNode, targetNode, bidirectionalEdge])
 
 	const [edgePath, labelX, labelY] = getBezierPath({
-		sourceX:        sourceX,
-		sourceY:        sourceY,
-		sourcePosition: sourcePos,
-		targetPosition: targetPos,
-		targetX:        targetX,
-		targetY:        targetY,
-	})
+			sourceX:        sourceX,
+			sourceY:        sourceY,
+			sourcePosition: sourcePos,
+			targetPosition: targetPos,
+			targetX:        targetX,
+			targetY:        targetY,
+		})
 
+	if(!sourceNode || !targetNode) {
+		return <></>
+	}
+	
 	let label = ''
 	for(const singleLabel of (standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
 		label += singleLabel + ' '
@@ -75,7 +86,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 			<style>
 				{cssRule}
 			</style>
-			<EdgeLabelRenderer>
+			{/* <EdgeLabelRenderer>
 				<div
 					id = {edgeLabelId}
 					style={{
@@ -88,7 +99,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 					{label}
 				</div>
 
-			</EdgeLabelRenderer>
+			</EdgeLabelRenderer> */}
 		</>
 	)
 }

@@ -60,7 +60,7 @@ export const BodyEdgeComponent: React.FC<BodyEdgeComponentProps> = (props) => {
 				style={props.edgeStyle}
 				markerEnd={props.arrowEnd ? 'url(#triangle)' : undefined} markerStart={props.arrowStart ? 'url(#triangle)' : undefined}
 			/>
-			<EdgeLabelRenderer>
+			{/* <EdgeLabelRenderer>
 				<div
 					style={{
 						position:      'absolute',
@@ -72,7 +72,7 @@ export const BodyEdgeComponent: React.FC<BodyEdgeComponentProps> = (props) => {
 				>
 					{props.standardEdgeInformation.label}
 				</div>
-			</EdgeLabelRenderer>
+			</EdgeLabelRenderer> */}
 		</>
 	)
 }
@@ -196,7 +196,7 @@ function getEdgePosition(node: Node, intersectionPoint:XYPosition): Position {
 }
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
-export function getEdgeParams(source:Node, target: Node, isBidirectionalEdge:boolean) {
+export function getEdgeParams(source:Node, target: Node, isBidirectionalEdge:boolean | undefined) {
 	let sourceIntersectionPoint = getNodeIntersection(source, target)
 	let targetIntersectionPoint = getNodeIntersection(target, source)
 
