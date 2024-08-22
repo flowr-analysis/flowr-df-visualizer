@@ -32,7 +32,7 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 	const nodeCount = standardEdgeInformation.data?.nodeCount as number ?? 0
 	const sourceNode = useInternalNode(source) as InternalNode
 	const targetNode = useInternalNode(target) as InternalNode
-	const bidirectionalEdge = nodeCount > 200 ? false : standardEdgeInformation.data?.isBidirectionalEdge as boolean
+	const bidirectionalEdge = standardEdgeInformation.data?.isBidirectionalEdge as boolean
 
 	const { sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = 
 		sourceNode && targetNode ? getEdgeParams(sourceNode, targetNode, bidirectionalEdge) : {
