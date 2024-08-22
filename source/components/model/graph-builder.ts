@@ -139,39 +139,20 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
             }
             nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
 		}
+	}
 
+	
+	const edgeConnection = new Map<number, number[]>()
 
-		/*
-        if(subflowMap.has(nodeId)){
-            const parentId = String(subflowMap.get(nodeId)) + '-subflow-node'
-            const idNewNode = String(nodeId)
-            const newNode: Node<VisualizationNodeProps> = {
-                id: idNewNode,
-                data: {label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag, parentId:parentId},
-                position: { x: 0, y: 0 },
-                connectable: false,
-                dragging: true,
-                selectable: true,
-                type: nodeTagMapper(nodeInfoInfo.tag)
-            }
-            visualizationGraph.nodesInfo.nodes.push(newNode)
-            nodeIdMap.set(idNewNode, newNode)
-            nodeIdMap.get(parentId)?.data.children?.push(idNewNode)
-        } else {
-            const idNewNode = String(nodeId)
-            const newNode: Node<VisualizationNodeProps> = {
-                id: idNewNode,
-                data: {label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag},
-                position: { x: 0, y: 0 },
-                connectable: false,
-                dragging: true,
-                selectable: true,
-                type: nodeTagMapper(nodeInfoInfo.tag),
-            }
-            visualizationGraph.nodesInfo.nodes.push(newNode)
-            nodeIdMap.set(idNewNode, newNode)
-        }
-        */
+	//Know EdgeConnections
+	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
+		const listOfConnectedNodes2 = listOfConnectedNodes
+		for(const [targetNodeId] of listOfConnectedNodes2){
+			if(!edgeConnection.has(sourceNodeId)){
+				edgeConnection.set(sourceNodeId, [])
+			}
+			edgeConnection.get(sourceNodeId)?.push(targetNodeId)
+		}
 	}
 
 	//construct Edges
@@ -183,12 +164,19 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			for( const linkEdgeType of listOfEdgeTypes){
 				labelNames += linkEdgeType + ' '
 			}
+			const isBidirectionalEdge = edgeConnection.get(targetNodeId)?.some((value) => (value === sourceNodeId)) ?? false
 			const newEdge: Edge = {
 				source: String(sourceNodeId),
 				target: String(targetNodeId),
 				id:     `edge-${sourceNodeId}-${targetNodeId}`,
 				label:  labelNames,
-				data:   { label: labelNames, edgeType: 'multiEdge' , edgeTypes: listOfEdgeTypes, nodeCount: dataflowGraph.vertexInformation.length }
+				data:   { 
+					label: labelNames, 
+					edgeType: 'multiEdge', 
+					edgeTypes: listOfEdgeTypes, 
+					nodeCount: dataflowGraph.vertexInformation.length,
+					isBidirectionalEdge:  isBidirectionalEdge
+				}
 			}
 			visualizationGraph.edges.push(newEdge)
 		}

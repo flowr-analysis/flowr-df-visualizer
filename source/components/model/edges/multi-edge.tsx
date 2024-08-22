@@ -29,22 +29,12 @@ interface BodyMultiEdgeComponentProps {
 }
 
 export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ standardEdgeInformation, source, target }) => {
+	const nodeCount = standardEdgeInformation.data?.nodeCount as number ?? 0
 	const sourceNode = useInternalNode(source) as InternalNode
 	const targetNode = useInternalNode(target) as InternalNode
-	let [bidirectionalEdge, setBidirectionalEdge] = useState<boolean | undefined>(undefined)
+	const bidirectionalEdge = nodeCount > 200 ? false : standardEdgeInformation.data?.isBidirectionalEdge as boolean
 
-	// TODO: pass this informatiohn when create the edge
-	// useStore((s: ReactFlowState) => {
-	// 	if(bidirectionalEdge === undefined) {
-	// 		setBidirectionalEdge(s.edges.some(
-	// 			e =>
-	// 				(e.source === standardEdgeInformation.target && e.target === standardEdgeInformation.source) ||
-	// 		(e.target === standardEdgeInformation.source && e.source === standardEdgeInformation.target),
-	// 		))
-	// 	}
-	// })
-
-	const { sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = useMemo(() =>
+	const { sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = 
 		sourceNode && targetNode ? getEdgeParams(sourceNode, targetNode, bidirectionalEdge) : {
 			sourceX: 0,
 			sourceY: 0,
@@ -53,53 +43,18 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 			sourcePos: Position.Left,
 			targetPos: Position.Left
 		}
-	, [sourceNode, targetNode, bidirectionalEdge])
-
-	const [edgePath, labelX, labelY] = getBezierPath({
-			sourceX:        sourceX,
-			sourceY:        sourceY,
-			sourcePosition: sourcePos,
-			targetPosition: targetPos,
-			targetX:        targetX,
-			targetY:        targetY,
-		})
 
 	if(!sourceNode || !targetNode) {
 		return <></>
 	}
-	
-	let label = ''
-	for(const singleLabel of (standardEdgeInformation.data?.edgeTypes as string[] ?? [])){
-		label += singleLabel + ' '
-	}
-
-	const edgeLabelId = standardEdgeInformation.id + '-edgeLabel'
 	const hoverOverEdgeId = standardEdgeInformation.id + '-hoverover-interactive'
-	const cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
-
 	const givenEdgeTypes = standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
-	const nodeCount = standardEdgeInformation.data?.nodeCount as number
+	
+
 	return (
 		<>
-			{nodeCount < 200  && <PathWithMarkerComponent id={standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} edgeTypes={givenEdgeTypes} edgePath={edgePath} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>}
+			{nodeCount < 200  && <PathWithMarkerComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY} sourcePos={sourcePos} targetPos = {targetPos} edgeTypes={givenEdgeTypes} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>}
 			{nodeCount >= 200 && <SimplePathComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY}/>}
-			<style>
-				{cssRule}
-			</style>
-			{/* <EdgeLabelRenderer>
-				<div
-					id = {edgeLabelId}
-					style={{
-						position:  'absolute',
-						transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-						fontSize:  12,
-					}}
-					className="nodrag nopan edge-label"
-				>
-					{label}
-				</div>
-
-			</EdgeLabelRenderer> */}
 		</>
 	)
 }
@@ -166,11 +121,16 @@ interface BezierCurve {
 }
 
 interface PathWithMarkerComponentProps {
-  edgePath:         string,
   edgeTypes:        Set<EdgeTypeName>
   id:               string
   visualStateModel: VisualStateModel
   hoverOverEdgeId:  string
+  sourceX: number
+  sourceY: number
+  targetX: number
+  targetY: number
+  sourcePos: Position
+  targetPos: Position
 }
 
 const edgeTypeNameMap:{[index: string]: string} = {
@@ -321,9 +281,23 @@ const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, 
 }
 
 /** */
-const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edgePath, edgeTypes, id, visualStateModel }) => {
-	const {markerEdgeMap} = useMemo(() => calculateMarkerPaths(edgePath, edgeTypes, id, visualStateModel), [edgePath, edgeTypes, id, visualStateModel])
-	const hoverOverEdgeId = id + '-hoverover-interactive'
+const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ sourceX, sourceY, targetX, targetY, sourcePos, targetPos, edgeTypes, id, visualStateModel, hoverOverEdgeId }) => {
+	const [edgePath, labelX, labelY] = getBezierPath({
+		sourceX:        sourceX,
+		sourceY:        sourceY,
+		sourcePosition: sourcePos,
+		targetPosition: targetPos,
+		targetX:        targetX,
+		targetY:        targetY,
+	})
+
+	let label = ''
+	for(const singleLabel of (edgeTypes ?? [])){
+		label += singleLabel + ' '
+	}
+	const edgeLabelId = id + '-edgeLabel'
+	const cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
+	const {markerEdgeMap} = calculateMarkerPaths(edgePath, edgeTypes, id, visualStateModel)
 	return (
 		<>
 			<path
@@ -332,6 +306,21 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ edge
 				className = 'interactive-edge'
 			/>
 			{markerEdgeMap.map((self) => self)}
+			<EdgeLabelRenderer>
+					<div
+						id = {edgeLabelId}
+						style={{
+							position:  'absolute',
+							transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+							fontSize:  12,
+						}}
+						className="nodrag nopan edge-label"
+					>
+						{label}
+					</div>
+
+			</EdgeLabelRenderer>
+			<style>{cssRule}</style>
 		</>)
 }
 
