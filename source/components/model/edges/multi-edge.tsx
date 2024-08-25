@@ -294,6 +294,7 @@ const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, 
 		edgeTypes.forEach((edgeType) => {
 			paths.push(
 				<path
+					key = {`${edgeId}-${edgeType}`} 
 					id = {`${edgeId}-${edgeType}`} 
 					className={`${edgeType}-edge`}
 					markerEnd = {'url(#triangle)'} 

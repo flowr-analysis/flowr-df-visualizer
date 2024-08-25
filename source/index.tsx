@@ -7,7 +7,7 @@ import type { OtherGraph } from './components/model/graph-builder'
 import { transformToVisualizationGraphForOtherGraph } from './components/model/graph-builder'
 import type { Node } from '@xyflow/react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { LayoutFlow, reloadGraph } from './components/graph-viewer'
+import { LayoutFlow, reloadGraph, startLoadingAnimation } from './components/graph-viewer'
 import { VisualizerWebsocketClient } from './components/network/visualizerWebsocketClient'
 import type { FormEvent } from 'react'
 import type { VisualizationGraph } from './components/model/graph'
@@ -21,29 +21,33 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 const firstValueInEditor = localStorage.getItem('monaco-text') ?? 'x <- 2 * 3; x'
 export let client: VisualizerWebsocketClient | undefined = undefined
+export let loadingButtonTimerId :NodeJS.Timer
+export function setLoadingButtonTimerId(id: NodeJS.Timer){
+	loadingButtonTimerId = id
+}
+
 try {
 	client = new VisualizerWebsocketClient('ws://127.0.0.1:1042')
 	client.onFileAnalysisResponse = (json) => {
 		console.log(JSON.stringify(json.results.dataflow.graph))
-		updateGraph(json.results.normalize.ast, json.results.dataflow.graph as unknown as OtherGraph)
+		const somePromise = updateGraph(json.results.normalize.ast, json.results.dataflow.graph as unknown as OtherGraph)
+		
+		//cancel loading animation
+		somePromise.finally(() => {
+			clearInterval(loadingButtonTimerId)
+			const svgIcon = document.getElementById('reload-button-icon-container') as HTMLDivElement
+			svgIcon.style.transform = ''
+		})
 	}
 	client.onHelloMessage = (json) => {
 		console.log('hello', json)
+		startLoadingAnimation()
 		client?.sendAnalysisRequestJSON(firstValueInEditor)
 	}
 } catch(e){
 	console.log(e)
 }
 
-
-let currentValue: string = ''
-function onRCodeInputChange(event: FormEvent<HTMLInputElement>) {
-	currentValue = event.currentTarget.value
-}
-
-function onRCodeRequest() {
-	client?.sendAnalysisRequestJSON(currentValue)
-}
 const graphFromOtherGraph: VisualizationGraph = {
 	edges:     [],
 	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>() }
@@ -55,7 +59,7 @@ function setGraphUpdater(updater: (graph: VisualizationGraph) => void) {
 	graphUpdater = updater
 }
 
-function updateGraph(ast: RNode<ParentInformation>, graph: OtherGraph) {
+async function updateGraph(ast: RNode<ParentInformation>, graph: OtherGraph) {
 	// borderline graph :D
 	const newGraph = transformToVisualizationGraphForOtherGraph(ast, graph)
 	graphUpdater?.(newGraph)
