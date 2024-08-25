@@ -52,18 +52,18 @@ body {
   background: #9b0f0b;
 }
 
-.refresh-button{
+.reload-button{
 	background-color: #9b0f0b !important;
 	color: white !important;
 	transition: 150ms ease-in-out;
 }
 
-.refresh-button:hover, .refresh-button:focus {
+.reload-button:hover, .reload-button:focus {
 	background-color: #5a0a0b !important;
 }
 
 
-.refresh-button:active {
+.reload-button:active {
 	background-color: #000 !important;
 }
 

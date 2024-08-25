@@ -7,7 +7,7 @@ import type { OtherGraph } from './components/model/graph-builder'
 import { transformToVisualizationGraphForOtherGraph } from './components/model/graph-builder'
 import type { Node } from '@xyflow/react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { LayoutFlow } from './components/graph-viewer'
+import { LayoutFlow, reloadGraph } from './components/graph-viewer'
 import { VisualizerWebsocketClient } from './components/network/visualizerWebsocketClient'
 import type { FormEvent } from 'react'
 import type { VisualizationGraph } from './components/model/graph'
@@ -75,7 +75,7 @@ root.render(
 	}}>
     <PanelGroup direction='horizontal'>
       <Panel className = 'left-side' defaultSize = {30}>  
-			<div id='editor-target' className = 'editor-div'> </div>
+		<div id='editor-target' className = 'editor-div'> </div>
       </Panel>
     
       <PanelResizeHandle/>
@@ -100,11 +100,14 @@ window.MonacoEnvironment = {
 export let monacoEditor:monaco.editor.IStandaloneCodeEditor
 
 window.onload = () => {
+
 	monacoEditor = monaco.editor.create((document.getElementById('editor-target') as HTMLElement), {
 		value:           firstValueInEditor,
 		language:        'r',
 		automaticLayout: true,
 	})
+	monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, reloadGraph)
+	monacoEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, reloadGraph)
 }
 
 
