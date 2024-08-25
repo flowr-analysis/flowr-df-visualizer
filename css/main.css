@@ -162,12 +162,49 @@ body {
 	border: solid 2px;
 }
 
+.reads-edge{
+	stroke:#DDDDDD;
+}
+
+.defined-by-edge{
+	stroke:#2E2585;
+}
+
+.calls-edge{
+	stroke:#337538;
+}
+
+.returns-edge{
+	stroke:#5DA899;
+}
+
+.defines-on-call-edge{
+	stroke:#94CBEC;
+}
+
+.defined-by-on-call-edge{
+	stroke:#DCCD7D;
+}
+
+.argument-edge{
+	stroke:#C26A77;
+}
+
+.side-effect-on-call-edge{
+	stroke:#9F4A96;
+}
+
+.non-standard-evaluation-edge{
+	stroke:#7E2954;
+}
+
 .node-handle.react-flow__handle{
 	background: none;
 	border: none;
 }
-.react-flow__edge-path.multi-edge {
-	stroke: black;
+
+.multi-edge {
+	fill:none;
 	stroke-width: 1px;
 	pointer-events: none;
 	cursor: none;
@@ -289,7 +326,6 @@ body {
 
 
 .legend-edge{
-	stroke:black;
 	stroke-width: 1px;
 }
 
