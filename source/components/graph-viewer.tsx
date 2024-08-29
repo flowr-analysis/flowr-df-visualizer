@@ -214,6 +214,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 				proOptions={{ hideAttribution: true }}
 				connectionLineComponent={FloatingConnectionLine}
 				fitView
+				onlyRenderVisibleElements
 			>
 				<Background />
 				<MiniMap />
