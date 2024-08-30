@@ -1,8 +1,20 @@
 
 interface SvgDefinitionsComponentProps{}
-
+export const argumentMaxShown = 7
 
 export const SvgDefinitionsComponent: React.FC<SvgDefinitionsComponentProps> = ({}) => {
+	
+	const argumentMarkerArray: JSX.Element[] = []
+	for(let argumentIndex = 0; argumentIndex < argumentMaxShown; argumentIndex++){
+		argumentMarkerArray.push(
+		<marker 
+			overflow = 'visible' 
+			id = {`argNum${argumentIndex}`}
+			orient = 'auto'
+			>
+			<text y = {5} >{argumentIndex}</text>
+		</marker>)
+	}
 	return (
 		<>
 			<marker
@@ -123,6 +135,16 @@ export const SvgDefinitionsComponent: React.FC<SvgDefinitionsComponentProps> = (
 				<g transform='translate(-150, -75)'>
 					<svg clipRule="evenodd" fillRule="evenodd" strokeLinejoin="round" strokeMiterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m3.514 6.61c-.317.179-.514.519-.514.887v8.95c0 .37.197.708.514.887 1.597.901 6.456 3.639 8.005 4.512.152.085.319.128.487.128.164 0 .328-.041.477-.123 1.549-.855 6.39-3.523 7.994-4.408.323-.177.523-.519.523-.891v-9.055c0-.368-.197-.708-.515-.887-1.595-.899-6.444-3.632-7.999-4.508-.151-.085-.319-.128-.486-.128-.168 0-.335.043-.486.128-1.555.876-6.405 3.609-8 4.508m15.986 2.115v7.525l-6.75 3.722v-7.578zm-15 7.425v-7.458l6.75 3.75v7.511zm.736-8.769 6.764-3.813 6.801 3.834-6.801 3.716z" fillRule="nonzero"/></svg>
 				</g>
+			</marker>
+
+			{argumentMarkerArray.map((self) => self)}
+
+			<marker 
+			overflow = 'visible' 
+			id = {'argNum*'}
+			orient = 'auto'
+			>
+				<text y = {5} style = {{fill: 'black', overflow: 'visible'}}>*</text>
 			</marker>
 
 			<symbol id="dotSymbol" width="10" height="10" overflow={'visible'}>

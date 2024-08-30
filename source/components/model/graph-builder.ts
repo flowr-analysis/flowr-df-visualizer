@@ -129,7 +129,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			}
 			visualizationGraph.nodesInfo.nodes.push(newNode)
 			nodeIdMap.set(idNewNode, newNode)
-		} else if(nodeInfoInfo.tag ==='function-definition' && nodeInfoInfo.args !== undefined){
+		} else if(nodeInfoInfo.tag ==='function-call' && nodeInfoInfo.args !== undefined){
 			// set witch edges belong to each argument
 			nodeInfoInfo.args.forEach(({nodeId:targetNodeId}, index) => {
 				argumentMap.set(nodeId, targetNodeId, index)

@@ -1,9 +1,10 @@
 import type { EdgeProps, InternalNode, ReactFlowState, XYPosition } from '@xyflow/react'
 import { EdgeLabelRenderer, Position, getBezierPath, useInternalNode, useStore } from '@xyflow/react'
 import { getEdgeParams } from './edge-base'
-import type { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
+import { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
 import { VisualStateModel } from '../visual-state-model'
 import { useEffect, useMemo, useState } from 'react'
+import { argumentMaxShown } from '../../svg-definitions'
 
 const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
@@ -12,8 +13,6 @@ const lineColorLength = 20
 const nodeCountPerformanceEasement = 400
 
 export function MultiEdge(props:EdgeProps){
-
-	console.log('Multi edge new')
 
 
 	return <BodyMultiEdgeComponent
@@ -35,7 +34,6 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 	const sourceNode = useInternalNode(source) as InternalNode
 	const targetNode = useInternalNode(target) as InternalNode
 	const bidirectionalEdge = standardEdgeInformation.data?.isBidirectionalEdge as boolean
-
 	const { sourceX, sourceY, targetX, targetY, sourcePos, targetPos } = 
 		sourceNode && targetNode ? getEdgeParams(sourceNode, targetNode, bidirectionalEdge) : {
 			sourceX: 0,
@@ -49,14 +47,13 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 	if(!sourceNode || !targetNode) {
 		return <></>
 	}
-	const hoverOverEdgeId = standardEdgeInformation.id + '-hoverover-interactive'
+	const hoverOverEdgeId = useMemo(() =>standardEdgeInformation.id + '-hoverover-interactive' , [standardEdgeInformation])
 	const givenEdgeTypes = standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
-	
-
+	const argumentNumber = givenEdgeTypes.has(EdgeTypeName.Argument) ? standardEdgeInformation.data?.argumentNumber as number: undefined
 	return (
 		<>
-			{nodeCount < nodeCountPerformanceEasement  && <PathWithMarkerComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY} sourcePos={sourcePos} targetPos = {targetPos} edgeTypes={givenEdgeTypes} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()}/>}
-			{nodeCount >= nodeCountPerformanceEasement && <SimplePathComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY} edgeTypes={givenEdgeTypes}/>}
+			{nodeCount < nodeCountPerformanceEasement  && <PathWithMarkerComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY} sourcePos={sourcePos} targetPos = {targetPos} edgeTypes={givenEdgeTypes} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()} argumentNumber={argumentNumber}/>}
+			{nodeCount >= nodeCountPerformanceEasement && <SimplePathComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY} edgeTypes={givenEdgeTypes} argumentNumber={argumentNumber}/>}
 		</>
 	)
 }
@@ -133,6 +130,7 @@ interface PathWithMarkerComponentProps {
   targetY: number
   sourcePos: Position
   targetPos: Position
+  argumentNumber?: number
 }
 
 const edgeTypeNameMap:{[index: string]: string} = {
@@ -285,7 +283,7 @@ interface SimplePathComponentProps{
 	argumentNumber?: number
 }
 
-const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, sourceY, targetX, targetY, hoverOverEdgeId, edgeTypes}) => {
+const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, sourceY, targetX, targetY, hoverOverEdgeId, edgeTypes, argumentNumber}) => {
 	//<path style = {{visibility: 'hidden'}}id = {edgeId} d = {dPath} className='react-flow__edge-path multi-edge' markerEnd = {'url(#triangle)'}/>
 	const dPath = useMemo(() => `M${sourceX},${sourceY} L${targetX},${targetY}`, [sourceX, sourceY, targetX, targetY])
 	const edgeId = useMemo(() => id + '-simple-path', [id])
@@ -298,7 +296,8 @@ const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, 
 					key = {`${edgeId}-${edgeType}`} 
 					id = {`${edgeId}-${edgeType}`} 
 					className={`${edgeType}-edge`}
-					markerEnd = {'url(#triangle)'} 
+					markerEnd = {'url(#triangle)'}
+					markerStart={edgeType === 'argument' && argumentNumber !== undefined ? (argumentNumber> argumentMaxShown ? 'url(#argNum*)' : `url(#argNum${argumentNumber})`) : undefined} 
 					d = {dPath} 
 					strokeDasharray={`${lineColorLength} ${(edgeTypes.size - 1) * lineColorLength}`} 
 					strokeDashoffset={`${edgeTypeIndex * lineColorLength}`} 
@@ -308,7 +307,7 @@ const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, 
 			edgeTypeIndex++
 		})
 		return paths
-	},[sourceX, sourceY, targetX, targetY, edgeTypes])
+	},[sourceX, sourceY, targetX, targetY, edgeTypes, argumentNumber])
 	
 	return (<>
 	{colorPaths.map((self) => self)}
@@ -322,7 +321,7 @@ const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, 
 	)
 }
 
-const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ sourceX, sourceY, targetX, targetY, sourcePos, targetPos, edgeTypes, id, visualStateModel, hoverOverEdgeId }) => {
+const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ sourceX, sourceY, targetX, targetY, sourcePos, targetPos, edgeTypes, id, visualStateModel, hoverOverEdgeId, argumentNumber }) => {
 	const [edgePath, labelX, labelY] = getBezierPath({
 		sourceX:        sourceX,
 		sourceY:        sourceY,
@@ -345,7 +344,7 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ sour
 	},[edgeTypes, id])
 	
 	const cssRule = useMemo(() => `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`, [edgeTypes, id, hoverOverEdgeId])
-	const {markerEdgeMap} = calculateMarkerPaths(edgePath, edgeTypes, id, visualStateModel)
+	const {markerEdgeMap} = useMemo(() => calculateMarkerPaths(edgePath, edgeTypes, id, visualStateModel, argumentNumber), [sourceX, sourceY, targetX, targetY, sourcePos, targetPos, edgeTypes, visualStateModel])
 	return (
 		<>
 			<path
@@ -372,7 +371,7 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ sour
 		</>)
 }
 
-function calculateMarkerPaths(edgePath:string, edgeTypes: Set<EdgeTypeName>, id:string , visualStateModel:VisualStateModel):{markerEdgeMap: JSX.Element[]}{
+function calculateMarkerPaths(edgePath:string, edgeTypes: Set<EdgeTypeName>, id:string , visualStateModel:VisualStateModel, argumentNumber?: number):{markerEdgeMap: JSX.Element[]}{
 	//Parse 4 Points from the calculated bezier-curve
 	const pointArray = edgePath.replace('M','').replace('C','').split(' ').map((stringPoint)=> stringPoint.split(',').map((stringNumber) => +stringNumber))
 	const startPointBez = { x: pointArray[0][0], y: pointArray[0][1] }
@@ -444,16 +443,18 @@ function calculateMarkerPaths(edgePath:string, edgeTypes: Set<EdgeTypeName>, id:
 		const edgeType = markerMap.get(index) ?? ''
 		dOfPath = dOfPath.trimEnd()
 		const pathId = id + `-${edgeType}-marker-edge`
+
 		const markerEdge = (
 			<path
 				key = {pathId}
 				id = {pathId}
-				className={'multi-edge' + ` ${edgeType}-edge` + ((visualStateModel.isGreyedOutMap.get(edgeType) ?? false) ? ' legend-passive': '')}
-				d={dOfPath}
+				className = {'multi-edge' + ` ${edgeType}-edge` + ((visualStateModel.isGreyedOutMap.get(edgeType) ?? false) ? ' legend-passive': '')}
+				d = {dOfPath}
 				strokeDasharray={`${lineColorLength} ${(edgeTypes.size - 1) * lineColorLength}`} 
 				strokeDashoffset={`${index * lineColorLength}`} 
 				markerMid = {`url(#${edgeTypeToMarkerIdMapper(edgeType)})`}
 				markerEnd = {'url(#triangle)'}
+				markerStart={edgeType === 'argument' && argumentNumber !== undefined ? (argumentNumber> argumentMaxShown ? 'url(#argNum*)' : `url(#argNum${argumentNumber})`) : undefined}
 			/>
 		)
 		markerEdgeMap.push(markerEdge)

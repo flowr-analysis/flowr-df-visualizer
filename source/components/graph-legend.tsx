@@ -41,6 +41,8 @@ export const LegendComponent: React.FC<LegendComponentProps> = ({ visualStateMod
 				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'argument' edgeText='argument' />
 				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'side-effect-on-call' edgeText='side-effect-on-call' />
 				<EdgeLegendComponent isGreyedOutMap = {isGreyedOutMap} edgeType = 'non-standard-evaluation' edgeText='non-standard-evaluation' />
+				<svg> 
+					<text x = {0} y = {20} z= {1} style={{overflow:'visible'}}>something</text></svg>
 			</div>
 
 			<div className = 'legend-control-elements'>
@@ -99,7 +101,7 @@ const EdgeLegendComponent: React.FC<EdgeLegendComponentProps> = ({ edgeText, edg
 			legendSVGElement.classList.toggle('legend-passive', !isEdgeTypeGreyedOut)
 		}}
 	>
-		<path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
+		<path className={classNameEdge} d='m0 10 l20 0 l20 0 l20 0 l20 0' markerStart= 'url(#argNum0)'markerEnd='url(#triangle)' markerMid={`url(#${markerId})`} ></path>
 		<path className = {classNameInteractiveEdge} d='m0 10 l80 0' ></path>
 
 		<text x = {92} y = {15}>{edgeText}</text>
