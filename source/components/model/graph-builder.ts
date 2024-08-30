@@ -1,10 +1,11 @@
 import type { Edge, Node } from '@xyflow/react'
 import type { VisualizationGraph } from './graph'
-import { edgeTypesToNames } from '@eagleoutice/flowr/dataflow/graph/edge'
+import { EdgeTypeName, edgeTypesToNames } from '@eagleoutice/flowr/dataflow/graph/edge'
 import type { NodeId } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/node-id'
 import type { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/decorate'
 import { visitAst } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/visitor'
 import type { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model'
+import { DataflowGraph } from '@eagleoutice/flowr/dataflow/graph/graph'
 
 export interface OtherGraph{
     'rootVertices':      number[]
@@ -39,8 +40,12 @@ export interface VertexInfo{
     'name'?:        string,
     'environment'?: any,
     'when'?:        string,
-    'args'?:        any,
+    'args'?:        ArgsInfo[],
     'subflow'?:     SubFlowInfo
+}
+
+export interface ArgsInfo{
+	nodeId: number
 }
 
 interface SubFlowInfo {
@@ -71,6 +76,24 @@ export interface VisualizationNodeProps extends Record<string, unknown> {
     children?: string[]
 }
 
+class TwoKeyMap<K1,K2, V> {
+	multiMap  = new Map<K1, Map<K2, V>>()
+	set(key1:K1, key2:K2, value:V):void{
+		if(!this.multiMap.has(key1)){
+			this.multiMap.set(key1,new Map<K2,V>())
+		}
+		this.multiMap.get(key1)?.set(key2, value)
+	}
+
+	get(key1:K1, key2:K2):V | undefined{
+		if(!this.multiMap.has(key1)){
+			return undefined
+		}
+		return this.multiMap.get(key1)?.get(key2)
+	}
+}
+
+
 
 export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInformation>, dataflowGraph: OtherGraph): VisualizationGraph {
 
@@ -81,6 +104,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
 
 	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap }, edges: [], }
+
+	const argumentMap = new TwoKeyMap<number,number, number>()
 
 	//Construct subflow Map and nodeId Map
 	for(const [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
@@ -104,6 +129,11 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			}
 			visualizationGraph.nodesInfo.nodes.push(newNode)
 			nodeIdMap.set(idNewNode, newNode)
+		} else if(nodeInfoInfo.tag ==='function-definition' && nodeInfoInfo.args !== undefined){
+			// set witch edges belong to each argument
+			nodeInfoInfo.args.forEach(({nodeId:targetNodeId}, index) => {
+				argumentMap.set(nodeId, targetNodeId, index)
+			})
 		}
 	}
 
@@ -165,6 +195,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 				labelNames += linkEdgeType + ' '
 			}
 			const isBidirectionalEdge = edgeConnection.get(targetNodeId)?.some((value) => (value === sourceNodeId)) ?? false
+			const hasArgument = listOfEdgeTypes.has(EdgeTypeName.Argument)
 			const newEdge: Edge = {
 				source: String(sourceNodeId),
 				target: String(targetNodeId),
@@ -175,7 +206,8 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 					edgeType: 'multiEdge', 
 					edgeTypes: listOfEdgeTypes, 
 					nodeCount: dataflowGraph.vertexInformation.length,
-					isBidirectionalEdge:  isBidirectionalEdge
+					isBidirectionalEdge:  isBidirectionalEdge,
+					...(hasArgument) && {argumentNumber: argumentMap.get(sourceNodeId, targetNodeId)}
 				}
 			}
 			visualizationGraph.edges.push(newEdge)

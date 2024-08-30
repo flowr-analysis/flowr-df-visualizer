@@ -137,7 +137,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 		)
 	}, [isNodeIdShown, setNodes])
 
-
+	
 
 
 	assignGraphUpdater(g =>  {

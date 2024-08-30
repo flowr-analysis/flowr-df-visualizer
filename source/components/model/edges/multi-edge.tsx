@@ -282,6 +282,7 @@ interface SimplePathComponentProps{
 	targetY: number
 	hoverOverEdgeId: string
 	edgeTypes: Set<EdgeTypeName>
+	argumentNumber?: number
 }
 
 const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, sourceY, targetX, targetY, hoverOverEdgeId, edgeTypes}) => {
@@ -309,7 +310,6 @@ const SimplePathComponent : React.FC<SimplePathComponentProps> = ({id, sourceX, 
 		return paths
 	},[sourceX, sourceY, targetX, targetY, edgeTypes])
 	
-	const gradientId = useMemo(() => id + '-simple-path-gradient', [id])
 	return (<>
 	{colorPaths.map((self) => self)}
 	<path
@@ -332,12 +332,19 @@ const PathWithMarkerComponent : React.FC<PathWithMarkerComponentProps> = ({ sour
 		targetY:        targetY,
 	})
 
-	let label = ''
-	for(const singleLabel of (edgeTypes ?? [])){
-		label += singleLabel + ' '
-	}
-	const edgeLabelId = id + '-edgeLabel'
-	const cssRule = `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`
+	const label = useMemo(() => {
+		let labelString = ''
+		for(const singleLabel of (edgeTypes ?? [])){
+			labelString += singleLabel + ' '
+		}
+		return labelString
+	}, [edgeTypes])
+
+	const edgeLabelId = useMemo(() => {
+		return id + '-edgeLabel'
+	},[edgeTypes, id])
+	
+	const cssRule = useMemo(() => `body:has(#${hoverOverEdgeId}:hover) #${edgeLabelId} {visibility: visible;}`, [edgeTypes, id, hoverOverEdgeId])
 	const {markerEdgeMap} = calculateMarkerPaths(edgePath, edgeTypes, id, visualStateModel)
 	return (
 		<>
