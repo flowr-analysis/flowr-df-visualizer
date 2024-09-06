@@ -110,7 +110,7 @@ export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
 }
 
 
-export const FunctionDefinitionNode: React.FC<NodeProps> = ({ data, selected }) => {
+export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 	const { estimatedMinX, estimatedMinY, estimatedMaxX, estimatedMaxY } = data as {
     estimatedMinX: number,
     estimatedMinY: number,
@@ -120,22 +120,16 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ data, selected }) 
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
-	//<NodeResizer minWidth={minWidth} minHeight={minHeight}/>
-	// style = {divStyle}
-	// style={{ height: '100%', width:'100%'}}
-	/*
-    <HandleNodeComponent targetHandleId={data.id as string + '-targetHandle'} sourceHandleId={data.id as string + '-sourceHandle'}>
-      <div className = 'function-definition-node base-node' >
-        <HoverOverComponent name={data.label as string} id={data.id as string} nodeType= {data.nodeType as string}/>
-        <label htmlFor="text">{data.label as string}</label>
-      </div>
-    </HandleNodeComponent>
-  */
 
 	return (
 		<>
+			<div className = 'function-call-hover-over' id = {id + '-hover-div'}> 
 			<NodeResizer lineClassName='function-definition-node function-definition-node-resizer-line' handleClassName='function-definition-node function-definition-node-resizer-edge-dot' />
 			<BodyNodeComponent data = {data} className='function-definition-node base-node'/>
+			
+			</div>
+			<button id = {id + '-hover-over-button'} className='function-call-reduce-button'>Reduce</button>
+			
 		</>
 	)
 }

@@ -234,6 +234,20 @@ body {
 	border: none;
 }
 
+.function-call-hover-over {
+	height: 100%;
+	width: 100%;
+}
+
+.function-call-reduce-button {
+	display:none;
+}
+
+.function-call-hover-over:hover + .function-call-reduce-button, .function-call-reduce-button:hover {
+	display:inline-block;
+}
+
+
 .multi-edge {
 	fill:none;
 	stroke-width: 1px;
