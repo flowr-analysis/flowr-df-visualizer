@@ -87,6 +87,7 @@ interface HoverOverComponentProps{
   readonly id:       string,
   readonly nodeType: string
 }
+
 export const HoverOverComponent: React.FC<HoverOverComponentProps> = ({ name, id , nodeType }) => {
 	return (
 		<span className='hover-over-text'>

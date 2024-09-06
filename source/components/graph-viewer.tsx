@@ -154,6 +154,10 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 			const nm = g ? g.nodesInfo.nodeMap: nodeMap
 			void getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, visualStateModel)
 				.then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+
+					visualStateModel.originalGraph = {nodes: layoutedNodes, edges: layoutedEdges}
+					visualStateModel.alteredGraph = {nodes: visualStateModel.originalGraph.nodes, edges: visualStateModel.originalGraph.edges}
+					
 					setNodes(layoutedNodes)
 					setEdges(layoutedEdges)
 
