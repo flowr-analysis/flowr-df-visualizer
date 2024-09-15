@@ -49,8 +49,8 @@ try {
 }
 
 const graphFromOtherGraph: VisualizationGraph = {
-	edges:     [],
-	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>() }
+	edgesInfo:     {edges: [], edgeConnectionMap: new Map<string, string[]>()},
+	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>(), nodeChildrenMap: new Map<string,string[]>() }
 
 }
 

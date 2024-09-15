@@ -6,7 +6,12 @@ export class VisualStateModel {
 	isNodeIdShown:           boolean = false
 	alteredGraph?: ShownGraph 
 	originalGraph?: ShownGraph
-  
+	alteredEdgeConnectionMap?: Map<string, string[]>
+	originalEdgeConnectionMap?: Map<string, string[]>
+	alteredNodeChildrenMap?: Map<string, string[]>
+	originalNodeChildrenMap?: Map<string, string[]>
+	nodeContainsReducedNodes?: Map<string, string[]>
+	reducedToNodeMapping?: Map<string, string>
 }
 
 export interface ShownGraph {

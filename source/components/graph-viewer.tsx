@@ -150,16 +150,48 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 			console.log('graph newly generated')
 			const opts = { 'elk.direction': direction, ...elkOptions }
 			const ns = g ? g.nodesInfo.nodes : nodes
-			const es = g ? g.edges : edges
+			const es = g ? g.edgesInfo.edges : edges
 			const nm = g ? g.nodesInfo.nodeMap: nodeMap
 			void getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, visualStateModel)
 				.then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
 
 					visualStateModel.originalGraph = {nodes: layoutedNodes, edges: layoutedEdges}
-					visualStateModel.alteredGraph = {nodes: visualStateModel.originalGraph.nodes, edges: visualStateModel.originalGraph.edges}
+					visualStateModel.alteredGraph = {nodes: [], edges: []}
 					
-					setNodes(layoutedNodes)
-					setEdges(layoutedEdges)
+					//copy nodes and edges for altering
+					visualStateModel.originalGraph.nodes.forEach((val) => visualStateModel.alteredGraph?.nodes.push(Object.assign({}, val)))
+					visualStateModel.originalGraph.edges.forEach((val) => visualStateModel.alteredGraph?.edges.push(Object.assign({}, val)))
+					
+					//set EdgeInformation and copy edgeConnections accordingly
+					visualStateModel.originalEdgeConnectionMap = g?.edgesInfo.edgeConnectionMap
+					visualStateModel.alteredEdgeConnectionMap = new Map<string, string[]>()
+					//copy Connections
+					visualStateModel.originalEdgeConnectionMap?.forEach((targetArray, sourceNode) => {
+						const deepCopiedTargetArray: string[] = []
+						targetArray.forEach((targetNode) => {
+							deepCopiedTargetArray.push(targetNode)
+						})
+						visualStateModel.alteredEdgeConnectionMap?.set(sourceNode, deepCopiedTargetArray)
+					})
+					
+					//Set Nodes Information
+					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap
+					visualStateModel.alteredNodeChildrenMap = new Map<string, string[]>()
+					//copy Children Map
+					visualStateModel.originalNodeChildrenMap?.forEach((childrenArray, parentNodeId) => {
+						const deepCopiedChildrenArray: string[] = []
+						childrenArray.forEach((childNodeId) => {
+							deepCopiedChildrenArray.push(childNodeId)
+						})
+						visualStateModel.alteredNodeChildrenMap?.set(parentNodeId, deepCopiedChildrenArray)
+					})
+
+					//Remember which nodes have been reduced to which 
+					visualStateModel.reducedToNodeMapping = new Map<string,string>()
+					visualStateModel.originalGraph.nodes.forEach((node) => { visualStateModel.reducedToNodeMapping?.set(node.id, node.id)})
+
+					setNodes(visualStateModel.alteredGraph?.nodes)
+					setEdges(visualStateModel.alteredGraph?.edges)
 
 					window.requestAnimationFrame(() => void fitView())
 				})

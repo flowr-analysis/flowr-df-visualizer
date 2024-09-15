@@ -103,9 +103,10 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
 
-	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap }, edges: [], }
+	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new Map<string, string[]>()}, edgesInfo: {edges:[], edgeConnectionMap: new Map()}, }
 
-	const argumentMap = new TwoKeyMap<number,number, number>()
+	//source, target, index
+	const argumentIndexMap = new TwoKeyMap<number, number, number>()
 
 	//Construct subflow Map and nodeId Map
 	for(const [nodeId, nodeInfo] of dataflowGraph.vertexInformation){
@@ -113,8 +114,11 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		const nodeInfoInfo = nodeInfo
 		if(nodeInfoInfo.tag ==='function-definition' && nodeInfoInfo.subflow !== undefined){
 			const subflowArray = nodeInfoInfo.subflow.graph
+			visualizationGraph.nodesInfo.nodeChildrenMap.set(String(nodeId), [])
 			subflowArray.forEach((subNode) => {
 				subflowMap.set(subNode,nodeId)
+				const childrenArray = visualizationGraph.nodesInfo.nodeChildrenMap.get(String(nodeId))
+				childrenArray?.push(String(subNode))
 			})
 
 			const idNewNode = String(nodeId) //+ '-subflow-node'
@@ -132,7 +136,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		} else if(nodeInfoInfo.tag ==='function-call' && nodeInfoInfo.args !== undefined){
 			// set witch edges belong to each argument
 			nodeInfoInfo.args.forEach(({nodeId:targetNodeId}, index) => {
-				argumentMap.set(nodeId, targetNodeId, index)
+				argumentIndexMap.set(nodeId, targetNodeId, index)
 			})
 		}
 	}
@@ -173,17 +177,22 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	
 	const edgeConnection = new Map<number, number[]>()
-
+	const edgeConnectionString = new Map<string, string[]>()
 	//Know EdgeConnections
 	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
 		const listOfConnectedNodes2 = listOfConnectedNodes
 		for(const [targetNodeId] of listOfConnectedNodes2){
 			if(!edgeConnection.has(sourceNodeId)){
 				edgeConnection.set(sourceNodeId, [])
+				edgeConnectionString.set(String(sourceNodeId), [])
 			}
 			edgeConnection.get(sourceNodeId)?.push(targetNodeId)
+			edgeConnectionString.get(String(sourceNodeId))?.push(String(targetNodeId))
 		}
 	}
+
+	//Remember EdgeConnection
+	visualizationGraph.edgesInfo.edgeConnectionMap = edgeConnectionString
 
 	//construct Edges
 	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
@@ -207,10 +216,10 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 					edgeTypes: listOfEdgeTypes, 
 					nodeCount: dataflowGraph.vertexInformation.length,
 					isBidirectionalEdge:  isBidirectionalEdge,
-					...(hasArgument) && {argumentNumber: argumentMap.get(sourceNodeId, targetNodeId)}
+					...(hasArgument) && {argumentNumber: argumentIndexMap.get(sourceNodeId, targetNodeId)}
 				}
 			}
-			visualizationGraph.edges.push(newEdge)
+			visualizationGraph.edgesInfo.edges.push(newEdge)
 		}
 	}
 	return visualizationGraph
