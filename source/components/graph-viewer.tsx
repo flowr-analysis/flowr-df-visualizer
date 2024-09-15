@@ -68,9 +68,6 @@ async function getLayoutedElements(nodes: Node[],
 	//console.log(layoutedGraph)
 	const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal, visualStateModel)
 
-	console.log(endGraph)
-
-
 	return endGraph
 }
 
@@ -115,12 +112,18 @@ export function reloadGraph(){
 	client?.sendAnalysisRequestJSON(textInEditor)
 }
 
+export let setEdgesExternal: React.Dispatch<React.SetStateAction<Edge[]>>
+export let setNodesExternal: React.Dispatch<React.SetStateAction<Node[]>>
+
 export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : LayoutFlowProps) {
 	const [currentGraph, setCurrentGraph] = useState(graph)
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 	const nodeMap = new Map<string,Node>()
 	const { fitView } = useReactFlow()
+
+	setEdgesExternal = setEdges
+	setNodesExternal = setNodes
 
 	const [isNodeIdShown, setIsNodeIdShown] = useState(false)
 

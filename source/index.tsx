@@ -69,7 +69,7 @@ const main = document.createElement('div')
 main.id = 'main'
 document.body.appendChild(main)
 const root = createRoot(main)
-const visualStateModel = new VisualStateModel()
+export const visualStateModel = new VisualStateModel()
 
 
 

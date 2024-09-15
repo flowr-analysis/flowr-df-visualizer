@@ -5,6 +5,7 @@ import React from 'react'
 
 import { getEdgeParams } from '../edges/edge-base'
 import { VisualStateModel } from '../visual-state-model'
+import { reduceOnFunctionDefinitionNode } from '../graph-reduction'
 
 
 function FloatingConnectionLine(props: ConnectionLineComponentProps) {
@@ -121,7 +122,6 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
-
 	return (
 		<>
 			<div className = 'function-call-hover-over' id = {id + '-hover-div'}> 
@@ -129,7 +129,7 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
 			<BodyNodeComponent data = {data} className='function-definition-node base-node'/>
 			
 			</div>
-			<button id = {id + '-hover-over-button'} className='function-call-reduce-button'>Reduce</button>
+			<button onClick = {() => reduceOnFunctionDefinitionNode(id)} id = {id + '-hover-over-button'} className='function-call-reduce-button'>Reduce</button>
 			
 		</>
 	)
