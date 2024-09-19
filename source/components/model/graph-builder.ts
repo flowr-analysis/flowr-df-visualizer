@@ -6,11 +6,12 @@ import type { ParentInformation } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast
 import { visitAst } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/processing/visitor'
 import type { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model'
 import { DataflowGraph } from '@eagleoutice/flowr/dataflow/graph/graph'
+import { TwoKeyMap } from '../utility/two-key-map'
 
 export interface OtherGraph{
     'rootVertices':      number[]
     'vertexInformation': [number, VertexInfo][]
-    'edgeInformation':   [number, [number, EdgeInfo][]][]
+    'edgeInformation':   [number, [number, EdgeInfoForImport][]][]
     '_idMap':            IdMapInfo,
     'functionCache'?:    any
 }
@@ -52,7 +53,7 @@ interface SubFlowInfo {
     'graph': number[]
 }
 
-export interface EdgeInfo{
+export interface EdgeInfoForImport{
     'types':      number,
     'attribute'?: string
 }
@@ -76,24 +77,6 @@ export interface VisualizationNodeProps extends Record<string, unknown> {
     children?: string[]
 }
 
-class TwoKeyMap<K1,K2, V> {
-	multiMap  = new Map<K1, Map<K2, V>>()
-	set(key1:K1, key2:K2, value:V):void{
-		if(!this.multiMap.has(key1)){
-			this.multiMap.set(key1,new Map<K2,V>())
-		}
-		this.multiMap.get(key1)?.set(key2, value)
-	}
-
-	get(key1:K1, key2:K2):V | undefined{
-		if(!this.multiMap.has(key1)){
-			return undefined
-		}
-		return this.multiMap.get(key1)?.get(key2)
-	}
-}
-
-
 
 export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInformation>, dataflowGraph: OtherGraph): VisualizationGraph {
 
@@ -103,7 +86,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
 
-	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new Map<string, string[]>()}, edgesInfo: {edges:[], edgeConnectionMap: new Map()}, }
+	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new Map<string, string[]>(), nodeCount: 0}, edgesInfo: {edges:[], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()}, }
 
 	//source, target, index
 	const argumentIndexMap = new TwoKeyMap<number, number, number>()
@@ -177,22 +160,19 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	
 	const edgeConnection = new Map<number, number[]>()
-	const edgeConnectionString = new Map<string, string[]>()
+	const edgeConnectionString = new TwoKeyMap<string,string, Set<EdgeTypeName>>()
+	const reversedEdgeConnection = new TwoKeyMap<string,string, boolean>()
+	
 	//Know EdgeConnections
 	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
 		const listOfConnectedNodes2 = listOfConnectedNodes
 		for(const [targetNodeId] of listOfConnectedNodes2){
 			if(!edgeConnection.has(sourceNodeId)){
 				edgeConnection.set(sourceNodeId, [])
-				edgeConnectionString.set(String(sourceNodeId), [])
-			}
+			}			
 			edgeConnection.get(sourceNodeId)?.push(targetNodeId)
-			edgeConnectionString.get(String(sourceNodeId))?.push(String(targetNodeId))
 		}
 	}
-
-	//Remember EdgeConnection
-	visualizationGraph.edgesInfo.edgeConnectionMap = edgeConnectionString
 
 	//construct Edges
 	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
@@ -205,25 +185,55 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			}
 			const isBidirectionalEdge = edgeConnection.get(targetNodeId)?.some((value) => (value === sourceNodeId)) ?? false
 			const hasArgument = listOfEdgeTypes.has(EdgeTypeName.Argument)
-			const newEdge: Edge = {
-				source: String(sourceNodeId),
-				target: String(targetNodeId),
-				id:     `edge-${sourceNodeId}-${targetNodeId}`,
-				label:  labelNames,
-				data:   { 
-					label: labelNames, 
-					edgeType: 'multiEdge', 
-					edgeTypes: listOfEdgeTypes, 
-					nodeCount: dataflowGraph.vertexInformation.length,
-					isBidirectionalEdge:  isBidirectionalEdge,
-					...(hasArgument) && {argumentNumber: argumentIndexMap.get(sourceNodeId, targetNodeId)}
-				}
-			}
+			const newEdge: Edge = generateEdge(
+				String(sourceNodeId),
+				String(targetNodeId),
+				isBidirectionalEdge,
+				'multiEdge',
+				listOfEdgeTypes,
+				dataflowGraph.vertexInformation.length,
+				hasArgument ? argumentIndexMap.get(sourceNodeId, targetNodeId) : undefined
+			)
+			
+			edgeConnectionString.set(String(sourceNodeId), String(targetNodeId), listOfEdgeTypes)
+			reversedEdgeConnection.set(String(targetNodeId), String(sourceNodeId), true)
 			visualizationGraph.edgesInfo.edges.push(newEdge)
 		}
 	}
+
+	//Remember nodeCount
+	visualizationGraph.nodesInfo.nodeCount = dataflowGraph.vertexInformation.length
+
+	//Remember EdgeConnection
+	visualizationGraph.edgesInfo.edgeConnectionMap = edgeConnectionString
+	visualizationGraph.edgesInfo.reversedEdgeConnectionMap = reversedEdgeConnection
+
 	return visualizationGraph
 }
+
+export function generateEdge(source: string, target: string, isBidirectionalEdge: boolean, edgeType:string, edgeTypes:Set<EdgeTypeName>, nodeCount:number, argumentNumber?: number):Edge{
+	let labelNames:string = ''
+	for( const linkEdgeType of edgeTypes){
+		labelNames += linkEdgeType + ' '
+	}
+	return (
+		{
+			source: source,
+			target: target,
+			id:     `edge-${source}-${target}`,
+			label:  labelNames,
+			data:   { 
+				label: labelNames, 
+				edgeType: edgeType, 
+				edgeTypes: edgeTypes, 
+				nodeCount: nodeCount,
+				isBidirectionalEdge:  isBidirectionalEdge,
+				...(argumentNumber !== undefined) && {argumentNumber: argumentNumber}}
+		}
+	)
+}
+
+
 
 function nodeTagMapper(type: string):string{
 	return nodeTagMap[type] ?? ''

@@ -10,7 +10,7 @@ const amountOfSamplePointsForLength = 100
 const lengthBetweenMarkerPoints = 10
 const startEndDistanceToMarkers = 10
 const lineColorLength = 20
-const nodeCountPerformanceEasement = 400
+export const nodeCountPerformanceEasement = 400
 
 export function MultiEdge(props:EdgeProps){
 

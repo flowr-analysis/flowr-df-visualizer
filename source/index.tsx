@@ -17,6 +17,8 @@ import { LegendComponent } from './components/graph-legend'
 import { VisualStateModel } from './components/model/visual-state-model'
 import * as monaco from 'monaco-editor'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
+import { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
+import { TwoKeyMap } from './components/utility/two-key-map'
 
 
 const firstValueInEditor = localStorage.getItem('monaco-text') ?? 'x <- 2 * 3; x'
@@ -49,8 +51,8 @@ try {
 }
 
 const graphFromOtherGraph: VisualizationGraph = {
-	edgesInfo:     {edges: [], edgeConnectionMap: new Map<string, string[]>()},
-	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>(), nodeChildrenMap: new Map<string,string[]>() }
+	edgesInfo:     {edges: [], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()},
+	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>(), nodeChildrenMap: new Map<string,string[]>(), nodeCount: 0}
 
 }
 

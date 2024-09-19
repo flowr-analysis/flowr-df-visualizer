@@ -30,11 +30,13 @@ import { SameReadReadEdge } from './model/edges/same-read-read-edge'
 import { SideEffectOnCallEdge } from './model/edges/side-effect-on-call-edge'
 import { NonStandardEvaluationEdge } from './model/edges/non-standard-evaluation-edge'
 import { transformGraphForLayouting, transformGraphForShowing } from './model/graph-transition'
-import { MultiEdge } from './model/edges/multi-edge'
+import { MultiEdge, nodeCountPerformanceEasement } from './model/edges/multi-edge'
 import { slideInLegend } from './graph-legend'
 import { SvgDefinitionsComponent } from './svg-definitions'
 import type { VisualStateModel } from './model/visual-state-model'
 import { client, loadingButtonTimerId as loadingButtonTimerId, monacoEditor, setLoadingButtonTimerId } from '..'
+import { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
+import { TwoKeyMap } from './utility/two-key-map'
 
 
 
@@ -166,19 +168,17 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					visualStateModel.originalGraph.edges.forEach((val) => visualStateModel.alteredGraph?.edges.push(Object.assign({}, val)))
 					
 					//set EdgeInformation and copy edgeConnections accordingly
-					visualStateModel.originalEdgeConnectionMap = g?.edgesInfo.edgeConnectionMap
-					visualStateModel.alteredEdgeConnectionMap = new Map<string, string[]>()
-					//copy Connections
-					visualStateModel.originalEdgeConnectionMap?.forEach((targetArray, sourceNode) => {
-						const deepCopiedTargetArray: string[] = []
-						targetArray.forEach((targetNode) => {
-							deepCopiedTargetArray.push(targetNode)
-						})
-						visualStateModel.alteredEdgeConnectionMap?.set(sourceNode, deepCopiedTargetArray)
-					})
+					visualStateModel.originalEdgeConnectionMap = g?.edgesInfo.edgeConnectionMap ?? new TwoKeyMap<string,string, Set<EdgeTypeName>>() 
+					visualStateModel.alteredEdgeConnectionMap = new TwoKeyMap<string,string, Set<EdgeTypeName>>(visualStateModel.originalEdgeConnectionMap)
 					
+					visualStateModel.originalReversedEdgeConnectionMap = g?.edgesInfo.reversedEdgeConnectionMap ?? new TwoKeyMap<string,string, boolean>() 
+					visualStateModel.alteredReversedEdgeConnectionMap = new TwoKeyMap<string,string, boolean>(visualStateModel.originalReversedEdgeConnectionMap)
+					
+					visualStateModel.nodeCount = g?.nodesInfo.nodeCount ?? nodeCountPerformanceEasement
+
+
 					//Set Nodes Information
-					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap
+					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap ?? new Map<string, string[]>()
 					visualStateModel.alteredNodeChildrenMap = new Map<string, string[]>()
 					//copy Children Map
 					visualStateModel.originalNodeChildrenMap?.forEach((childrenArray, parentNodeId) => {
