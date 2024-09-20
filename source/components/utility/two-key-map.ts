@@ -28,6 +28,15 @@ export class TwoKeyMap<K1,K2, V> {
         }
         return map.delete(key2)
     }
+
+    forEach(callbackfn:(value:V, key1:K1, key2:K2) => void):void{
+        this.multiMap.forEach((key2Map,k1) => {
+            key2Map.forEach((val, k2) => {
+                callbackfn(val, k1, k2)
+            })
+        })
+    }
+
     constructor(copyMap?: TwoKeyMap<K1,K2,V>){
         if(copyMap !== undefined){
             copyMap.multiMap.forEach((map, key1) => {

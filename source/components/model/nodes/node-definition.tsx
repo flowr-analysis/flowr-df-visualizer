@@ -5,7 +5,7 @@ import React from 'react'
 
 import { getEdgeParams } from '../edges/edge-base'
 import { VisualStateModel } from '../visual-state-model'
-import { reduceOnFunctionDefinitionNode } from '../graph-reduction'
+import { expandOnFunctionCallNode, reduceOnFunctionDefinitionNode } from '../graph-reduction'
 
 
 function FloatingConnectionLine(props: ConnectionLineComponentProps) {
@@ -119,30 +119,17 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
     estimatedMaxX: number,
     estimatedMaxY: number
   }
-  	/**
-	 * <div className = 'function-call-hover-over' id = {id + '-hover-div'}> 
-			
-			</div>
-			<button onClick = {() => {
-				reduceOnFunctionDefinitionNode(id)
-			}} 
-			id = {id + '-hover-over-button'} className='reduce-component-hover-button'>Collapse</button>
-			
-	 */
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
 	return (
 		<>
-			
-			
-			<ReduceComponent id ={id} onReduce={() => reduceOnFunctionDefinitionNode(id)} onExpand={() => {}}>
+			<ReduceComponent id ={id} onReduce={() => reduceOnFunctionDefinitionNode(id)} onExpand={() => expandOnFunctionCallNode(id)
+			}>
 			<NodeResizer lineClassName='function-definition-node function-definition-node-resizer-line' handleClassName='function-definition-node function-definition-node-resizer-edge-dot' />
 			<BodyNodeComponent data = {data} className='function-definition-node base-node'/>
 				
 			</ReduceComponent>
-
-
 		</>
 	)
 }
