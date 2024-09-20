@@ -234,16 +234,22 @@ body {
 	border: none;
 }
 
-.function-call-hover-over {
+.reduce-hidden{
+	visibility: hidden;
+	pointer-events:none;
+	display:none;
+}
+
+.reduce-hover-over {
 	height: 100%;
 	width: 100%;
 }
 
-.function-call-reduce-button {
+.reduce-component-hover-button {
 	display:none;
 }
 
-.function-call-hover-over:hover + .function-call-reduce-button, .function-call-reduce-button:hover {
+.reduce-hover-over:hover + .reduce-component-hover-button, .reduce-component-hover-button:hover {
 	display:inline-block;
 }
 

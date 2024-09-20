@@ -119,22 +119,33 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
     estimatedMaxX: number,
     estimatedMaxY: number
   }
+  	/**
+	 * <div className = 'function-call-hover-over' id = {id + '-hover-div'}> 
+			
+			</div>
+			<button onClick = {() => {
+				reduceOnFunctionDefinitionNode(id)
+			}} 
+			id = {id + '-hover-over-button'} className='reduce-component-hover-button'>Collapse</button>
+			
+	 */
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
 	return (
 		<>
-			<div className = 'function-call-hover-over' id = {id + '-hover-div'}> 
+			
+			
+			<ReduceComponent id ={id} onReduce={() => {}} onExpand={() => {}}>
 			<NodeResizer lineClassName='function-definition-node function-definition-node-resizer-line' handleClassName='function-definition-node function-definition-node-resizer-edge-dot' />
 			<BodyNodeComponent data = {data} className='function-definition-node base-node'/>
-			
-			</div>
-			<button onClick = {() => reduceOnFunctionDefinitionNode(id)} id = {id + '-hover-over-button'} className='function-call-reduce-button'>Reduce</button>
-			
+				
+			</ReduceComponent>
+
+
 		</>
 	)
 }
-
 
 export const ExitPointNode: React.FC<NodeComponentProps> = ({ data }) => {
 	return <BodyNodeComponent data={data} className='exit-point-node base-node'/>
@@ -161,4 +172,37 @@ export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
 			{data.label as string}
 		</div>
 	)
+}
+
+interface ReduceComponentProps{
+	onReduce: () => void
+	onExpand:() => void
+	id: string
+}
+const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> = ({id, onReduce, onExpand, children}) => {
+	
+	const idReduceButton = id + '-reduce-hover-over-button'
+	const idExpandButton = id + '-expand-button'
+
+	return <>
+		<button onClick = {() => {
+			//TODO insert expand functionality
+			const expandButton = document.getElementById(idReduceButton) as HTMLButtonElement
+			expandButton.classList.toggle('reduce-hidden')
+			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
+			reduceButton.classList.toggle('reduce-hidden')
+		}} 
+		id = {idExpandButton} className='reduce-hidden'>Expand</button>
+		<div className = 'reduce-hover-over' id = {id + '-hover-div'}> 
+			{children}
+		</div>
+		<button onClick = {() => {
+			reduceOnFunctionDefinitionNode(id)
+			const expandButton = document.getElementById(idReduceButton) as HTMLButtonElement
+			expandButton.classList.toggle('reduce-hidden')
+			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
+			reduceButton.classList.toggle('reduce-hidden')
+		}} 
+		id = {idReduceButton} className='reduce-component-hover-button'>Reduce</button>		
+	</>
 }
