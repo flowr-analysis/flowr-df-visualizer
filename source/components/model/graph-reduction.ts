@@ -6,6 +6,7 @@ import { EdgeTypeName } from "@eagleoutice/flowr/dataflow/graph/edge";
 import { generateEdge } from "./graph-builder";
 import { EdgeInfo, VisualStateModel } from "./visual-state-model";
 import { TwoKeyMap } from "../utility/two-key-map";
+import { transformBuildedEdgesToShowEdges } from "./graph-transition";
 
 let combineEdgeIdIndex = 1
 
@@ -53,7 +54,6 @@ function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, 
 
 
 function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges: Edge[]):void{
-    console.log(visualStateModel)
     const deletedEdges: EdgeSourceTarget[] = []
     const deleteEdgesMap: TwoKeyMap<string, string, boolean> = new TwoKeyMap<string, string, boolean>()
     const toAddEdges: EdgeSourceTarget[] = []
@@ -162,9 +162,8 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
     })
 
 
-    //console.log(deletedEdges)
-    //console.log(toAddEdges)
-    //console.log(visualStateModel.combinedEdges)
+    console.log(deletedEdges)
+    console.log(toAddEdges)
     
     //delete edges
     //delete from view
@@ -214,13 +213,12 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
             visualStateModel.nodeCount,
             undefined)
         combineEdgeIdIndex++
-        //console.log(newEdge)
         newEdgesArray.push(newEdge)
     })
 
-    //console.log(newEdgesArray)
-    setEdgesExternal((edges) => edges.concat(newEdgesArray))
-    console.log(visualStateModel)
+    const transformedEdges = transformBuildedEdgesToShowEdges(newEdgesArray, visualStateModel)
+    
+    setEdgesExternal((edges) => edges.concat(transformedEdges))
 }
 
 

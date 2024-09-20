@@ -13,8 +13,7 @@ const lineColorLength = 20
 export const nodeCountPerformanceEasement = 400
 
 export function MultiEdge(props:EdgeProps){
-	console.log(props)
-
+	
 	return <BodyMultiEdgeComponent
 		standardEdgeInformation={props}
 		source={props.source}
@@ -43,13 +42,14 @@ export const BodyMultiEdgeComponent: React.FC<BodyMultiEdgeComponentProps> = ({ 
 			sourcePos: Position.Left,
 			targetPos: Position.Left
 		}
-
+	
 	if(!sourceNode || !targetNode) {
 		return <></>
 	}
 	const hoverOverEdgeId = useMemo(() =>standardEdgeInformation.id + '-hoverover-interactive' , [standardEdgeInformation])
 	const givenEdgeTypes = standardEdgeInformation.data?.edgeTypes as Set<EdgeTypeName> ?? new Set<EdgeTypeName>()
 	const argumentNumber = givenEdgeTypes.has(EdgeTypeName.Argument) ? standardEdgeInformation.data?.argumentNumber as number: undefined
+	
 	return (
 		<>
 			{nodeCount < nodeCountPerformanceEasement  && <PathWithMarkerComponent id = {standardEdgeInformation.id} hoverOverEdgeId = {hoverOverEdgeId} sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY = {targetY} sourcePos={sourcePos} targetPos = {targetPos} edgeTypes={givenEdgeTypes} visualStateModel={standardEdgeInformation.data?.visualStateModel as VisualStateModel ?? new VisualStateModel()} argumentNumber={argumentNumber}/>}

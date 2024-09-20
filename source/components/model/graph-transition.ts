@@ -3,6 +3,7 @@ import { flattenToNodeArray, foldIntoElkHierarchy } from '../graph-hierarchy'
 import type { Edge, Node } from '@xyflow/react'
 import { edgeTagMapper } from './edges/edge-base'
 import type { VisualStateModel } from './visual-state-model'
+import { convertToExtendedEdges } from '../graph-viewer'
 
 export function transformGraphForLayouting(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions, isHorizontal: boolean):ElkNode{
 	const toReturn: ElkNode = {
@@ -57,4 +58,26 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
 			}
 		})
 	}
+}
+
+export function transformToShowEdge(edges: ExtendedExtendedEdge[], visualStateModel:VisualStateModel):Edge[]{
+	const isHorizontal = visualStateModel.elkDirectionIsHorizontal
+	return edges.map((e) => {
+		return {
+			id:           e.id,
+			source:       e.sources[0],
+			target:       e.targets[0],
+			sourceHandle: isHorizontal ? 'right' : 'bottom',
+			targetHandle: isHorizontal ? 'left' : 'top',
+			label:        e.label,
+			//animated: true,
+			//style: { stroke: '#000' },
+			type:         edgeTagMapper(e.edgeType),
+			data:         { ...e.data, isHovered: false, visualStateModel: visualStateModel }
+		}		
+	})	
+}
+
+export function transformBuildedEdgesToShowEdges(edges: Edge[], visualStateModel:VisualStateModel):Edge[]{
+	return transformToShowEdge(convertToExtendedEdges(edges) as ExtendedExtendedEdge[],visualStateModel)
 }

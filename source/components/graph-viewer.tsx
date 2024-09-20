@@ -73,7 +73,7 @@ async function getLayoutedElements(nodes: Node[],
 	return endGraph
 }
 
-function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {
+export function convertToExtendedEdges(edges: Edge[]): ElkExtendedEdge[] {
 	return edges.map(edge => ({
 		id:       edge.id,
 		sources:  [edge.source],
@@ -175,7 +175,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					visualStateModel.alteredReversedEdgeConnectionMap = new TwoKeyMap<string,string, boolean>(visualStateModel.originalReversedEdgeConnectionMap)
 					
 					visualStateModel.nodeCount = g?.nodesInfo.nodeCount ?? nodeCountPerformanceEasement
-
+					visualStateModel.elkDirectionIsHorizontal = opts['elk.direction'] === 'RIGHT'
 
 					//Set Nodes Information
 					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap ?? new Map<string, string[]>()

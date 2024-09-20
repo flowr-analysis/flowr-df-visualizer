@@ -21,6 +21,7 @@ export class VisualStateModel {
 	unCombinedDeletedEdges: TwoKeyMap<string, string, EdgeInfo> = new TwoKeyMap<string, string, EdgeInfo>() // Original Node
 	deletedNodes: Map<string, Node> = new Map<string, Node>() //deleted Node -> original Node Object
 	nodeCount: number = 0
+	elkDirectionIsHorizontal:boolean = true
 }
 
 export interface ShownGraph {
