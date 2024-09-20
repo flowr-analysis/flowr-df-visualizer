@@ -94,6 +94,11 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
                         originEdgesArray.push({source:currentEdge.source, target:reduceNodeId, edgeTypes:visualStateModel.alteredEdgeConnectionMap.get(currentEdge.source, reduceNodeId) ?? new Set<EdgeTypeName>()})
                         visualStateModel.combinedEdges.set(currentEdge.source, reduceNodeId, originEdgesArray)
                     }
+
+                    if(!deleteEdgesMap.has(currentEdge.source, reduceNodeId)){
+                        deletedEdges.push({source: currentEdge.source, target: reduceNodeId})
+                        deleteEdgesMap.set(currentEdge.source, reduceNodeId, true)
+                    }
                 } else {
                     visualStateModel.combinedEdges.set(currentEdge.source, reduceNodeId, originEdgesArray)
                 }
@@ -141,8 +146,13 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
                         visualStateModel.combinedEdges.set(reduceNodeId, currentEdge.target, allCombinedEdges)
                         deletedEdges.push({source: reduceNodeId, target: currentEdge.target})
                     }else {
+                        
                         originEdgesArray.push({source:reduceNodeId, target: currentEdge.target, edgeTypes: visualStateModel.alteredEdgeConnectionMap.get(reduceNodeId, currentEdge.target) ?? new Set<EdgeTypeName>()})
                         visualStateModel.combinedEdges.set(reduceNodeId, currentEdge.target, originEdgesArray)
+                    }
+                    if(!deleteEdgesMap.has(reduceNodeId, currentEdge.target)){
+                        deletedEdges.push({source: reduceNodeId, target: currentEdge.target})
+                        deleteEdgesMap.set(reduceNodeId, currentEdge.target, true)
                     }
                 } else {
                     visualStateModel.combinedEdges.set(reduceNodeId, currentEdge.target, originEdgesArray)

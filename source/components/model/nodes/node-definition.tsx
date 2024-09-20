@@ -136,7 +136,7 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
 		<>
 			
 			
-			<ReduceComponent id ={id} onReduce={() => {}} onExpand={() => {}}>
+			<ReduceComponent id ={id} onReduce={() => reduceOnFunctionDefinitionNode(id)} onExpand={() => {}}>
 			<NodeResizer lineClassName='function-definition-node function-definition-node-resizer-line' handleClassName='function-definition-node function-definition-node-resizer-edge-dot' />
 			<BodyNodeComponent data = {data} className='function-definition-node base-node'/>
 				
@@ -186,7 +186,7 @@ const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> =
 
 	return <>
 		<button onClick = {() => {
-			//TODO insert expand functionality
+			onExpand()
 			const expandButton = document.getElementById(idReduceButton) as HTMLButtonElement
 			expandButton.classList.toggle('reduce-hidden')
 			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
@@ -197,7 +197,7 @@ const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> =
 			{children}
 		</div>
 		<button onClick = {() => {
-			reduceOnFunctionDefinitionNode(id)
+			onReduce()
 			const expandButton = document.getElementById(idReduceButton) as HTMLButtonElement
 			expandButton.classList.toggle('reduce-hidden')
 			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
