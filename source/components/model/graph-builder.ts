@@ -186,6 +186,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			const isBidirectionalEdge = edgeConnection.get(targetNodeId)?.some((value) => (value === sourceNodeId)) ?? false
 			const hasArgument = listOfEdgeTypes.has(EdgeTypeName.Argument)
 			const newEdge: Edge = generateEdge(
+				`edge-${sourceNodeId}-${targetNodeId}`,
 				String(sourceNodeId),
 				String(targetNodeId),
 				isBidirectionalEdge,
@@ -211,7 +212,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	return visualizationGraph
 }
 
-export function generateEdge(source: string, target: string, isBidirectionalEdge: boolean, edgeType:string, edgeTypes:Set<EdgeTypeName>, nodeCount:number, argumentNumber?: number):Edge{
+export function generateEdge(id: string, source: string, target: string, isBidirectionalEdge: boolean, edgeType:string, edgeTypes:Set<EdgeTypeName>, nodeCount:number, argumentNumber?: number):Edge{
 	let labelNames:string = ''
 	for( const linkEdgeType of edgeTypes){
 		labelNames += linkEdgeType + ' '
@@ -220,7 +221,7 @@ export function generateEdge(source: string, target: string, isBidirectionalEdge
 		{
 			source: source,
 			target: target,
-			id:     `edge-${source}-${target}`,
+			id:     id,
 			label:  labelNames,
 			data:   { 
 				label: labelNames, 

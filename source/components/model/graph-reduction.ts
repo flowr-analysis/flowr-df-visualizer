@@ -7,6 +7,8 @@ import { generateEdge } from "./graph-builder";
 import { EdgeInfo, VisualStateModel } from "./visual-state-model";
 import { TwoKeyMap } from "../utility/two-key-map";
 
+let combineEdgeIdIndex = 1
+
 export function reduceOnFunctionDefinitionNode(reduceNodeId: string){
     const childrenArrayReductionNode = visualStateModel.alteredNodeChildrenMap?.get(reduceNodeId)
     const deletedCHildrenArray: string[] = [] 
@@ -173,13 +175,6 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
         )
     )
 
-    console.log('entireGraphEdges')
-    setEdgesExternal((edges) => {
-        edges.forEach((edge)=>{
-            console.log(edge)
-        })
-        return edges
-    })
     
     //delete from model 
     deletedEdges.forEach((deleteEdge) => { 
@@ -208,7 +203,9 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
         visualStateModel.alteredEdgeConnectionMap.set(currentAddEdge.source, currentAddEdge.target, accumulatedEdgeTypeNameSet)
         visualStateModel.alteredReversedEdgeConnectionMap.set(currentAddEdge.target, currentAddEdge.source, true)
 
+        
         const newEdge = generateEdge(
+            `edge-${currentAddEdge.source}-${currentAddEdge.target}-${combineEdgeIdIndex}`,
             currentAddEdge.source, 
             currentAddEdge.target, 
             isBidirectional, 
@@ -216,9 +213,11 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
             accumulatedEdgeTypeNameSet, 
             visualStateModel.nodeCount,
             undefined)
+        combineEdgeIdIndex++
         //console.log(newEdge)
         newEdgesArray.push(newEdge)
     })
+
     //console.log(newEdgesArray)
     setEdgesExternal((edges) => edges.concat(newEdgesArray))
     console.log(visualStateModel)

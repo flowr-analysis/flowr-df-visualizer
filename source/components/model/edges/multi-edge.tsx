@@ -13,7 +13,7 @@ const lineColorLength = 20
 export const nodeCountPerformanceEasement = 400
 
 export function MultiEdge(props:EdgeProps){
-
+	console.log(props)
 
 	return <BodyMultiEdgeComponent
 		standardEdgeInformation={props}
