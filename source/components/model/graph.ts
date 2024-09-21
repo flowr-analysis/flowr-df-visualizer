@@ -12,6 +12,7 @@ export interface NodeInformation{
     nodeMap: Map<string, Node>
     nodeChildrenMap: Map<string, string[]> //parent -> children
     nodeCount:number
+    rootNodes:string[]
 }
 
 export interface EdgeInformation{

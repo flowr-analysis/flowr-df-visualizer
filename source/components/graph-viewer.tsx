@@ -54,22 +54,23 @@ const elkOptions: LayoutOptions = {
 }
 
 async function getLayoutedElements(nodes: Node[],
+								   rootNodes: string[],
 								   nodeIdMap: Map<string,Node>,
 								   edges: ElkExtendedEdge[],
 								   options: LayoutOptions,
 								   visualStateModel: VisualStateModel): Promise<{ nodes: Node[]; edges: Edge[] }> {
 	const isHorizontal = options?.['elk.direction'] === 'RIGHT'
 
-	const graph: ElkNode = transformGraphForLayouting(nodes,nodeIdMap, edges, options, isHorizontal)
-	//console.log('before Layout:')
-	//console.log(graph)
+	const graph: ElkNode = transformGraphForLayouting(nodes, rootNodes, nodeIdMap, edges, options, isHorizontal)
+	console.log('before Layout:')
+	console.log(graph)
 
 	const layoutedGraph = await elk.layout(graph)
 
-	//console.log('after Layout:')
-	//console.log(layoutedGraph)
+	console.log('after Layout:')
+	console.log(layoutedGraph)
 	const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal, visualStateModel)
-
+	console.log(endGraph)
 	return endGraph
 }
 
@@ -122,6 +123,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 	const nodeMap = new Map<string,Node>()
+	const rootNodes:string[] = [] 
 	const { fitView } = useReactFlow()
 
 	setEdgesExternal = setEdges
@@ -157,7 +159,8 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 			const ns = g ? g.nodesInfo.nodes : nodes
 			const es = g ? g.edgesInfo.edges : edges
 			const nm = g ? g.nodesInfo.nodeMap: nodeMap
-			void getLayoutedElements(ns, nm, convertToExtendedEdges(es), opts, visualStateModel)
+			const rn = g ? g.nodesInfo.rootNodes: rootNodes 
+			void getLayoutedElements(ns, rn, nm, convertToExtendedEdges(es), opts, visualStateModel)
 				.then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
 
 					visualStateModel.originalGraph = {nodes: layoutedNodes, edges: layoutedEdges}
@@ -193,6 +196,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					visualStateModel.reducedToNodeMapping = new Map<string,string>()
 					visualStateModel.originalGraph.nodes.forEach((node) => { visualStateModel.reducedToNodeMapping?.set(node.id, node.id)})
 
+					console.log(visualStateModel.alteredGraph?.nodes)
 					setNodes(visualStateModel.alteredGraph?.nodes)
 					setEdges(visualStateModel.alteredGraph?.edges)
 

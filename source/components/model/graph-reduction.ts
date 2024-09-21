@@ -17,7 +17,6 @@ export function reduceOnFunctionDefinitionNode(reduceNodeId: string){
         deleteChildrenAccordingly(reduceNodeId, childId, deletedChildrenArray)
     })
     visualStateModel.alteredNodeChildrenMap.delete(reduceNodeId)
-    console.log(deletedChildrenArray)
     //delete Nodes from Array
     setNodesExternal((nodes) => nodes.filter((node) => {
         const doesNodeStayInArray = deletedChildrenArray.find((deletedChildId) => deletedChildId === node.id) === undefined
@@ -26,28 +25,27 @@ export function reduceOnFunctionDefinitionNode(reduceNodeId: string){
         }
         return doesNodeStayInArray
     }))
-    console.log(visualStateModel.nodeContainsReducedNodes)
-    console.log(visualStateModel.reducedToNodeMapping)
-    console.log(visualStateModel.deletedNodes)
+
     updateEdges(reduceNodeId,deletedChildrenArray,visualStateModel.alteredGraph?.edges ?? [])
 
-    console.log(visualStateModel.combinedEdges)
 
 }
 
 function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, deletedChildren: string []): string[]{
     const childrenArray = visualStateModel.alteredNodeChildrenMap.get(currentNodeId)
-    //If this node has children also reduce this one
-    childrenArray?.forEach((childId) => {
-        deleteChildrenAccordingly(reduceNodeId, childId, deletedChildren)
-    })
-
+    
     //remember which node was reduced to which
     visualStateModel.reducedToNodeMapping.set(currentNodeId, reduceNodeId)
     if(!visualStateModel.nodeContainsReducedNodes.has(reduceNodeId)){
         visualStateModel.nodeContainsReducedNodes.set(reduceNodeId, [])
     }
     visualStateModel.nodeContainsReducedNodes.get(reduceNodeId)?.push(currentNodeId)
+
+    
+    //If this node has children also reduce this one
+    childrenArray?.forEach((childId) => {
+        deleteChildrenAccordingly(reduceNodeId, childId, deletedChildren)
+    })
 
     //node has no children anymore
     visualStateModel.alteredNodeChildrenMap.delete(currentNodeId)
@@ -169,8 +167,7 @@ function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges:
     })
 
 
-    //console.log(deletedEdges)
-    //console.log(toAddEdges)
+
     
     //delete edges
     //delete from view
@@ -277,7 +274,7 @@ export function expandOnFunctionCallNode(reduceNodeId: string):void{
             listOfEdgesToLookAt.push(...(visualStateModel.combinedEdges.get(reduceNodeId, targetNodeId) ?? []))
             visualStateModel.combinedEdges.delete(reduceNodeId, targetNodeId)
             deletedEdges.push({source: reduceNodeId, target:targetNodeId})
-            console.log('outgoing:'+ reduceNodeId +','+ targetNodeId)
+
         }
     })
     visualStateModel.alteredReversedEdgeConnectionMap.getKey1Map(reduceNodeId)?.forEach((someBool, sourceNodeId) => {
@@ -285,7 +282,7 @@ export function expandOnFunctionCallNode(reduceNodeId: string):void{
             listOfEdgesToLookAt.push(...(visualStateModel.combinedEdges.get(sourceNodeId, reduceNodeId) ?? []))
             visualStateModel.combinedEdges.delete(sourceNodeId, reduceNodeId)
             deletedEdges.push({source: sourceNodeId, target:reduceNodeId})
-            console.log('incoming:'+ sourceNodeId +','+ reduceNodeId)
+
         }
     })
     //delete the deleted combined edges from the model
@@ -294,9 +291,7 @@ export function expandOnFunctionCallNode(reduceNodeId: string):void{
         visualStateModel.alteredReversedEdgeConnectionMap.delete(sourceTarget.target, sourceTarget.source)
         deleteEdgesMap.set(sourceTarget.source, sourceTarget.target, true)
     })
-    console.log('combineEdges and listOfEdgesToLookAt')
-    console.log(visualStateModel.combinedEdges)
-    console.log(listOfEdgesToLookAt)
+
     const toAddEdges: EdgeSourceTarget[] = []
     const addEdgesMap: TwoKeyMap<string, string, boolean> = new TwoKeyMap<string, string, boolean>()
     visualStateModel.unCombinedDeletedEdges.forEach((edgesInfo) => {
@@ -339,9 +334,7 @@ export function expandOnFunctionCallNode(reduceNodeId: string):void{
             addEdgesMap.set(reducedSource, reducedTarget, true)
         }
     })
-    console.log('delete and add edges')
-    console.log(deletedEdges)
-    console.log(toAddEdges)
+
     //delete the deleted combined edges from the model
     deletedEdges.forEach((sourceTarget) => {
         visualStateModel.alteredEdgeConnectionMap.delete(sourceTarget.source, sourceTarget.target)

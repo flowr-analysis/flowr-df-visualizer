@@ -11,13 +11,20 @@ const standardWidth  = 150
  * @param nodesIdMap - Map of the nodes with the id as key
  * @param isHorizontal - boolean to determine if the layout should be horizontal or vertical
  */
-export function foldIntoElkHierarchy(nodes:Node[], nodesIdMap: Map<string,Node>, isHorizontal: boolean):ElkNode[]{
+export function foldIntoElkHierarchy(nodes:Node[], rootNodeIds:string[], nodesIdMap: Map<string,Node>, isHorizontal: boolean):ElkNode[]{
 	const usedMap  = new Map<string, boolean>()
 	nodesIdMap.forEach((node, id) => usedMap.set(id,false))
+	const rootNodes:Node[] = []
+	rootNodeIds.forEach((rootNodeId) => {
+		const rootNode = nodesIdMap.get(rootNodeId)
+		if(rootNode !== undefined){
+			rootNodes.push(rootNode)
+		}
+	})
 
-	return nodes
-		.map(node =>
-			foldOnVisualizationGraphNodes(node as Node<VisualizationNodeProps>, nodesIdMap as Map<string, Node<VisualizationNodeProps>>, usedMap, isHorizontal)
+	return rootNodes
+		.map(rootNode =>
+			foldOnVisualizationGraphNodes(rootNode as Node<VisualizationNodeProps>, nodesIdMap as Map<string, Node<VisualizationNodeProps>>, usedMap, isHorizontal)
 		).filter(nonEmpty)
 }
 
@@ -47,7 +54,7 @@ function nonEmpty<TValue>(value:TValue| null| undefined): value is TValue{
 function foldOnVisualizationGraphNodes(currentNode: Node<VisualizationNodeProps>, nodeIdMap: Map<string, Node<VisualizationNodeProps>>, usedIdsMap: Map<string,boolean>, isHorizontal: boolean):HierarchyElkNode | undefined{
 	if(currentNode.data.children !== undefined){
 		//calculate Children of the currentNode
-		const childrenOfNode : HierarchyElkNode[]=
+		const childrenOfNode : HierarchyElkNode[] =
           currentNode.data.children.map(nodeId => nodeIdMap.get(nodeId)).filter(node => node !== undefined).map(node => foldOnVisualizationGraphNodes(node as Node<VisualizationNodeProps>,nodeIdMap,usedIdsMap, isHorizontal)).filter(nonEmpty)
 		const newHeight = childrenOfNode.reduce((accumulatedHeight, node) => accumulatedHeight + (node.height ?? 0), 0) + standardHeight
 		const newWidth = standardWidth + 10

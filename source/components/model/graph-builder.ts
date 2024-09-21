@@ -86,7 +86,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
 
-	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new Map<string, string[]>(), nodeCount: 0}, edgesInfo: {edges:[], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()}, }
+	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new Map<string, string[]>(), nodeCount: 0, rootNodes: []}, edgesInfo: {edges:[], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()}, }
 
 	//source, target, index
 	const argumentIndexMap = new TwoKeyMap<number, number, number>()
@@ -158,7 +158,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		}
 	}
 
-	
+	console.log(visualizationGraph.nodesInfo.nodes)
 	const edgeConnection = new Map<number, number[]>()
 	const edgeConnectionString = new TwoKeyMap<string,string, Set<EdgeTypeName>>()
 	const reversedEdgeConnection = new TwoKeyMap<string,string, boolean>()
@@ -201,6 +201,11 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			visualizationGraph.edgesInfo.edges.push(newEdge)
 		}
 	}
+
+	//Remember Root Nodes
+	dataflowGraph.rootVertices.forEach((nodeId) => {
+		visualizationGraph.nodesInfo.rootNodes.push(String(nodeId))
+	})
 
 	//Remember nodeCount
 	visualizationGraph.nodesInfo.nodeCount = dataflowGraph.vertexInformation.length

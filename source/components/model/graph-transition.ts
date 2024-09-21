@@ -5,11 +5,11 @@ import { edgeTagMapper } from './edges/edge-base'
 import type { VisualStateModel } from './visual-state-model'
 import { convertToExtendedEdges } from '../graph-viewer'
 
-export function transformGraphForLayouting(nodes: Node[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions, isHorizontal: boolean):ElkNode{
+export function transformGraphForLayouting(nodes: Node[], rootNodes:string[], nodeIdMap: Map<string,Node>, edges: ElkExtendedEdge[], options: LayoutOptions, isHorizontal: boolean):ElkNode{
 	const toReturn: ElkNode = {
 		id:            'root',
 		layoutOptions: options,
-		children:      foldIntoElkHierarchy(nodes, nodeIdMap, isHorizontal),
+		children:      foldIntoElkHierarchy(nodes, rootNodes, nodeIdMap, isHorizontal),
 		edges:         edges
 	}
 
@@ -30,14 +30,18 @@ export function transformGraphForShowing(layoutedGraph: ElkNode, isHorizontal: b
 	//reset node height and width so they will be correctly calculated and set afterwards
 
 	newNodes.forEach((node) => {
+		const nodeHeightBeforeDeletion = node['height'] ?? 0
+		const nodeWidthBeforeDeletion = node['width'] ?? 0
 		delete node['height']
 		delete node['width']
 		node.data = { ...node.data, visualStateModel: visualStateModel }
 
 		//size needs to be defined for size of function definiton to make sense
 		if(node.data.nodeType === 'function-definition'){
-			node.width = node.data.estimatedMaxX - node.data.estimatedMinX
-			node.height = node.data.estimatedMaxY - node.data.estimatedMinY
+			//node.width = node.data.estimatedMaxX - node.data.estimatedMinX
+			//node.height = node.data.estimatedMaxY - node.data.estimatedMinY
+			node.width = nodeWidthBeforeDeletion
+			node.height = nodeHeightBeforeDeletion
 		}
 	})
 
