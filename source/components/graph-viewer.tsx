@@ -34,7 +34,7 @@ import { MultiEdge, nodeCountPerformanceEasement } from './model/edges/multi-edg
 import { slideInLegend } from './graph-legend'
 import { SvgDefinitionsComponent } from './svg-definitions'
 import type { VisualStateModel } from './model/visual-state-model'
-import { client, loadingButtonTimerId as loadingButtonTimerId, monacoEditor, setLoadingButtonTimerId } from '..'
+import { client, loadingButtonTimerId as loadingButtonTimerId, monacoEditor, setLoadingButtonTimerId, visualStateModel } from '..'
 import { EdgeTypeName } from '@eagleoutice/flowr/dataflow/graph/edge'
 import { TwoKeyMap } from './utility/two-key-map'
 
@@ -62,15 +62,15 @@ async function getLayoutedElements(nodes: Node[],
 	const isHorizontal = options?.['elk.direction'] === 'RIGHT'
 
 	const graph: ElkNode = transformGraphForLayouting(nodes, rootNodes, nodeIdMap, edges, options, isHorizontal)
-	console.log('before Layout:')
-	console.log(graph)
+	//console.log('before Layout:')
+	//console.log(graph)
 
 	const layoutedGraph = await elk.layout(graph)
 
-	console.log('after Layout:')
-	console.log(layoutedGraph)
+	//console.log('after Layout:')
+	//console.log(layoutedGraph)
 	const endGraph = transformGraphForShowing(layoutedGraph, isHorizontal, visualStateModel)
-	console.log(endGraph)
+	//console.log(endGraph)
 	return endGraph
 }
 
@@ -113,6 +113,7 @@ export function reloadGraph(){
 	const textInEditor = monacoEditor?.getValue() ?? ''
 	localStorage.setItem('monaco-text', textInEditor)
 	client?.sendAnalysisRequestJSON(textInEditor)
+	visualStateModel.nextGraphTextInput = textInEditor
 }
 
 export let setEdgesExternal: React.Dispatch<React.SetStateAction<Edge[]>>
@@ -177,10 +178,12 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					visualStateModel.originalReversedEdgeConnectionMap = g?.edgesInfo.reversedEdgeConnectionMap ?? new TwoKeyMap<string,string, boolean>() 
 					visualStateModel.alteredReversedEdgeConnectionMap = new TwoKeyMap<string,string, boolean>(visualStateModel.originalReversedEdgeConnectionMap)
 					
+					//set general Info about Graph
 					visualStateModel.nodeCount = g?.nodesInfo.nodeCount ?? nodeCountPerformanceEasement
 					visualStateModel.elkDirectionIsHorizontal = opts['elk.direction'] === 'RIGHT'
+					visualStateModel.currentGraphTextInput = visualStateModel.currentGraphTextInput
 
-					//Set Nodes Information
+					//set Nodes Information
 					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap ?? new Map<string, string[]>()
 					visualStateModel.alteredNodeChildrenMap = new Map<string, string[]>()
 					//copy Children Map
@@ -196,7 +199,6 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					visualStateModel.reducedToNodeMapping = new Map<string,string>()
 					visualStateModel.originalGraph.nodes.forEach((node) => { visualStateModel.reducedToNodeMapping?.set(node.id, node.id)})
 
-					console.log(visualStateModel.alteredGraph?.nodes)
 					setNodes(visualStateModel.alteredGraph?.nodes)
 					setEdges(visualStateModel.alteredGraph?.edges)
 
@@ -292,3 +294,6 @@ const ControlButtonHoverOverTextComponent: React.FC<React.PropsWithChildren<Cont
 		</div>
 	)
 }
+
+
+

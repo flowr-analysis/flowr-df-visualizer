@@ -45,6 +45,7 @@ try {
 		console.log('hello', json)
 		startLoadingAnimation()
 		client?.sendAnalysisRequestJSON(firstValueInEditor)
+		visualStateModel.nextGraphTextInput = firstValueInEditor
 	}
 } catch(e){
 	console.log(e)

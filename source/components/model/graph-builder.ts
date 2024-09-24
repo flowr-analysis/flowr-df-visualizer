@@ -58,16 +58,23 @@ export interface EdgeInfoForImport{
     'attribute'?: string
 }
 
-function constructLexemeMapping(ast: RNode<ParentInformation>): Map<NodeId, string> {
+function constructLexemeMapping(ast: RNode<ParentInformation>): {infoMap:Map<NodeId, string>, locationMap:Map<NodeId,number[]>} {
 	const infoMap = new Map<NodeId, string>()
+	const locationMap = new Map<NodeId, number[]>()
 	visitAst(ast, node => {
 		if(node.lexeme !== undefined){
 			infoMap.set(node.info.id, node.lexeme)
 		}
+		if(node.location != undefined){
+			locationMap.set(node.info.id, node.location)
+		}
+		
 	})
-
-	return infoMap
+	
+	return {infoMap, locationMap}
 }
+
+
 
 export interface VisualizationNodeProps extends Record<string, unknown> {
     label:     string
@@ -80,7 +87,7 @@ export interface VisualizationNodeProps extends Record<string, unknown> {
 
 export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInformation>, dataflowGraph: OtherGraph): VisualizationGraph {
 
-	const infoMap = constructLexemeMapping(ast)
+	const {infoMap, locationMap} = constructLexemeMapping(ast)
 
 	const subflowMap = new Map<number, number>()
 
@@ -107,7 +114,14 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			const idNewNode = String(nodeId) //+ '-subflow-node'
 			const newNode: Node<VisualizationNodeProps> = {
 				id:          idNewNode,
-				data:        { label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag, children: [], nodeCount: dataflowGraph.vertexInformation.length},
+				data:        { 
+					label: infoMap.get(nodeId) ?? '', 
+					nodeType: nodeInfoInfo.tag, 
+					children: [], 
+					nodeCount: dataflowGraph.vertexInformation.length,
+					location: locationMap.get(nodeId) ?? '',
+					originalLexeme: infoMap.get(nodeId) ?? ''
+				},
 				position:    { x: 0, y: 0 },
 				connectable: false,
 				dragging:    true,
@@ -132,7 +146,12 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		const idNewNode = String(nodeId)
 		const newNode: Node<VisualizationNodeProps> = {
 			id:          idNewNode,
-			data:        { label: infoMap.get(nodeId) ?? '', nodeType: nodeInfoInfo.tag,  nodeCount: dataflowGraph.vertexInformation.length},
+			data:        { 
+				label: infoMap.get(nodeId) ?? '', 
+				nodeType: nodeInfoInfo.tag,  
+				nodeCount: dataflowGraph.vertexInformation.length,
+				location: locationMap.get(nodeId) ?? '',
+				originalLexeme: infoMap.get(nodeId) ?? ''},
 			position:    { x: 0, y: 0 },
 			connectable: false,
 			dragging:    true,
@@ -158,7 +177,6 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		}
 	}
 
-	console.log(visualizationGraph.nodesInfo.nodes)
 	const edgeConnection = new Map<number, number[]>()
 	const edgeConnectionString = new TwoKeyMap<string,string, Set<EdgeTypeName>>()
 	const reversedEdgeConnection = new TwoKeyMap<string,string, boolean>()

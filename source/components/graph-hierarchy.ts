@@ -30,11 +30,13 @@ export function foldIntoElkHierarchy(nodes:Node[], rootNodeIds:string[], nodesId
 
 interface ExtendedElkNode extends ElkNode {
   data:{
-    label:     string,
-    nodeType:  string,
-	nodeCount: number,
-    parentId?: string,
+    label:     string
+    nodeType:  string
+	nodeCount: number
+    parentId?: string
     children?: string[]
+	location: number[]
+	originalLexeme: string
   }
  }
 
@@ -130,6 +132,8 @@ function flattenHierarchyNode(currentNode: ElkNode, positionParentNode: XYPositi
 			id:            currentNode.id,
 			nodeType:      (currentNode as ExtendedElkNode).data.nodeType,
 			nodeCount:     (currentNode as ExtendedElkNode).data.nodeCount,
+			location:      (currentNode as ExtendedElkNode).data.location,
+			originalLexeme:(currentNode as ExtendedElkNode).data.originalLexeme,
 			estimatedMinX: absolutePositionX,
 			estimatedMinY: absolutePositionY,
 			estimatedMaxX: absolutePositionX + (currentNode.width ?? 0),

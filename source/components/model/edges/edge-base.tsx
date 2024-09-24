@@ -230,7 +230,9 @@ function rotatePositionOnNodeDegrees(node:Node, intersectionPoint:XYPosition, an
 	if(node.position.x === undefined || node.position.y === undefined || node.measured?.height === undefined || node.measured.width === undefined){
 		throw Error('position or measured dimension undefined')
 	}
-	const nodeMiddle:XYPosition = { x: node.position.x + 1/2 * node.measured.width, y: node.position.y + 1/2 * node.measured.height }
+
+	const positionNode = getAbsolutePosition(node)
+	const nodeMiddle:XYPosition = { x: positionNode.x + 1/2 * node.measured.width, y: positionNode.y + 1/2 * node.measured.height }
 
 	const distanceToMiddle:XYPosition = { x: intersectionPoint.x - nodeMiddle.x, y: intersectionPoint.y - nodeMiddle.y }
 	let degreeFromMiddle  = 0

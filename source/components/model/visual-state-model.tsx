@@ -22,6 +22,8 @@ export class VisualStateModel {
 	deletedNodes: Map<string, Node> = new Map<string, Node>() //deleted Node -> original Node Object
 	nodeCount: number = 0
 	elkDirectionIsHorizontal:boolean = true
+	currentGraphTextInput: string = ''
+	nextGraphTextInput: string = ''
 }
 
 export interface ShownGraph {
