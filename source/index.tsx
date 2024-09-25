@@ -53,7 +53,7 @@ try {
 
 const graphFromOtherGraph: VisualizationGraph = {
 	edgesInfo:     {edges: [], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()},
-	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>(), nodeChildrenMap: new Map<string,string[]>(), nodeCount: 0, rootNodes: []}
+	nodesInfo: { nodes: [], nodeMap: new Map<string,Node>(), nodeChildrenMap: new TwoKeyMap<string,string,boolean>(), nodeCount: 0, rootNodes: []}
 
 }
 

@@ -94,7 +94,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	const nodeIdMap = new Map<string, Node<VisualizationNodeProps>>()
 
-	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new Map<string, string[]>(), nodeCount: 0, rootNodes: []}, edgesInfo: {edges:[], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()}, }
+	const visualizationGraph: VisualizationGraph = { nodesInfo: { nodes: [], nodeMap: nodeIdMap , nodeChildrenMap: new TwoKeyMap<string, string, boolean>(), nodeCount: 0, rootNodes: []}, edgesInfo: {edges:[], edgeConnectionMap: new TwoKeyMap<string,string, Set<EdgeTypeName>>(), reversedEdgeConnectionMap: new TwoKeyMap<string,string, boolean>()}, }
 
 	//source, target, index
 	const argumentIndexMap = new TwoKeyMap<number, number, number>()
@@ -105,11 +105,9 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		const nodeInfoInfo = nodeInfo
 		if(nodeInfoInfo.tag ==='function-definition' && nodeInfoInfo.subflow !== undefined){
 			const subflowArray = nodeInfoInfo.subflow.graph
-			visualizationGraph.nodesInfo.nodeChildrenMap.set(String(nodeId), [])
 			subflowArray.forEach((subNode) => {
 				subflowMap.set(subNode,nodeId)
-				const childrenArray = visualizationGraph.nodesInfo.nodeChildrenMap.get(String(nodeId))
-				childrenArray?.push(String(subNode))
+				visualizationGraph.nodesInfo.nodeChildrenMap.set(String(nodeId), String(subNode), true)
 			})
 
 			const idNewNode = String(nodeId) //+ '-subflow-node'
@@ -145,7 +143,6 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		const nodeInfoInfo = nodeInfo
 
 		const idNewNode = String(nodeId)
-		console.log(idNewNode)
 		const newNode: Node<VisualizationNodeProps> = {
 			id:          idNewNode,
 			data:        { 
@@ -160,7 +157,6 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			selectable:  true,
 			type:        nodeTagMapper(nodeInfoInfo.tag),
 		}
-		console.log(newNode)
 
 		if(!nodeIdMap.has(idNewNode)){
 			nodeIdMap.set(idNewNode, newNode)
@@ -187,7 +183,6 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
 		const listOfConnectedNodes2 = listOfConnectedNodes
 		for(const [targetNodeId] of listOfConnectedNodes2){
-			console.log(sourceNodeId + ', ' + targetNodeId)
 			if(!edgeConnection.has(sourceNodeId)){
 				edgeConnection.set(sourceNodeId, [])
 			}			
@@ -236,7 +231,6 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	const stringIdLocationMap = new Map<string, number[]>()
 	locationMap.forEach((locationArray, numberKey) => {
 		stringIdLocationMap.set(String(numberKey), locationArray)
-		console.log(numberKey + ',' + locationArray)
 	}) 
 	visualStateModel.locationMap = stringIdLocationMap
 	infoMap.forEach((lexeme, nodeId) => {

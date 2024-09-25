@@ -11,9 +11,9 @@ import { transformBuildedEdgesToShowEdges } from "./graph-transition";
 let combineEdgeIdIndex = 1
 
 export function reduceOnFunctionDefinitionNode(reduceNodeId: string):void{
-    const childrenArrayReductionNode = visualStateModel.alteredNodeChildrenMap?.get(reduceNodeId)
+    const childrenMapReductionNode = visualStateModel.alteredNodeChildrenMap.getKey1Map((reduceNodeId)) //get(reduceNodeId)
     const deletedChildrenArray: string[] = [] 
-    childrenArrayReductionNode?.forEach((childId) => {
+    childrenMapReductionNode?.forEach((value, childId) => {
         deleteChildrenAccordingly(reduceNodeId, childId, deletedChildrenArray)
     })
     
@@ -22,7 +22,7 @@ export function reduceOnFunctionDefinitionNode(reduceNodeId: string):void{
 }
 
 function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, deletedChildren: string []): string[]{
-    const childrenArray = visualStateModel.alteredNodeChildrenMap.get(currentNodeId)
+    const childrenArray = visualStateModel.alteredNodeChildrenMap.getKey1Map(currentNodeId)
     
     //remember which node was reduced to which
     visualStateModel.reducedToNodeMapping.set(currentNodeId, reduceNodeId)
@@ -33,12 +33,12 @@ function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, 
 
     
     //If this node has children also reduce this one
-    childrenArray?.forEach((childId) => {
+    childrenArray?.forEach((value, childId) => {
         deleteChildrenAccordingly(reduceNodeId, childId, deletedChildren)
     })
 
     //node has no children anymore
-    visualStateModel.alteredNodeChildrenMap.delete(currentNodeId)
+    visualStateModel.alteredNodeChildrenMap.deleteKey1(currentNodeId)
 
     deletedChildren.push(currentNodeId)
 
@@ -291,31 +291,37 @@ export function reduceAll(reduceNodeId: string){
 
 
 export function expandGeneral(reduceNodeId: string):void{
-
-    if(visualStateModel.originalNodeChildrenMap.has(reduceNodeId)){
-        visualStateModel.alteredNodeChildrenMap.set(reduceNodeId, visualStateModel.originalNodeChildrenMap.get(reduceNodeId) ?? [])
-    }
+    
+    const reduceNodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(reduceNodeId)
+    
 
     //reduced Nodes
     const reducedNodeIds = visualStateModel.nodeContainsReducedNodes.get(reduceNodeId) ?? []
+
+    //correct model for reduce node
+    if(reduceNodeChildrenMap !== undefined){
+        reduceNodeChildrenMap.forEach((dummyValue, childId) => {
+            if(reducedNodeIds.find((idOfReducedNode) => idOfReducedNode === childId) !== undefined){
+                visualStateModel.alteredNodeChildrenMap.set(reduceNodeId, childId, true)
+                visualStateModel.reducedToNodeMapping.delete(childId)
+            }
+        })
+    }
+
     
     //nodes no longer reduced
     visualStateModel.nodeContainsReducedNodes.delete(reduceNodeId)
 
-    //correct model
+    //correct model for node children
     reducedNodeIds.forEach((nodeId) => {
-        if(visualStateModel.originalNodeChildrenMap.has(nodeId)){
-
-            const child = visualStateModel.originalNodeChildrenMap.get(nodeId)?.at(0) ?? ''
-            if(reducedNodeIds.find((reduceNodeId) => reduceNodeId === child) !== undefined){
-                //correct reduced nodes
-                const childrenArray = visualStateModel.originalNodeChildrenMap.get(nodeId) ?? []
-                visualStateModel.alteredNodeChildrenMap.set(nodeId, childrenArray)
-                childrenArray.forEach((childNodeId) => {
-                    visualStateModel.reducedToNodeMapping.delete(childNodeId)
-                })
-            }
-            
+        const nodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(nodeId) 
+        if(nodeChildrenMap !== undefined){
+            nodeChildrenMap.forEach((dummyValue, childId) => {
+                if(reducedNodeIds.find((idOfReducedNode) => idOfReducedNode === childId) !== undefined){
+                    visualStateModel.alteredNodeChildrenMap.set(nodeId, childId, true)
+                    visualStateModel.reducedToNodeMapping.delete(childId)
+                }
+            })
         }
     })
 
@@ -421,7 +427,7 @@ export function expandGeneral(reduceNodeId: string):void{
 
 function reduceGeneral(reduceNodeId: string, deletedChildrenArray: string[]){
 
-    visualStateModel.alteredNodeChildrenMap.delete(reduceNodeId)
+    visualStateModel.alteredNodeChildrenMap.deleteKey1(reduceNodeId)
     //delete Nodes from Array
     setNodesExternal((nodes) => nodes.filter((node) => {
         const doesNodeStayInArray = deletedChildrenArray.find((deletedChildId) => deletedChildId === node.id) === undefined

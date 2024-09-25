@@ -10,7 +10,7 @@ export interface VisualizationGraph {
 export interface NodeInformation{
     nodes:   Node[],
     nodeMap: Map<string, Node>
-    nodeChildrenMap: Map<string, string[]> //parent -> children
+    nodeChildrenMap: TwoKeyMap<string,string,boolean> //parent -> children
     nodeCount:number
     rootNodes:string[]
 }

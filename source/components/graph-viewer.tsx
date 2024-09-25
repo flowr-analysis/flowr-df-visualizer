@@ -182,10 +182,12 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					visualStateModel.nodeCount = g?.nodesInfo.nodeCount ?? nodeCountPerformanceEasement
 					visualStateModel.elkDirectionIsHorizontal = opts['elk.direction'] === 'RIGHT'
 					visualStateModel.currentGraphTextInput = visualStateModel.nextGraphTextInput
-					console.log(visualStateModel.currentGraphTextInput)
+					
 					//set Nodes Information
-					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap ?? new Map<string, string[]>()
-					visualStateModel.alteredNodeChildrenMap = new Map<string, string[]>()
+					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap ?? new TwoKeyMap<string, string, boolean>()
+					visualStateModel.alteredNodeChildrenMap = new TwoKeyMap<string, string, boolean>(visualStateModel.originalNodeChildrenMap)
+					
+					/* 					
 					//copy Children Map
 					visualStateModel.originalNodeChildrenMap?.forEach((childrenArray, parentNodeId) => {
 						const deepCopiedChildrenArray: string[] = []
@@ -193,7 +195,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 							deepCopiedChildrenArray.push(childNodeId)
 						})
 						visualStateModel.alteredNodeChildrenMap?.set(parentNodeId, deepCopiedChildrenArray)
-					})
+					}) */
 
 					//remember copy of each node
 					ns.forEach((node) => {

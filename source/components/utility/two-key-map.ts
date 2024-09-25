@@ -7,6 +7,10 @@ export class TwoKeyMap<K1,K2, V> {
 		this.multiMap.get(key1)?.set(key2, value)
 	}
 
+    deleteKey1(key1: K1):boolean{
+        return this.multiMap.delete(key1)
+    }
+
     getKey1Map(key1: K1):Map<K2, V> | undefined{
         return this.multiMap.get(key1)
     }
