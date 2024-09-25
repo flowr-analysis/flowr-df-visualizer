@@ -7,6 +7,7 @@ import { visitAst } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/process
 import type { RNode } from '@eagleoutice/flowr/r-bridge/lang-4.x/ast/model/model'
 import { DataflowGraph } from '@eagleoutice/flowr/dataflow/graph/graph'
 import { TwoKeyMap } from '../utility/two-key-map'
+import { visualStateModel } from '../..'
 
 export interface OtherGraph{
     'rootVertices':      number[]
@@ -227,6 +228,14 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 
 	//Remember nodeCount
 	visualizationGraph.nodesInfo.nodeCount = dataflowGraph.vertexInformation.length
+
+	//Remember lexeme mapping
+	const stringIdLocationMap = new Map<string, number[]>()
+	locationMap.forEach((locationArray, numberKey) => {
+		stringIdLocationMap.set(String(numberKey), locationArray)
+		console.log(locationArray)
+	})
+	visualStateModel.locationMap = stringIdLocationMap
 
 	//Remember EdgeConnection
 	visualizationGraph.edgesInfo.edgeConnectionMap = edgeConnectionString

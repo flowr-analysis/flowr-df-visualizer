@@ -24,6 +24,7 @@ export class VisualStateModel {
 	elkDirectionIsHorizontal:boolean = true
 	currentGraphTextInput: string = ''
 	nextGraphTextInput: string = ''
+	locationMap: Map<string, number[]> = new Map<string, number[]>()
 }
 
 export interface ShownGraph {

@@ -431,3 +431,85 @@ function reduceGeneral(reduceNodeId: string, deletedChildrenArray: string[]){
 
     updateEdges(reduceNodeId,deletedChildrenArray,visualStateModel.alteredGraph?.edges ?? [])
 }
+
+
+
+function changeReduceLabelOnReduction(reduceNodeId:string){
+    const atomicReducedNodes = getAllReducedNodes(reduceNodeId).concat([reduceNodeId])
+    const locationMap = visualStateModel.locationMap
+    const inputTextSplitPerLine = visualStateModel.currentGraphTextInput.split('\n')
+    //sort by column and line number
+    atomicReducedNodes.sort((firstId, secondId) => {
+        //no location data available
+        if(!locationMap.has(firstId) && !locationMap.has(secondId)){
+            return 0
+        }
+        if(!locationMap.has(firstId)){
+            return -1
+        }
+        if(!locationMap.has(secondId)){
+            return 1
+        }
+        const firstLocationArray = locationMap.get(firstId) ?? [0,0,0,0]
+        const secondLocationArray = locationMap.get(secondId) ?? [0,0,0,0]
+
+        //check if one line number is greater than other
+        if(firstLocationArray[0] < secondLocationArray[0]){
+            return -1
+        } 
+        if(firstLocationArray[0] > secondLocationArray[0]){
+            return 1
+        } 
+        //line numbers are equal check if line number of one is greater than the other
+        if(firstLocationArray[1] < secondLocationArray[1]){
+            return -1
+        } 
+        if(firstLocationArray[1] > secondLocationArray[1]){
+            return 1
+        }
+
+        //both values are equal
+        return 0
+    })
+
+    
+}
+
+function createNewLabelFromGivenReducedNodes(sortedIds: string[], inputTextLineSeparated: string[]):string{
+    //TODO finish
+    const locationMap = visualStateModel.locationMap
+    
+    let lineNumber = 1
+    let positionInLine = 1
+    let indexSortedIds = 0
+    
+    let newLabel = ''
+    while(indexSortedIds < sortedIds.length && !locationMap.has(sortedIds[indexSortedIds])){
+        indexSortedIds++
+    }
+
+    let currentNodeLocation = [0,0,0,0]
+    if(indexSortedIds < sortedIds.length){
+        currentNodeLocation = locationMap.get(sortedIds[indexSortedIds]) ?? [0,0,0,0]
+    }
+    
+    while(indexSortedIds < sortedIds.length && lineNumber <= inputTextLineSeparated.length && positionInLine <= inputTextLineSeparated[lineNumber].length){
+        
+    }
+    return newLabel
+}
+
+function getAllReducedNodes(currentNode: string):string[]{
+    if(visualStateModel.nodeContainsReducedNodes.has(currentNode)){
+        return [currentNode]
+    }
+    const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.get(currentNode) ?? []
+    let containedNodes: string[] = []
+    currentNodeChildren.forEach((childId) => {
+        containedNodes = containedNodes.concat(getAllReducedNodes(childId))
+    })
+
+    return containedNodes
+}
+
+
