@@ -18,6 +18,7 @@ export function reduceOnFunctionDefinitionNode(reduceNodeId: string):void{
     })
     
     reduceGeneral(reduceNodeId, deletedChildrenArray)
+
 }
 
 function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, deletedChildren: string []): string[]{
@@ -415,6 +416,7 @@ export function expandGeneral(reduceNodeId: string):void{
     const newEdgesArray = transformAddEdges(toAddEdges)
     //add the new Edges to the Graph
     setEdgesExternal((edges) => edges.concat(newEdgesArray))
+    resetNodeNames(reducedNodeIds.concat([reduceNodeId]))
 }
 
 function reduceGeneral(reduceNodeId: string, deletedChildrenArray: string[]){
@@ -430,11 +432,12 @@ function reduceGeneral(reduceNodeId: string, deletedChildrenArray: string[]){
     }))
 
     updateEdges(reduceNodeId,deletedChildrenArray,visualStateModel.alteredGraph?.edges ?? [])
+    changeLabelAccordingToReduction(reduceNodeId)
 }
 
 
 
-function changeReduceLabelOnReduction(reduceNodeId:string){
+function changeLabelAccordingToReduction(reduceNodeId:string){
     const atomicReducedNodes = getAllReducedNodes(reduceNodeId).concat([reduceNodeId])
     const locationMap = visualStateModel.locationMap
     const inputTextSplitPerLine = visualStateModel.currentGraphTextInput.split('\n')
@@ -472,6 +475,22 @@ function changeReduceLabelOnReduction(reduceNodeId:string){
         return 0
     })
 
+    const newLabel = createNewLabelFromGivenReducedNodes(atomicReducedNodes, inputTextSplitPerLine)
+
+    //notify reactflow about changes by creating new node object
+    setNodesExternal((nodes) => nodes.map((node) => {
+        if(node.id === reduceNodeId){
+            return {
+                ...node,
+                data:{
+                    ...node.data,
+                    label: newLabel
+                }
+            }
+        }
+        return node
+    }))
+    
     
 }
 
@@ -479,28 +498,121 @@ function createNewLabelFromGivenReducedNodes(sortedIds: string[], inputTextLineS
     //TODO finish
     const locationMap = visualStateModel.locationMap
     
-    let lineNumber = 1
-    let positionInLine = 1
-    let indexSortedIds = 0
+    let currentLineNumber = 1
+    let currentPositionInLine = 1
+    let endLastIndexLineNumber = 1
+    let endLastIndexPositionInLine = 1
+    let currentIndexSortedIds = 0
     
     let newLabel = ''
-    while(indexSortedIds < sortedIds.length && !locationMap.has(sortedIds[indexSortedIds])){
-        indexSortedIds++
+    while(currentIndexSortedIds < sortedIds.length && !locationMap.has(sortedIds[currentIndexSortedIds])){
+        currentIndexSortedIds++
     }
 
     let currentNodeLocation = [0,0,0,0]
-    if(indexSortedIds < sortedIds.length){
-        currentNodeLocation = locationMap.get(sortedIds[indexSortedIds]) ?? [0,0,0,0]
+    if(currentIndexSortedIds < sortedIds.length){
+        currentNodeLocation = locationMap.get(sortedIds[currentIndexSortedIds]) ?? [0,0,0,0]
     }
-    
-    while(indexSortedIds < sortedIds.length && lineNumber <= inputTextLineSeparated.length && positionInLine <= inputTextLineSeparated[lineNumber].length){
-        
+
+    currentLineNumber = currentNodeLocation[0]
+    currentPositionInLine = currentNodeLocation[1]
+    endLastIndexLineNumber = currentLineNumber
+    endLastIndexPositionInLine = currentPositionInLine
+
+    while(currentIndexSortedIds < sortedIds.length && 
+        (currentLineNumber < inputTextLineSeparated.length || (currentLineNumber === inputTextLineSeparated.length && currentPositionInLine <= inputTextLineSeparated[currentLineNumber].length))){
+        currentNodeLocation = locationMap.get(sortedIds[currentIndexSortedIds]) ?? [0,0,0,0]
+        currentLineNumber = currentNodeLocation[0]
+        currentPositionInLine = currentNodeLocation[1]
+
+        const shouldAddText = onlySeparationFreeCharactersInTextPassage(endLastIndexLineNumber, endLastIndexPositionInLine, currentLineNumber, currentPositionInLine, inputTextLineSeparated)
+        if(shouldAddText){
+            newLabel += getPassageFromText(endLastIndexLineNumber, endLastIndexPositionInLine, currentLineNumber, currentPositionInLine, inputTextLineSeparated)
+        } else {
+            //signal that nodes are in between here that do not belong to reduction 
+            newLabel += '||$||' 
+        }
+        newLabel += visualStateModel.lexemeMap.get(sortedIds[currentIndexSortedIds]) ?? ''
+        endLastIndexLineNumber = currentNodeLocation[2]
+        endLastIndexPositionInLine = currentNodeLocation[3]
+        currentIndexSortedIds++
     }
     return newLabel
 }
 
+function onlySeparationFreeCharactersInTextPassage(startLineNumberExclusive: number, startPositionInLineExclusive: number, endLineNumberExclusive: number, endPositionInLineExclusive: number, text: string[]):boolean{
+    
+    //if start equals end or end exceeds start text in between is nonexistent
+    if( startLineNumberExclusive > endLineNumberExclusive || (startLineNumberExclusive === endLineNumberExclusive && startPositionInLineExclusive >= endLineNumberExclusive)){
+        return true
+    }
+
+    let currentLine = startLineNumberExclusive
+    let currentPositionInLine = startPositionInLineExclusive
+    const allowedSymbols = [' ', '\n', '\t', '\{', '\(', '\}', '\)'];
+    
+    ({lineNumber: currentLine, positionInLine: currentPositionInLine} = nextPositionInText(currentLine, currentPositionInLine, text))
+
+    while(currentLine < endLineNumberExclusive || (currentLine === endLineNumberExclusive && currentPositionInLine < endPositionInLineExclusive)){
+        // check if text only contains allowed characters
+        const currentCharacter = text[currentLine - 1].at(currentPositionInLine - 1)
+        if(allowedSymbols.find((symbol) => symbol === currentCharacter) === undefined){
+            return false
+        }
+        //go to next position
+        ({lineNumber: currentLine, positionInLine: currentPositionInLine} = nextPositionInText(currentLine, currentPositionInLine, text))
+    }
+
+    return true
+}
+
+function nextPositionInText(lineNumber: number, positionInLine: number, text: string[]):{lineNumber: number, positionInLine: number}{
+    /*
+    if(lineNumber === text.length && positionInLine === text[text.length - 1].length){
+        return{lineNumber, positionInLine}
+    }
+    */
+
+    if(positionInLine === text[lineNumber - 1].length){
+        lineNumber++
+        positionInLine = 1
+    } else {
+        positionInLine++
+    }
+    return {lineNumber: lineNumber, positionInLine: positionInLine}
+}
+
+
+function getPassageFromText(startLineNumberExclusive: number, startPositionInLineExclusive: number, endLineNumberExclusive: number, endPositionInLineExclusive: number, text: string[]):string{
+    let {lineNumber: currentLineNumber, positionInLine: currentPositionInLine} = nextPositionInText(startLineNumberExclusive, startPositionInLineExclusive, text)
+    let passage = ''
+    let hasSpace = false
+    while(currentLineNumber < endLineNumberExclusive || (currentLineNumber === endLineNumberExclusive && currentPositionInLine < endPositionInLineExclusive)){
+        const nextCharacter = text[currentLineNumber - 1].at(currentPositionInLine - 1) ?? ''
+        //ignore multiple spaces in a row
+        if(nextCharacter !== ' '){
+            passage += nextCharacter
+            hasSpace = false
+        } else if(nextCharacter === ' ' && !hasSpace){
+            passage += nextCharacter
+            hasSpace = true
+        }
+
+        const {lineNumber: nextLineNumber, positionInLine: nextPositionInLine} = nextPositionInText(currentLineNumber, currentPositionInLine, text)
+        
+        if(currentLineNumber !== nextLineNumber){
+            passage += (hasSpace ? '' : ' ') + '\\n '
+        }
+
+        currentLineNumber = nextLineNumber
+        currentPositionInLine = nextPositionInLine
+    }
+    
+    return passage
+}
+
 function getAllReducedNodes(currentNode: string):string[]{
-    if(visualStateModel.nodeContainsReducedNodes.has(currentNode)){
+    if(!visualStateModel.nodeContainsReducedNodes.has(currentNode)){
         return [currentNode]
     }
     const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.get(currentNode) ?? []
@@ -512,4 +624,28 @@ function getAllReducedNodes(currentNode: string):string[]{
     return containedNodes
 }
 
-
+function resetNodeNames(nameResetNodeIds:string[]){
+    const renameMap = new Map<string,string>()
+    nameResetNodeIds.forEach((nodeId) => {
+        const isReduced = visualStateModel.nodeContainsReducedNodes.has(nodeId)
+        if(isReduced){
+            changeLabelAccordingToReduction(nodeId)
+        } else {
+            const originalLexeme = visualStateModel.lexemeMap.get(nodeId) ?? ''
+            renameMap.set(nodeId, originalLexeme)
+        }
+        
+    })
+    setNodesExternal((nodes) => nodes.map((node) => {
+        if(renameMap.has(node.id)){
+            return {
+                ...node,
+                data:{
+                    ...node.data,
+                    label: renameMap.get(node.id)
+                }
+            }
+        }
+        return node
+    }))
+}

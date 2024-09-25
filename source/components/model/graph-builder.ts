@@ -145,6 +145,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 		const nodeInfoInfo = nodeInfo
 
 		const idNewNode = String(nodeId)
+		console.log(idNewNode)
 		const newNode: Node<VisualizationNodeProps> = {
 			id:          idNewNode,
 			data:        { 
@@ -159,7 +160,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			selectable:  true,
 			type:        nodeTagMapper(nodeInfoInfo.tag),
 		}
-
+		console.log(newNode)
 
 		if(!nodeIdMap.has(idNewNode)){
 			nodeIdMap.set(idNewNode, newNode)
@@ -186,6 +187,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	for( const [sourceNodeId, listOfConnectedNodes] of dataflowGraph.edgeInformation){
 		const listOfConnectedNodes2 = listOfConnectedNodes
 		for(const [targetNodeId] of listOfConnectedNodes2){
+			console.log(sourceNodeId + ', ' + targetNodeId)
 			if(!edgeConnection.has(sourceNodeId)){
 				edgeConnection.set(sourceNodeId, [])
 			}			
@@ -230,12 +232,17 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 	visualizationGraph.nodesInfo.nodeCount = dataflowGraph.vertexInformation.length
 
 	//Remember lexeme mapping
+	const stringLexemeMapping = new Map<string, string>() 
 	const stringIdLocationMap = new Map<string, number[]>()
 	locationMap.forEach((locationArray, numberKey) => {
 		stringIdLocationMap.set(String(numberKey), locationArray)
-		console.log(locationArray)
-	})
+		console.log(numberKey + ',' + locationArray)
+	}) 
 	visualStateModel.locationMap = stringIdLocationMap
+	infoMap.forEach((lexeme, nodeId) => {
+		stringLexemeMapping.set(String(nodeId), lexeme)
+	})
+	visualStateModel.lexemeMap = stringLexemeMapping
 
 	//Remember EdgeConnection
 	visualizationGraph.edgesInfo.edgeConnectionMap = edgeConnectionString
