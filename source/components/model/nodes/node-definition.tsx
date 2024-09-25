@@ -122,9 +122,10 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
 	const divStyle: React.CSSProperties = {}
 	divStyle.width = estimatedMaxX - estimatedMinX
 	divStyle.height = estimatedMaxY - estimatedMinY
+	
 	return (
 		<>
-			<ReduceComponent id ={id} onReduce={() => reduceOnFunctionDefinitionNode(id)} onExpand={() => expandOnFunctionCallNode(id)
+			<ReduceComponent data = {data} id ={id} onReduce={() => reduceOnFunctionDefinitionNode(id)} onExpand={() => expandOnFunctionCallNode(id)
 			}>
 			<NodeResizer lineClassName='function-definition-node function-definition-node-resizer-line' handleClassName='function-definition-node function-definition-node-resizer-edge-dot' />
 			<BodyNodeComponent data = {data} className='function-definition-node base-node'/>
@@ -165,12 +166,15 @@ interface ReduceComponentProps{
 	onReduce: () => void
 	onExpand:() => void
 	id: string
+	data: NodeProps['data']
 }
-const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> = ({id, onReduce, onExpand, children}) => {
-	
+const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> = ({id, data, onReduce, onExpand, children}) => {
+	const isReducedOn = data.isReducedOn as boolean
 	const idReduceButton = id + '-reduce-hover-over-button'
 	const idExpandButton = id + '-expand-button'
-
+	const classNameReduceButton = 'reduce-component-hover-button' + (isReducedOn ? ' reduce-hidden' : '')
+	const classNameExpandButton = (isReducedOn ? '' : ' reduce-hidden')
+	
 	return <>
 		<button onClick = {() => {
 			onExpand()
@@ -178,8 +182,9 @@ const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> =
 			expandButton.classList.toggle('reduce-hidden')
 			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
 			reduceButton.classList.toggle('reduce-hidden')
+			data.isReducedOn = false
 		}} 
-		id = {idExpandButton} className='reduce-hidden'>Expand</button>
+		id = {idExpandButton} className={classNameExpandButton}>Expand</button>
 		<div className = 'reduce-hover-over' id = {id + '-hover-div'}> 
 			{children}
 		</div>
@@ -189,7 +194,8 @@ const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> =
 			expandButton.classList.toggle('reduce-hidden')
 			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
 			reduceButton.classList.toggle('reduce-hidden')
+			data.isReducedOn = true
 		}} 
-		id = {idReduceButton} className='reduce-component-hover-button'>Reduce</button>		
+		id = {idReduceButton} className={classNameReduceButton}>Reduce</button>		
 	</>
 }

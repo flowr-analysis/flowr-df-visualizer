@@ -134,6 +134,7 @@ function flattenHierarchyNode(currentNode: ElkNode, positionParentNode: XYPositi
 			nodeCount:     (currentNode as ExtendedElkNode).data.nodeCount,
 			location:      (currentNode as ExtendedElkNode).data.location,
 			originalLexeme:(currentNode as ExtendedElkNode).data.originalLexeme,
+			isReducedOn:   false,
 			estimatedMinX: absolutePositionX,
 			estimatedMinY: absolutePositionY,
 			estimatedMaxX: absolutePositionX + (currentNode.width ?? 0),
