@@ -196,7 +196,9 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 
 					//Remember which nodes have been reduced to which 
 					visualStateModel.reducedToNodeMapping = new Map<string,string>()
-					visualStateModel.originalGraph.nodes.forEach((node) => { visualStateModel.reducedToNodeMapping?.set(node.id, node.id)})
+					//visualStateModel.originalGraph.nodes.forEach((node) => { visualStateModel.reducedToNodeMapping?.set(node.id, node.id)})
+
+					console.log(visualStateModel)
 
 					setNodes(visualStateModel.alteredGraph?.nodes)
 					setEdges(visualStateModel.alteredGraph?.edges)

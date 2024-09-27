@@ -305,9 +305,6 @@ export function reduceAll(reduceNodeId: string){
 
 
 export function expandGeneral(reduceNodeId: string):void{
-    
-    const reduceNodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(reduceNodeId)
-    
 
     //reduced Nodes
     const reducedNodeIdsMap = visualStateModel.nodeContainsReducedNodes.getKey1Map(reduceNodeId) ?? new Map<string,number>() 
@@ -320,13 +317,13 @@ export function expandGeneral(reduceNodeId: string):void{
         const secondIndexValue = reducedNodeIdsMap.get(secondId) ?? 0
         return firstIndexValue - secondIndexValue
     })
-
+    
     //correct model for reduce node
+    const reduceNodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(reduceNodeId)
     if(reduceNodeChildrenMap !== undefined){
         reduceNodeChildrenMap.forEach((dummyValue, childId) => {
             if(reducedNodeIdsMap.has(childId)){
                 visualStateModel.alteredNodeChildrenMap.set(reduceNodeId, childId, true)
-                visualStateModel.reducedToNodeMapping.delete(childId)
             }
         })
     }
@@ -338,13 +335,9 @@ export function expandGeneral(reduceNodeId: string):void{
     //correct model for node children
     reducedNodeIds.forEach((nodeId) => {
         visualStateModel.reducedToNodeMapping.delete(nodeId)
-        const nodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(nodeId) 
-        if(nodeChildrenMap !== undefined){
-            nodeChildrenMap.forEach((dummyValue, childId) => {
-                if(reducedNodeIdsMap.has(childId)){
-                    visualStateModel.alteredNodeChildrenMap.set(nodeId, childId, true)
-                }
-            })
+        const parentId = visualStateModel.childToParentMap.get(nodeId)
+        if(parentId !== undefined){
+            visualStateModel.alteredNodeChildrenMap.set(parentId, nodeId, true)
         }
     })
     
@@ -363,8 +356,8 @@ export function expandGeneral(reduceNodeId: string):void{
         newNodesArray.forEach((node) => visualStateModel.nodeMap.set(node.id, node))
         return newNodesArray
     })
-
-    resizeParents([reduceNodeId].concat(reducedNodeIds), visualStateModel)
+    const parentChildNodes = [reduceNodeId].concat(reducedNodeIds)
+    resizeParents(parentChildNodes, visualStateModel)
 
     const deletedEdges:EdgeSourceTarget[] = [] //delete combined edges that go from and to the reduction node
     const deleteEdgesMap: TwoKeyMap<string, string, boolean> = new TwoKeyMap<string, string, boolean>()
