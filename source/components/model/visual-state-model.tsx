@@ -14,6 +14,7 @@ export class VisualStateModel {
 	originalReversedEdgeConnectionMap:TwoKeyMap<string,string, boolean> = new TwoKeyMap<string,string, boolean>() // target -> source
 	alteredNodeChildrenMap: TwoKeyMap<string,string, boolean> = new TwoKeyMap<string,string, boolean>()//parent -> children
 	originalNodeChildrenMap: TwoKeyMap<string,string, boolean> = new TwoKeyMap<string,string, boolean>()  //parent -> children
+	childToParentMap: Map<string, string> = new Map<string, string>() // child ->  parent 
 	nodeContainsReducedNodes: Map<string, string[]> = new Map<string, string[]>() //reductionNode -> deletedNodes
 	reducedToNodeMapping: Map<string, string> = new Map<string, string>() // deletedNode -> reducedNode
 	deletedEdges: TwoKeyMap<string, string, Edge[]> = new TwoKeyMap<string, string, Edge[]>() //

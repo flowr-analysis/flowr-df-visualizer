@@ -7,15 +7,13 @@ import { generateEdge } from "./graph-builder";
 import { EdgeInfo, VisualStateModel } from "./visual-state-model";
 import { TwoKeyMap } from "../utility/two-key-map";
 import { transformBuildedEdgesToShowEdges } from "./graph-transition";
+import { resizeParents } from "./nodes/parent-resizer";
 
 let combineEdgeIdIndex = 1
 
 export function reduceOnFunctionDefinitionNode(reduceNodeId: string):void{
-    const childrenMapReductionNode = visualStateModel.alteredNodeChildrenMap.getKey1Map((reduceNodeId)) //get(reduceNodeId)
     const deletedChildrenArray: string[] = [] 
-    childrenMapReductionNode?.forEach((value, childId) => {
-        deleteChildrenAccordingly(reduceNodeId, childId, deletedChildrenArray)
-    })
+    deleteChildrenAccordingly(reduceNodeId, reduceNodeId, deletedChildrenArray)
     
     reduceGeneral(reduceNodeId, deletedChildrenArray)
 
@@ -25,12 +23,15 @@ function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, 
     const childrenArray = visualStateModel.alteredNodeChildrenMap.getKey1Map(currentNodeId)
     
     //remember which node was reduced to which
-    visualStateModel.reducedToNodeMapping.set(currentNodeId, reduceNodeId)
-    if(!visualStateModel.nodeContainsReducedNodes.has(reduceNodeId)){
-        visualStateModel.nodeContainsReducedNodes.set(reduceNodeId, [])
-    }
-    visualStateModel.nodeContainsReducedNodes.get(reduceNodeId)?.push(currentNodeId)
+    if(reduceNodeId !== currentNodeId){
+        visualStateModel.reducedToNodeMapping.set(currentNodeId, reduceNodeId)
+        if(!visualStateModel.nodeContainsReducedNodes.has(reduceNodeId)){
+            visualStateModel.nodeContainsReducedNodes.set(reduceNodeId, [])
+        }
+        visualStateModel.nodeContainsReducedNodes.get(reduceNodeId)?.push(currentNodeId)
 
+        deletedChildren.push(currentNodeId)
+    }
     
     //If this node has children also reduce this one
     childrenArray?.forEach((value, childId) => {
@@ -40,7 +41,7 @@ function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, 
     //node has no children anymore
     visualStateModel.alteredNodeChildrenMap.deleteKey1(currentNodeId)
 
-    deletedChildren.push(currentNodeId)
+
 
     return deletedChildren
 }
@@ -324,7 +325,7 @@ export function expandGeneral(reduceNodeId: string):void{
             })
         }
     })
-
+    
     //include reduced nodes back again in graph
     const nodeObjects:Node[] = []
     reducedNodeIds.forEach((nodeId) => {
@@ -334,7 +335,14 @@ export function expandGeneral(reduceNodeId: string):void{
         }
         visualStateModel.deletedNodes.delete(nodeId)
     })
-    setNodesExternal((nodes) => nodes.concat(nodeObjects))
+
+    setNodesExternal((nodes) => {
+        const newNodesArray = nodes.concat(nodeObjects)
+        newNodesArray.forEach((node) => visualStateModel.nodeMap.set(node.id, node))
+        return newNodesArray
+    })
+
+    resizeParents([reduceNodeId].concat(reducedNodeIds), visualStateModel)
 
     const deletedEdges:EdgeSourceTarget[] = [] //delete combined edges that go from and to the reduction node
     const deleteEdgesMap: TwoKeyMap<string, string, boolean> = new TwoKeyMap<string, string, boolean>()
@@ -654,4 +662,9 @@ function resetNodeNames(nameResetNodeIds:string[]){
         }
         return node
     }))
+}
+
+
+function reduceClosestNeighbors(reduceNodeId:string){
+
 }

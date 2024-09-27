@@ -108,6 +108,7 @@ export function transformToVisualizationGraphForOtherGraph(ast: RNode<ParentInfo
 			subflowArray.forEach((subNode) => {
 				subflowMap.set(subNode,nodeId)
 				visualizationGraph.nodesInfo.nodeChildrenMap.set(String(nodeId), String(subNode), true)
+				visualStateModel.childToParentMap.set(String(subNode),String(nodeId))
 			})
 
 			const idNewNode = String(nodeId) //+ '-subflow-node'

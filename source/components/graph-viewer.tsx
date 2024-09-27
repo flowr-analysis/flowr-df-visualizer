@@ -1,7 +1,7 @@
 import type { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js'
 import ELK from 'elkjs/lib/elk.bundled.js'
 import React, { Children, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import type { Edge, Node } from '@xyflow/react'
+import type { Edge, Node, OnNodesChange } from '@xyflow/react'
 import {
 	ReactFlow,
 	useNodesState,
@@ -118,6 +118,7 @@ export function reloadGraph(){
 
 export let setEdgesExternal: React.Dispatch<React.SetStateAction<Edge[]>>
 export let setNodesExternal: React.Dispatch<React.SetStateAction<Node[]>>
+export let onNodesChangeExternal: OnNodesChange<Node>
 
 export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : LayoutFlowProps) {
 	const [currentGraph, setCurrentGraph] = useState(graph)
@@ -129,6 +130,7 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 
 	setEdgesExternal = setEdges
 	setNodesExternal = setNodes
+	onNodesChangeExternal = onNodesChange
 
 	const [isNodeIdShown, setIsNodeIdShown] = useState(false)
 
@@ -186,16 +188,6 @@ export function LayoutFlow({ graph, assignGraphUpdater, visualStateModel } : Lay
 					//set Nodes Information
 					visualStateModel.originalNodeChildrenMap = g?.nodesInfo.nodeChildrenMap ?? new TwoKeyMap<string, string, boolean>()
 					visualStateModel.alteredNodeChildrenMap = new TwoKeyMap<string, string, boolean>(visualStateModel.originalNodeChildrenMap)
-					
-					/* 					
-					//copy Children Map
-					visualStateModel.originalNodeChildrenMap?.forEach((childrenArray, parentNodeId) => {
-						const deepCopiedChildrenArray: string[] = []
-						childrenArray.forEach((childNodeId) => {
-							deepCopiedChildrenArray.push(childNodeId)
-						})
-						visualStateModel.alteredNodeChildrenMap?.set(parentNodeId, deepCopiedChildrenArray)
-					}) */
 
 					//remember copy of each node
 					ns.forEach((node) => {
