@@ -3,8 +3,6 @@ import { onNodesChangeExternal } from "../../graph-viewer";
 import { visualStateModel } from "../../..";
 import { VisualStateModel } from "../visual-state-model";
 
-
-
 export function resizeParents(parentAndChildNodes: string[], visualStateModel: VisualStateModel):void{
     const nodesToChange:Map<string, Dimensions> = new Map<string, Dimensions>()
     //go backwards through array because childNodes are somewhere behind the parent node in the array
@@ -14,8 +12,7 @@ export function resizeParents(parentAndChildNodes: string[], visualStateModel: V
             const parentId = visualStateModel.childToParentMap.get(currentNodeId) ?? ''
             const parentObject = visualStateModel.nodeMap.get(parentId)
             const childObject = visualStateModel.nodeMap.get(currentNodeId)
-            console.log(parentObject)
-            console.log(childObject)
+
             if(parentObject !== undefined && childObject !== undefined){
                 //get children dimensions
                 const isChildAlreadyResized = nodesToChange.has(currentNodeId)

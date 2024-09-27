@@ -25,12 +25,20 @@ export class TwoKeyMap<K1,K2, V> {
     has(key1: K1, key2: K2):boolean{
         return this.multiMap.has(key1) ? (this.multiMap.get(key1)?.has(key2) ?? false) : false
     }
+    hasKey1(key1: K1):boolean{
+        return this.multiMap.has(key1)
+    }
+
     delete(key1: K1, key2: K2):boolean{
         const map = this.multiMap.get(key1)
         if(map === undefined){
             return false
         }
-        return map.delete(key2)
+        const toReturn = map.delete(key2)
+        if(map.size === 0){
+            this.multiMap.delete(key1)
+        }
+        return toReturn
     }
 
     forEach(callbackfn:(value:V, key1:K1, key2:K2) => void):void{

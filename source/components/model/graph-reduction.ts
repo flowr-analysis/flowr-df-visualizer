@@ -12,40 +12,53 @@ import { resizeParents } from "./nodes/parent-resizer";
 let combineEdgeIdIndex = 1
 
 export function reduceOnFunctionDefinitionNode(reduceNodeId: string):void{
-    const deletedChildrenArray: string[] = [] 
-    deleteChildrenAccordingly(reduceNodeId, reduceNodeId, deletedChildrenArray)
-    
+    const deletedChildrenArray: string[] = determineChildNodes(reduceNodeId)
     reduceGeneral(reduceNodeId, deletedChildrenArray)
-
 }
 
-function deleteChildrenAccordingly(reduceNodeId: string, currentNodeId: string, deletedChildren: string []): string[]{
+/**
+ * returns all child nodes and also children's children (recursive)
+ * @param reduceNodeId 
+ * @param currentNodeId node 
+ * @returns array of all child nodes that has parents in front of children in the array
+ */
+function determineChildNodes(currentNodeId: string): string[]{
     const childrenArray = visualStateModel.alteredNodeChildrenMap.getKey1Map(currentNodeId)
-    
-    //remember which node was reduced to which
-    if(reduceNodeId !== currentNodeId){
-        visualStateModel.reducedToNodeMapping.set(currentNodeId, reduceNodeId)
-        if(!visualStateModel.nodeContainsReducedNodes.has(reduceNodeId)){
-            visualStateModel.nodeContainsReducedNodes.set(reduceNodeId, [])
-        }
-        visualStateModel.nodeContainsReducedNodes.get(reduceNodeId)?.push(currentNodeId)
+    let childArray: string[] = []
 
-        deletedChildren.push(currentNodeId)
-    }
-    
     //If this node has children also reduce this one
-    childrenArray?.forEach((value, childId) => {
-        deleteChildrenAccordingly(reduceNodeId, childId, deletedChildren)
+    childrenArray?.forEach((dummyValue, childId) => {
+        childArray = childArray.concat(determineChildNodesHelper(childId))
     })
 
-    //node has no children anymore
-    visualStateModel.alteredNodeChildrenMap.deleteKey1(currentNodeId)
-
-
-
-    return deletedChildren
+    return childArray
 }
 
+
+/**
+ * helper function to not include the parent in
+ * @param currentNodeId 
+ * @returns 
+ */
+function determineChildNodesHelper(currentNodeId:string):string[]{
+    const childrenArray = visualStateModel.alteredNodeChildrenMap.getKey1Map(currentNodeId)
+    let childArray: string[] = [currentNodeId]
+
+    //If this node has children also reduce this one
+    childrenArray?.forEach((dummyValue, childId) => {
+        childArray = childArray.concat(determineChildNodesHelper(childId))
+    })
+
+    return childArray
+}
+
+function setReducedNodeMapping(reduceNodeId: string, childReduceNodeId: string): void{
+    if(reduceNodeId !== childReduceNodeId){
+        visualStateModel.reducedToNodeMapping.set(childReduceNodeId, reduceNodeId)
+        const currentMapIndex = visualStateModel.nodeContainsReducedNodes.getKey1Map(reduceNodeId)?.size ?? 0
+        visualStateModel.nodeContainsReducedNodes.set(reduceNodeId, childReduceNodeId, currentMapIndex)
+    }
+}
 
 function updateEdges(reduceNodeId: string, deletedNodesIdArray: string[], edges: Edge[]):void{
     const deletedEdges: EdgeSourceTarget[] = []
@@ -297,12 +310,21 @@ export function expandGeneral(reduceNodeId: string):void{
     
 
     //reduced Nodes
-    const reducedNodeIds = visualStateModel.nodeContainsReducedNodes.get(reduceNodeId) ?? []
+    const reducedNodeIdsMap = visualStateModel.nodeContainsReducedNodes.getKey1Map(reduceNodeId) ?? new Map<string,number>() 
+    const reducedNodeIds:string[] = []
+    reducedNodeIdsMap.forEach((index, reducedNodeId)=>{
+        reducedNodeIds.push(reducedNodeId)
+    })
+    reducedNodeIds.sort((firstId, secondId) => {
+        const firstIndexValue = reducedNodeIdsMap.get(firstId) ?? 0
+        const secondIndexValue = reducedNodeIdsMap.get(secondId) ?? 0
+        return firstIndexValue - secondIndexValue
+    })
 
     //correct model for reduce node
     if(reduceNodeChildrenMap !== undefined){
         reduceNodeChildrenMap.forEach((dummyValue, childId) => {
-            if(reducedNodeIds.find((idOfReducedNode) => idOfReducedNode === childId) !== undefined){
+            if(reducedNodeIdsMap.has(childId)){
                 visualStateModel.alteredNodeChildrenMap.set(reduceNodeId, childId, true)
                 visualStateModel.reducedToNodeMapping.delete(childId)
             }
@@ -311,14 +333,14 @@ export function expandGeneral(reduceNodeId: string):void{
 
     
     //nodes no longer reduced
-    visualStateModel.nodeContainsReducedNodes.delete(reduceNodeId)
+    visualStateModel.nodeContainsReducedNodes.deleteKey1(reduceNodeId)
 
     //correct model for node children
     reducedNodeIds.forEach((nodeId) => {
         const nodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(nodeId) 
         if(nodeChildrenMap !== undefined){
             nodeChildrenMap.forEach((dummyValue, childId) => {
-                if(reducedNodeIds.find((idOfReducedNode) => idOfReducedNode === childId) !== undefined){
+                if(reducedNodeIdsMap.has(childId)){
                     visualStateModel.alteredNodeChildrenMap.set(nodeId, childId, true)
                     visualStateModel.reducedToNodeMapping.delete(childId)
                 }
@@ -433,19 +455,44 @@ export function expandGeneral(reduceNodeId: string):void{
     resetNodeNames(reducedNodeIds.concat([reduceNodeId]))
 }
 
-function reduceGeneral(reduceNodeId: string, deletedChildrenArray: string[]){
+/**
+ * sets the underlying model correctly and updates the view
+ * @param reduceNodeId node to reduce to
+ * @param allReducedNodeIdsArray all to reduced nodes
+ */
+function reduceGeneral(reduceNodeId: string, allReducedNodeIdsArray: string[]){
 
     visualStateModel.alteredNodeChildrenMap.deleteKey1(reduceNodeId)
+
+    //parents need to be in front of the children in the array
+    allReducedNodeIdsArray.sort((firstId, secondId) => {
+        if(visualStateModel.originalNodeChildrenMap.has(firstId, secondId)){
+            return -1
+        } else if(visualStateModel.originalNodeChildrenMap.has(secondId, firstId)){
+            return 1
+        }
+        return 0
+    })
+
+    //correct Child Mapping
+    allReducedNodeIdsArray.forEach((nodeId) => {
+        if(visualStateModel.childToParentMap.has(nodeId)){
+            const parentId = visualStateModel.childToParentMap.get(nodeId) ?? ''
+            visualStateModel.alteredNodeChildrenMap.delete(parentId, nodeId)
+        }
+        setReducedNodeMapping(reduceNodeId, nodeId)
+    })
+
     //delete Nodes from Array
     setNodesExternal((nodes) => nodes.filter((node) => {
-        const doesNodeStayInArray = deletedChildrenArray.find((deletedChildId) => deletedChildId === node.id) === undefined
+        const doesNodeStayInArray = allReducedNodeIdsArray.find((deletedChildId) => deletedChildId === node.id) === undefined
         if(!doesNodeStayInArray){
             visualStateModel.deletedNodes.set(node.id , node)
         }
         return doesNodeStayInArray
     }))
 
-    updateEdges(reduceNodeId,deletedChildrenArray,visualStateModel.alteredGraph?.edges ?? [])
+    updateEdges(reduceNodeId,allReducedNodeIdsArray,visualStateModel.alteredGraph?.edges ?? [])
     changeLabelAccordingToReduction(reduceNodeId)
 }
 
@@ -534,7 +581,7 @@ function createNewLabelFromGivenReducedNodes(sortedIds: string[], inputTextLineS
     endLastIndexPositionInLine = currentPositionInLine
 
     while(currentIndexSortedIds < sortedIds.length && 
-        (currentLineNumber < inputTextLineSeparated.length || (currentLineNumber === inputTextLineSeparated.length && currentPositionInLine <= inputTextLineSeparated[currentLineNumber].length))){
+        (currentLineNumber < inputTextLineSeparated.length || (currentLineNumber === inputTextLineSeparated.length && currentPositionInLine <= inputTextLineSeparated[currentLineNumber - 1].length))){
         currentNodeLocation = locationMap.get(sortedIds[currentIndexSortedIds]) ?? [0,0,0,0]
         currentLineNumber = currentNodeLocation[0]
         currentPositionInLine = currentNodeLocation[1]
@@ -626,12 +673,12 @@ function getPassageFromText(startLineNumberExclusive: number, startPositionInLin
 }
 
 function getAllReducedNodes(currentNode: string):string[]{
-    if(!visualStateModel.nodeContainsReducedNodes.has(currentNode)){
+    if(!visualStateModel.nodeContainsReducedNodes.hasKey1(currentNode)){
         return [currentNode]
     }
-    const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.get(currentNode) ?? []
+    const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.getKey1Map(currentNode) ?? new Map<string,number>()
     let containedNodes: string[] = []
-    currentNodeChildren.forEach((childId) => {
+    currentNodeChildren.forEach((dummyValue, childId) => {
         containedNodes = containedNodes.concat(getAllReducedNodes(childId))
     })
 
@@ -641,7 +688,7 @@ function getAllReducedNodes(currentNode: string):string[]{
 function resetNodeNames(nameResetNodeIds:string[]){
     const renameMap = new Map<string,string>()
     nameResetNodeIds.forEach((nodeId) => {
-        const isReduced = visualStateModel.nodeContainsReducedNodes.has(nodeId)
+        const isReduced = visualStateModel.nodeContainsReducedNodes.hasKey1(nodeId)
         if(isReduced){
             changeLabelAccordingToReduction(nodeId)
         } else {
@@ -665,6 +712,24 @@ function resetNodeNames(nameResetNodeIds:string[]){
 }
 
 
-function reduceClosestNeighbors(reduceNodeId:string){
-
+export function reduceAllNodesDirectlyPointedAt(reduceNodeId:string){
+    const allNeighbors = visualStateModel.alteredEdgeConnectionMap.getKey1Map(reduceNodeId)
+    let toReduceNodes: string[] = []
+    let toReduceNodesMap: Map<string,boolean> = new Map<string,boolean>()  
+    if(allNeighbors !== undefined){
+        allNeighbors.forEach((dummyValue, neighborId) => {
+            if(!toReduceNodesMap.has(neighborId)){
+                toReduceNodes.push(neighborId)
+                toReduceNodesMap.set(neighborId, true)
+                const neighborChildren = determineChildNodes(neighborId)
+                neighborChildren.forEach((childId) => {
+                    if(!toReduceNodesMap.has(childId)){
+                        toReduceNodes.push(childId)
+                        toReduceNodesMap.set(childId, true)
+                    }
+                })
+            }
+        })
+    }
+    reduceGeneral(reduceNodeId, toReduceNodes)
 }

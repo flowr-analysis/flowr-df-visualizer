@@ -5,7 +5,7 @@ import React from 'react'
 
 import { getEdgeParams } from '../edges/edge-base'
 import { VisualStateModel } from '../visual-state-model'
-import { expandOnFunctionCallNode, reduceOnFunctionDefinitionNode } from '../graph-reduction'
+import { expandGeneral, expandOnFunctionCallNode, reduceAllNodesDirectlyPointedAt, reduceOnFunctionDefinitionNode } from '../graph-reduction'
 
 
 function FloatingConnectionLine(props: ConnectionLineComponentProps) {
@@ -65,6 +65,7 @@ interface BodyNodeComponentProps{
 }
 
 interface NodeComponentProps {
+  readonly id: string
   readonly data: NodeProps['data']
 }
 
@@ -99,16 +100,28 @@ export const HoverOverComponent: React.FC<HoverOverComponentProps> = ({ name, id
 	)
 }
 
-export const VariableDefinitionNode: React.FC<NodeComponentProps> = ({ data }) => {
-	return <BodyNodeComponent data={data} className='variable-definition-node base-node'/>
+export const VariableDefinitionNode: React.FC<NodeComponentProps> = ({ data, id }) => {
+	return (
+		<ReduceComponent data = {data} id ={id} onReduce={() => reduceAllNodesDirectlyPointedAt(id)} onExpand={() => expandGeneral(id)}>
+			<BodyNodeComponent data={data} className='variable-definition-node base-node'/>
+		</ReduceComponent> 
+		)
 }
 
-export const UseNode: React.FC<NodeComponentProps> = ({ data }) => {
-	return <BodyNodeComponent data={data} className='use-node base-node'/>
+export const UseNode: React.FC<NodeComponentProps> = ({ data, id }) => {
+	return (
+		<ReduceComponent data = {data} id ={id} onReduce={() => reduceAllNodesDirectlyPointedAt(id)} onExpand={() => expandGeneral(id)}>
+			<BodyNodeComponent data={data} className='use-node base-node'/>
+		</ReduceComponent> 
+		)
 }
 
-export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data }) => {
-	return <BodyNodeComponent data={data} className='function-call-node base-node'/>
+export const FunctionCallNode: React.FC<NodeComponentProps> = ({ data, id }) => {
+	return (
+		<ReduceComponent data = {data} id ={id} onReduce={() => reduceAllNodesDirectlyPointedAt(id)} onExpand={() => expandGeneral(id)}>
+			<BodyNodeComponent data={data} className='function-call-node base-node'/>
+		</ReduceComponent> 
+		)
 }
 
 
@@ -135,12 +148,20 @@ export const FunctionDefinitionNode: React.FC<NodeProps> = ({ id, data, selected
 	)
 }
 
-export const ExitPointNode: React.FC<NodeComponentProps> = ({ data }) => {
-	return <BodyNodeComponent data={data} className='exit-point-node base-node'/>
+export const ExitPointNode: React.FC<NodeComponentProps> = ({ data, id }) => {
+	return (
+		<ReduceComponent data = {data} id ={id} onReduce={() => reduceAllNodesDirectlyPointedAt(id)} onExpand={() => expandGeneral(id)}>
+			<BodyNodeComponent data={data} className='exit-point-node base-node'/>
+		</ReduceComponent> 
+		)
 }
 
-export const ValueNode: React.FC<NodeComponentProps> = ({ data }) => {
-	return <BodyNodeComponent data={data} className='value-node base-node'/>
+export const ValueNode: React.FC<NodeComponentProps> = ({ data, id }) => {
+	return (
+		<ReduceComponent data = {data} id ={id} onReduce={() => reduceAllNodesDirectlyPointedAt(id)} onExpand={() => expandGeneral(id)}>
+			<BodyNodeComponent data={data} className='value-node base-node'/>
+		</ReduceComponent> 
+		)
 }
 
 export const GroupNode: React.FC<NodeComponentProps> = ({ data }) => {
