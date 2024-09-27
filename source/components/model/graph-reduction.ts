@@ -492,7 +492,7 @@ function reduceGeneral(reduceNodeId: string, allReducedNodeIdsArray: string[]){
 
 
 function changeLabelAccordingToReduction(reduceNodeId:string){
-    const atomicReducedNodes = getAllReducedNodes(reduceNodeId).concat([reduceNodeId])
+    const atomicReducedNodes = getAllReducedNodes(reduceNodeId)
     const locationMap = visualStateModel.locationMap
     const inputTextSplitPerLine = visualStateModel.currentGraphTextInput.split('\n')
     //sort by column and line number
@@ -528,7 +528,6 @@ function changeLabelAccordingToReduction(reduceNodeId:string){
         //both values are equal
         return 0
     })
-
     const newLabel = createNewLabelFromGivenReducedNodes(atomicReducedNodes, inputTextSplitPerLine)
 
     //notify reactflow about changes by creating new node object
@@ -666,11 +665,11 @@ function getPassageFromText(startLineNumberExclusive: number, startPositionInLin
 }
 
 function getAllReducedNodes(currentNode: string):string[]{
+    let containedNodes: string[] = [currentNode]
     if(!visualStateModel.nodeContainsReducedNodes.hasKey1(currentNode)){
-        return [currentNode]
+        return containedNodes
     }
     const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.getKey1Map(currentNode) ?? new Map<string, number>()
-    let containedNodes: string[] = []
     currentNodeChildren.forEach((dummyValue, childId) => {
         containedNodes = containedNodes.concat(getAllReducedNodes(childId))
     })

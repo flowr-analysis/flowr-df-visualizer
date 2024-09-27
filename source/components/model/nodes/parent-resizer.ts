@@ -46,7 +46,6 @@ function resizeNode(currentNodeId: string, nodesToChange: Map<string, Dimensions
         const isHeightTooSmall = parentHeight < childMaxExtensionHeight
 
         if(isWidthTooSmall || isHeightTooSmall){
-            console.log('adjusted')
             //set the new Height and width
             const newParentWidth = Math.max(parentWidth, childMaxExtensionWidth)
             const newParentHeight = Math.max(parentHeight, childMaxExtensionHeight) 
