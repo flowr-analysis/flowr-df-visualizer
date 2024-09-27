@@ -6,6 +6,7 @@ import React from 'react'
 import { getEdgeParams } from '../edges/edge-base'
 import { VisualStateModel } from '../visual-state-model'
 import { expandGeneral, expandOnFunctionCallNode, reduceAllNodesDirectlyPointedAt, reduceOnFunctionDefinitionNode } from '../graph-reduction'
+import { visualStateModel } from '../../..'
 
 
 function FloatingConnectionLine(props: ConnectionLineComponentProps) {
@@ -204,6 +205,8 @@ const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> =
 			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
 			reduceButton.classList.toggle('reduce-hidden')
 			data.isReducedOn = false
+			console.log('expanded :' + id)
+			console.log(visualStateModel)
 		}} 
 		id = {idExpandButton} className={classNameExpandButton}>Expand</button>
 		<div className = 'reduce-hover-over' id = {id + '-hover-div'}> 
@@ -216,6 +219,8 @@ const ReduceComponent: React.FC<React.PropsWithChildren<ReduceComponentProps>> =
 			const reduceButton = document.getElementById(idExpandButton) as HTMLButtonElement
 			reduceButton.classList.toggle('reduce-hidden')
 			data.isReducedOn = true
+			console.log('reduced: ' + id)
+			console.log(visualStateModel)
 		}} 
 		id = {idReduceButton} className={classNameReduceButton}>Reduce</button>		
 	</>

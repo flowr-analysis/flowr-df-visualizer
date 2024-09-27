@@ -337,12 +337,12 @@ export function expandGeneral(reduceNodeId: string):void{
 
     //correct model for node children
     reducedNodeIds.forEach((nodeId) => {
+        visualStateModel.reducedToNodeMapping.delete(nodeId)
         const nodeChildrenMap = visualStateModel.originalNodeChildrenMap.getKey1Map(nodeId) 
         if(nodeChildrenMap !== undefined){
             nodeChildrenMap.forEach((dummyValue, childId) => {
                 if(reducedNodeIdsMap.has(childId)){
                     visualStateModel.alteredNodeChildrenMap.set(nodeId, childId, true)
-                    visualStateModel.reducedToNodeMapping.delete(childId)
                 }
             })
         }
@@ -676,7 +676,7 @@ function getAllReducedNodes(currentNode: string):string[]{
     if(!visualStateModel.nodeContainsReducedNodes.hasKey1(currentNode)){
         return [currentNode]
     }
-    const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.getKey1Map(currentNode) ?? new Map<string,number>()
+    const currentNodeChildren = visualStateModel.nodeContainsReducedNodes.getKey1Map(currentNode) ?? new Map<string, number>()
     let containedNodes: string[] = []
     currentNodeChildren.forEach((dummyValue, childId) => {
         containedNodes = containedNodes.concat(getAllReducedNodes(childId))
